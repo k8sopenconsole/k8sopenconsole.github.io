@@ -5,8 +5,8 @@ import type * as OpenApiPlugin from 'docusaurus-plugin-openapi-docs';
 
 // Where the site is served. Moving it (custom domain, another repo) changes
 // only these two lines, plus static/CNAME for a custom domain.
-const SITE_URL = 'https://vurulkan.com';
-const BASE_URL = '/openconsole-docs/';
+const SITE_URL = 'https://k8sopenconsole.github.io';
+const BASE_URL = '/';
 
 const CODE_REPO = 'https://github.com/vurulkan/kubernetes-openconsole';
 
@@ -24,8 +24,8 @@ const config: Config = {
   baseUrl: BASE_URL,
   trailingSlash: false,
 
-  organizationName: 'vurulkan',
-  projectName: 'openconsole-docs',
+  organizationName: 'k8sopenconsole',
+  projectName: 'k8sopenconsole.github.io',
 
   onBrokenLinks: 'throw',
   onBrokenAnchors: 'throw',
@@ -105,7 +105,7 @@ const config: Config = {
           routeBasePath: '/',
           sidebarPath: './sidebars.ts',
           docItemComponent: '@theme/ApiItem',
-          editUrl: 'https://github.com/vurulkan/openconsole-docs/edit/main/',
+          editUrl: 'https://github.com/k8sopenconsole/k8sopenconsole.github.io/edit/main/',
           showLastUpdateTime: false,
         },
         blog: false,

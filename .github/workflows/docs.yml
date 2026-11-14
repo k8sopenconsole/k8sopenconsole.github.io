@@ -1,7 +1,7 @@
 # Pull requests: build (broken links and anchors fail it) + a preview artifact.
 # main and manual runs: build + deploy to GitHub Pages.
 # After a release of the code repo, refresh the release notes with:
-#   gh workflow run docs.yml -R vurulkan/openconsole-docs
+#   gh workflow run docs.yml -R k8sopenconsole/k8sopenconsole.github.io
 name: docs
 
 on:
