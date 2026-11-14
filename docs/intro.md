@@ -14,7 +14,7 @@ Scripts and AI agents use the same rules through a REST API with scoped API keys
 **Who it is for:** platform teams that want to give developers, support and on-call staff a view into the
 clusters without handing out kubeconfigs, and want one place that records who looked at or changed what.
 
-## How it works
+## How it works {#how-it-works}
 
 ```mermaid
 flowchart LR
@@ -43,7 +43,7 @@ flowchart LR
 - **Live data.** OpenConsole watches each cluster (informers), so lists come from memory and the API server is
   not polled. CPU and memory come from metrics-server, longer history from Prometheus if you configure it.
 
-## What it is not
+## What it is not {#what-it-is-not}
 
 - **Not a replacement for `kubectl`.** It covers looking, logs, a shell, restart, scale and YAML edits of the
   common workload kinds. Cluster administration (nodes, RBAC, CRDs, storage) stays with your usual tools.
@@ -52,7 +52,7 @@ flowchart LR
 - **Not a Kubernetes security boundary.** It is an internal visibility and operations platform. It enforces its
   own permissions within what its ServiceAccount may do; it does not change what Kubernetes allows anyone else.
 
-## Where to go next
+## Where to go next {#where-to-go-next}
 
 | You want to | Read |
 |---|---|

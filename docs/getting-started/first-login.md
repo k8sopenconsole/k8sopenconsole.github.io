@@ -6,7 +6,7 @@ description: "The default admin, the password policy, and the first things to se
 
 # First login and admin checklist
 
-## First login
+## First login {#first-login}
 
 On its very first start OpenConsole creates one admin: **`admin` / `admin`**. Sign in with it and choose a new
 password; until you do, every other page and API call is refused. After the change you are signed out; sign in
@@ -16,7 +16,7 @@ Local passwords must be at least 8 characters (`PASSWORD_MIN_LENGTH`), at most 7
 must actually change the password. Five failed sign-ins for one user from one address lock that pair for five
 minutes.
 
-## Admin checklist
+## Admin checklist {#admin-checklist}
 
 Do these in order; each step needs the one before.
 

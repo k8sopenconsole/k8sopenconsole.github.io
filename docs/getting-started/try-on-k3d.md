@@ -12,7 +12,7 @@ init container, an unschedulable pod. About ten minutes, most of it image pulls.
 You need Docker, [k3d](https://k3d.io/stable/#installation) and `kubectl`. Every `kubectl` command below names the
 cluster's context, so your other clusters are never touched.
 
-## 1. Create the cluster
+## 1. Create the cluster {#1-create-the-cluster}
 
 ```bash
 k3d cluster create openconsole-demo --kubeconfig-switch-context=false --wait
@@ -21,7 +21,7 @@ kubectl --context k3d-openconsole-demo get nodes
 
 k3s ships metrics-server, so CPU and memory show up after a minute.
 
-## 2. Install OpenConsole
+## 2. Install OpenConsole {#2-install-openconsole}
 
 ```bash
 kubectl --context k3d-openconsole-demo apply -k \
@@ -35,7 +35,7 @@ This creates the `kubernetes-openconsole` namespace with the app, its volume and
 `:latest` image, the newest release. [Install on Kubernetes](/installation/kubernetes) explains each part and how
 to pin the version, which you should do for anything but a demo.
 
-## 3. Add the failing workloads
+## 3. Add the failing workloads {#3-add-the-failing-workloads}
 
 ```bash
 kubectl --context k3d-openconsole-demo apply -f \
@@ -46,7 +46,7 @@ Namespace `crashlab`: healthy Deployments, StatefulSets and a DaemonSet next to 
 looping, failing their liveness probe, stuck on `ImagePullBackOff`, missing a ConfigMap, failing an init container
 or unschedulable. Never apply it to a real cluster.
 
-## 4. Open the UI
+## 4. Open the UI {#4-open-the-ui}
 
 ```bash
 kubectl --context k3d-openconsole-demo -n kubernetes-openconsole \
@@ -55,7 +55,7 @@ kubectl --context k3d-openconsole-demo -n kubernetes-openconsole \
 
 Open http://localhost:8080, sign in as `admin` / `admin` and choose a new password.
 
-## 5. Connect the cluster
+## 5. Connect the cluster {#5-connect-the-cluster}
 
 Read the ServiceAccount's token and CA certificate (in a second terminal):
 
@@ -79,7 +79,7 @@ In **Admin → Clusters → Add Cluster**:
 
 **Save Cluster**, then **Set as default**.
 
-## 6. Look around
+## 6. Look around {#6-look-around}
 
 | Where | What to look at |
 |---|---|
@@ -94,7 +94,7 @@ In **Admin → Clusters → Add Cluster**:
 
 Restart history and usage charts fill in over the next minutes.
 
-## 7. Delete it
+## 7. Delete it {#7-delete-it}
 
 ```bash
 k3d cluster delete openconsole-demo

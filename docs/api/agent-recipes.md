@@ -11,7 +11,7 @@ summarize their logs", without the key ever showing up in a prompt or a transcri
 Each recipe uses a [key](/api/quick-start#1-create-a-key) with the **Read-only (safe)** template, limited to the
 namespaces the agent should see. Add `pods:exec` only if the agent must run commands; every command is recorded.
 
-## The `oc` helper
+## The `oc` helper {#the-oc-helper}
 
 A small script the agent calls instead of `curl`. It reads the key, the address and the cluster from the environment,
 so the commands the agent writes (and you approve) never contain the key or a `$VARIABLE`. Save it as `oc` in the
@@ -45,7 +45,7 @@ export OPENCONSOLE_API_KEY=oc_…                  # the key; never in a prompt 
 A refused call prints `curl: (22) The requested URL returned error: 403` and the body (`{"error":"forbidden"}`), and
 exits non-zero, which agents read well.
 
-## A shell script
+## A shell script {#a-shell-script}
 
 Lists the pods of a namespace that restart or can't start, with the end of the log of the container that crashed
 (the current run if it has just ended, otherwise the one before):
@@ -102,7 +102,7 @@ chmod +x oc-crashes.sh
 `previous_unavailable` means the container never ran, so there is no log; the pod's events say why
 (`GET /api/namespaces/<ns>/pods/<pod>/events`).
 
-## Claude Code
+## Claude Code {#claude-code}
 
 Give Claude Code the API in the project's `CLAUDE.md` (the same text as **API keys → Documentation → Text for your
 agent** in the app, using `./oc`):
@@ -145,7 +145,7 @@ Claude Code asks before it runs a command that expands a variable, such as
 there is nobody to ask, so it stops. With `./oc` the key stays in the environment and the allowed command is exactly `./oc …`.
 :::
 
-## Cursor
+## Cursor {#cursor}
 
 Cursor's agent reads project rules from `.cursor/rules/`. Put the `oc` helper in the project, export the three
 variables in the terminal Cursor starts from, and save the same text as a rule:

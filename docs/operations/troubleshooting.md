@@ -9,7 +9,7 @@ Search this page for the message you see. Messages in `code` are exactly what Op
 logs. The log lines are in `kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole`
 ([Logging](/operations/logging)).
 
-## Adding a cluster fails
+## Adding a cluster fails {#adding-a-cluster-fails}
 
 **Save Cluster** answers `cluster validation failed: cannot list namespaces with these credentials: …`. The end of
 the message says why:
@@ -22,7 +22,7 @@ the message says why:
 | `Unauthorized` | the token is wrong, expired, or its ServiceAccount was deleted | read the token again |
 | `namespaces is forbidden: User "system:serviceaccount:…" cannot list resource "namespaces" …` | the identity has no ClusterRole binding (or not this one) | apply `deploy/rbac.yaml` and bind it to that identity |
 
-## A cluster shows empty lists or 503
+## A cluster shows empty lists or 503 {#a-cluster-shows-empty-lists-or-503}
 
 The cluster was added fine, but now its workload lists are empty, other screens fail, and the log is full of:
 
@@ -46,7 +46,7 @@ A write the ClusterRole doesn't allow answers 403 with the API server's message,
 `restart failed: deployments.apps "web" is forbidden: …` (a view-only ClusterRole, or the `patch` / `update` verb
 removed).
 
-## No CPU or memory figures
+## No CPU or memory figures {#no-cpu-or-memory-figures}
 
 | Message | Cause |
 |---|---|
@@ -56,7 +56,7 @@ removed).
 | `Prometheus is unreachable; showing the last 24 hours from memory` | the cluster's Prometheus setting doesn't answer; use **Test connection** below |
 | `No samples yet; the first arrive within 30 seconds.` | OpenConsole just started or the cluster was just connected; wait |
 
-## Prometheus "Test connection" fails
+## Prometheus "Test connection" fails {#prometheus-test-connection-fails}
 
 Admin → Clusters → Prometheus → **Test connection** stops at the first failing step and says why:
 
@@ -75,7 +75,7 @@ Admin → Clusters → Prometheus → **Test connection** stops at the first fai
 
 More: [Prometheus](/administration/prometheus).
 
-## Sign-in fails
+## Sign-in fails {#sign-in-fails}
 
 | Symptom | Where to look |
 |---|---|
@@ -94,7 +94,7 @@ LDAP Result Code 200 "Network Error": dial tcp: lookup ldap.example.invalid on 1
 `connection refused` / `no such host` are the host and port; `Invalid Credentials` is the bind DN or password; a
 certificate error is the TLS settings.
 
-## Shells or live logs break behind a proxy
+## Shells or live logs break behind a proxy {#shells-or-live-logs-break-behind-a-proxy}
 
 | Symptom | Cause | Fix |
 |---|---|---|
@@ -104,12 +104,12 @@ certificate error is the TLS settings.
 | `Too many log streams; try again shortly.` | the per-user log stream limit | close log viewers you don't need |
 | a WebSocket answers `401` | its ticket was used already or is older than 30 seconds | the UI gets a new ticket for every connection; a script must too (`POST /api/ws-ticket`) |
 
-## Error answers
+## Error answers {#error-answers}
 
 Every error answer is JSON, `{"error": "<reason or message>"}`. `401` has no body: the session or API key is
 missing, expired or revoked.
 
-### 403 reasons
+### 403 reasons {#403-reasons}
 
 | `error` | Meaning | Source (v2.22.0) |
 |---|---|---|
@@ -129,7 +129,7 @@ missing, expired or revoked.
 The first six are also the `reason` of the `denied` audit event. For API keys and agents, see also
 [API overview](/api/overview).
 
-### Other answers
+### Other answers {#other-answers}
 
 | Answer | Meaning |
 |---|---|

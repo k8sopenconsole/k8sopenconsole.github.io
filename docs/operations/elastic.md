@@ -23,7 +23,7 @@ Requires Elasticsearch 8.8 or later. Every command and query on this page was ru
 and **9.1.0** with lines from OpenConsole 2.22.0. For 8.7, see
 [Elasticsearch 8.7 and older](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/deploy/elk/README.md#elasticsearch-87-and-older).
 
-## 1. Install the pipeline and templates
+## 1. Install the pipeline and templates {#1-install-the-pipeline-and-templates}
 
 From a checkout of the code repository at the release you run:
 
@@ -46,16 +46,16 @@ again, e.g. after an upgrade that adds fields. If `logs-kubernetes.container_log
 leaves it alone and prints the one processor to add to it. Without shell access, send the same four requests from
 Kibana → Dev Tools ([Without install.sh](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/deploy/elk/README.md#without-installsh)).
 
-## 2. Ship the lines
+## 2. Ship the lines {#2-ship-the-lines}
 
-### Elastic Agent with the Kubernetes integration
+### Elastic Agent with the Kubernetes integration {#elastic-agent-with-the-kubernetes-integration}
 
 If Fleet's Kubernetes integration already collects your container logs, there is nothing to change in the Agent
 policy. The integration's pipeline calls `logs-kubernetes.container_logs@custom` for every line, `install.sh` made
 that pipeline call `openconsole-logs`, and the OpenConsole lines move to the two data streams above. Lines written
 before the installation stay as they arrived.
 
-### Filebeat or Elastic Agent standalone
+### Filebeat or Elastic Agent standalone {#filebeat-or-elastic-agent-standalone}
 
 Read the OpenConsole pod's log files, keep the line as it is, and hand it to the same pipeline:
 
@@ -85,7 +85,7 @@ output.elasticsearch:
 - Exclude the same files from your generic container input, or every line arrives twice.
 - In Elastic Agent standalone the input goes under `inputs:` with the same `paths`, `parsers` and `pipeline`.
 
-## 3. Check
+## 3. Check {#3-check}
 
 After the next request to OpenConsole (from Dev Tools, or with `curl` against Elasticsearch):
 
@@ -104,7 +104,7 @@ index                                                docs.count
 In Kibana, create a data view for `logs-openconsole.audit-*` and one for `logs-openconsole.app-*`
 (Stack Management → Data views), with `@timestamp` as the time field.
 
-## Questions the audit log answers
+## Questions the audit log answers {#questions-the-audit-log-answers}
 
 Kibana → Discover, data view `logs-openconsole.audit-*`, KQL:
 
@@ -161,7 +161,7 @@ FROM logs-openconsole.audit-*
 | SORT refusals DESC
 ```
 
-## Keep the audit trail as long as you need
+## Keep the audit trail as long as you need {#keep-the-audit-trail-as-long-as-you-need}
 
 On 8.8 and later the two data streams get the stack's `logs` lifecycle policy, which rolls over but **never deletes**.
 To keep OpenConsole's lines for a fixed time (here a year), give them their own policy:
@@ -196,7 +196,7 @@ GET logs-openconsole.audit-*/_ilm/explain     ← every index "managed": true, "
 Keep your copy of the index template: `install.sh` puts the file from the repository back, without
 `openconsole@settings`, when you run it again. Don't use `logs@custom` for this: every `logs-*` data stream reads it.
 
-## After an upgrade
+## After an upgrade {#after-an-upgrade}
 
 Run `install.sh` from the new release. New fields apply from the next backing index; to get them now, roll over:
 
@@ -208,7 +208,7 @@ POST logs-openconsole.app-default/_rollover
 The release notes say when a release adds fields (2.22 added ten). Details:
 [deploy/elk/README.md](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/deploy/elk/README.md).
 
-## Remove
+## Remove {#remove}
 
 ```text
 DELETE _ingest/pipeline/logs-kubernetes.container_logs@custom   ← only if install.sh created it

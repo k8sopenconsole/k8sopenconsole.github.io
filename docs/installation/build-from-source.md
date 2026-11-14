@@ -5,13 +5,13 @@ description: "Build your own image and run the tests."
 
 # Build from source
 
-## Option A — your own image
+## Option A — your own image {#option-a--your-own-image}
 
 ```bash
 docker build -t kubernetes-openconsole:local .
 ```
 
-## Tests
+## Tests {#tests}
 
 CI runs these on every push. Run them locally before you open a PR:
 

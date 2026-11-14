@@ -7,7 +7,7 @@ import Screenshot from '@site/src/components/Screenshot';
 
 # Restart and scale
 
-## Restart a Deployment
+## Restart a Deployment {/* #restart-a-deployment */}
 
 **You want to:** restart every pod of a Deployment, e.g. to pick up a changed Secret or ConfigMap.
 
@@ -18,7 +18,7 @@ import Screenshot from '@site/src/components/Screenshot';
 It does what `kubectl rollout restart` does: the pod template gets a new timestamp and Kubernetes replaces the pods
 one by one, following the Deployment's strategy. With one replica there may be a short interruption.
 
-## Scale
+## Scale {/* #scale */}
 
 **You want to:** run more or fewer pods of a Deployment or StatefulSet.
 
@@ -29,7 +29,7 @@ one by one, following the Deployment's strategy. With one replica there may be a
 The target can be 0 (stops all pods) up to 100 by default (your admin sets the maximum). If an HPA manages the
 workload, it will change the count again on its own.
 
-## Permissions and audit
+## Permissions and audit {/* #permissions-and-audit */}
 
 | Action | Permission | Audit event |
 |---|---|---|

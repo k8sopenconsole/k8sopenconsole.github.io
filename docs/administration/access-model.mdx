@@ -29,13 +29,13 @@ flowchart LR
   holds at least one permission for on their current cluster. Other names are never sent to the browser.
 - **Changes apply on the next click.** Adding or removing a role, group or membership doesn't need a new sign-in.
 
-## Admins
+## Admins {/* #admins */}
 
 An **admin** holds every permission everywhere, sees every cluster and is the only one who can open Overview, Nodes
 and Admin (users, roles, clusters, audit log, recordings, settings). Admin is all or nothing: there is no "user
 manager" or "audit reader" role. Keep the number of admins small and give everyone else roles.
 
-## Two ceilings above every role
+## Two ceilings above every role {/* #two-ceilings-above-every-role */}
 
 1. **The cluster connection.** OpenConsole acts on a cluster with one identity (usually the `openconsole-reader`
    ServiceAccount). What its ClusterRole doesn't allow fails for everyone, admins included, with a Kubernetes 403
@@ -46,7 +46,7 @@ manager" or "audit reader" role. Keep the number of admins small and give everyo
 API keys add a third, per user: the admin's [API access policy](/administration/api-access-policy) limits how much of a
 user's permissions their keys may use.
 
-## Everything is audited
+## Everything is audited {/* #everything-is-audited */}
 
 Every allowed and every refused action is an audit event with the user, the cluster, the namespace, the resource and
 the outcome ([Audit log](/administration/audit-log)). A refused attempt is `denied` with a reason, so a missing

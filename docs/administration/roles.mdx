@@ -14,12 +14,12 @@ them. Below it, **Role Permissions** shows what the selected role grants.
 
 <Screenshot id="admin-roles" alt="Admin → Roles: payments-viewer, shop-developer and sre with API access and groups; the Role Permissions panel with shop-developer's grants grouped by cluster and namespace" />
 
-## Create a role
+## Create a role {/* #create-a-role */}
 
 1. **New role**: a name, an optional description, and the API access for keys (default *Safe read-only*).
 2. Select it in **Role Permissions** and click **Add permissions**.
 
-## Add permissions
+## Add permissions {/* #add-permissions */}
 
 <Screenshot id="admin-add-permissions" alt="Add permissions: cluster (or all clusters), namespaces with a filter and Select N matching, the templates, and the resource × action matrix" />
 
@@ -40,7 +40,7 @@ them. Below it, **Role Permissions** shows what the selected role grants.
 
 The full list of actions: [Application permissions](/reference/permissions).
 
-## Change a role
+## Change a role {/* #change-a-role */}
 
 - Grants are shown as cards; namespaces with identical grants share a card. Edit a card in place, or remove it.
 - **Copy from role** copies another role's grants into this one: a quick way to make *payments-developer* from
@@ -48,7 +48,7 @@ The full list of actions: [Application permissions](/reference/permissions).
 - Changes apply to every member on their next click. Each change is in the audit log (`permission.create`,
   `permission.delete`, with the grant).
 
-## Attach it to people
+## Attach it to people {/* #attach-it-to-people */}
 
 Roles are given to **groups**, never to single users: Admin → Groups → **Edit** → Roles. See
 [Users and groups](/administration/users).

@@ -15,7 +15,7 @@ log as `denied`. The screens are explained in [Roles and permissions](/administr
 
 <Screenshot id="admin-roles" alt="Admin → Roles: three roles with their API access, and the Role Permissions panel showing what shop-developer grants per cluster and namespace" />
 
-## A developer team: free on staging, read-only on production
+## A developer team: free on staging, read-only on production {/* #a-developer-team-free-on-staging-read-only-on-production */}
 
 *The shop team works on `shop`: on staging they read logs, open shells, restart and scale; on production they look
 and read logs.*
@@ -32,7 +32,7 @@ answers 403 and the audit log shows `deployment.restart` `denied` with reason `f
 
 <Screenshot id="admin-add-permissions" alt="The Add permissions dialog: cluster, namespaces with Select N matching, the Viewer / Developer / SRE / Admin templates and the resource × action matrix" />
 
-## SREs: everywhere, restart and scale, no secret values
+## SREs: everywhere, restart and scale, no secret values {/* #sres-everywhere-restart-and-scale-no-secret-values */}
 
 *The on-call team reads every workload namespace on every cluster, restarts and scales; secret values and shells
 stay closed.*
@@ -47,7 +47,7 @@ What they get: restart and scale on every cluster; the Secrets tab lists names a
 
 *All clusters* covers clusters added later; namespaces don't: add a new namespace to the role when it appears.
 
-## Auditors: read-only, no secrets, audit from outside
+## Auditors: read-only, no secrets, audit from outside {/* #auditors-read-only-no-secrets-audit-from-outside */}
 
 *Internal audit reviews what runs where and who did what.*
 
@@ -62,7 +62,7 @@ What they get: restart and scale on every cluster; the Secrets tab lists names a
 
 What they get: lists and details everywhere in scope; logs, secrets, shells and changes answer 403.
 
-## An external contractor: one namespace, recorded, with an end date
+## An external contractor: one namespace, recorded, with an end date {/* #an-external-contractor-one-namespace-recorded-with-an-end-date */}
 
 *A contractor needs shell access to `shop` on staging for three weeks.*
 
@@ -82,7 +82,7 @@ the directory's own account expiry also stops the sign-in. A disabled user is re
 What they get: logs and a shell in `shop` on staging, every command recorded with their name (Admin → Recordings);
 secrets and other namespaces answer 403.
 
-## Temporary access, then take it back
+## Temporary access, then take it back {/* #temporary-access-then-take-it-back */}
 
 *Someone needs SRE rights for tonight's incident.*
 

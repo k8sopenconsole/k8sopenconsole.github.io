@@ -18,7 +18,7 @@ Cluster tokens, LDAP and Prometheus passwords and the Azure AD client secret are
 whatever someone printed in a shell. Store backups encrypted, with access as tight as the clusters themselves.
 :::
 
-## Back up
+## Back up {#back-up}
 
 The image has no `sqlite3`, and the database must not be copied while the app writes to it. So stop the app for a
 moment, read the volume from a short-lived helper pod, and start the app again. The console is unavailable for
@@ -47,7 +47,7 @@ kubectl -n $NS scale deploy/kubernetes-openconsole --replicas=1
 A volume snapshot (CSI `VolumeSnapshot`) of the PVC is an alternative if your storage supports it; take it while the
 Deployment is scaled to 0, as above.
 
-## Restore
+## Restore {#restore}
 
 Restoring replaces everything on the volume with the backup. It works into the same installation (lost or broken
 volume) or into a new one (another namespace or cluster).

@@ -10,7 +10,7 @@ OpenConsole holds credentials to your clusters and lets people act on them, so t
 admin accounts like those credentials. Go through this list before you hand it to users. Why each item matters is in
 the [Security model](/operations/security).
 
-## Cluster access
+## Cluster access {#cluster-access}
 
 - **The smallest ClusterRole that covers what you grant.** If nobody restarts, scales, edits or opens shells
   through OpenConsole on a cluster, connect it with the view-only ClusterRole
@@ -24,7 +24,7 @@ the [Security model](/operations/security).
   read its volume, or read its Secrets in Kubernetes gets every cluster credential OpenConsole holds. Keep those
   Kubernetes permissions to the people who run OpenConsole.
 
-## The deployment
+## The deployment {#the-deployment}
 
 - **Pin the release and use `Recreate`** ([Install on Kubernetes](/installation/kubernetes#1-write-a-kustomization)),
   one replica, and verify the image you run ([Verify the image](/installation/verify-image)).
@@ -71,7 +71,7 @@ the [Security model](/operations/security).
   Kubelet probes and `kubectl port-forward` still work. Outgoing traffic is left open: OpenConsole needs your API
   servers, and, if you use them, LDAP, `login.microsoftonline.com` and Prometheus.
 
-## Accounts and access
+## Accounts and access {#accounts-and-access}
 
 - **Change the `admin` password at the first sign-in**, then sign in through LDAP or Azure AD for daily work and
   keep one local admin for emergencies ([First login](/getting-started/first-login)).
@@ -88,7 +88,7 @@ the [Security model](/operations/security).
   ([API access policy](/administration/api-access-policy)).
 - **Review access regularly**: Admin → Users / Groups → Export CSV, and Admin → API keys for every key.
 
-## Records
+## Records {#records}
 
 - **Ship the audit log** to your log platform and keep it as long as you must; the database keeps 30 days
   ([Elastic](/operations/elastic#keep-the-audit-trail-as-long-as-you-need)).
@@ -96,7 +96,7 @@ the [Security model](/operations/security).
 - **Keep shell recording on** and set its retention (Admin → Recordings). Recordings contain whatever a shell
   printed; only admins can replay them ([Session recording](/administration/recordings)).
 
-## The volume
+## The volume {#the-volume}
 
 - **Back it up, and protect the backups like the cluster credentials.** The database holds the credentials
   (encrypted) and the key that decrypts them ([Backup and restore](/installation/backup-restore)).

@@ -10,7 +10,7 @@ LDAP server, Azure AD, Prometheus and trace receiver. Two things come from outsi
 which you copy in once per release, and two files the **browser** loads from public CDNs (see
 [What the browser loads](#what-the-browser-loads)).
 
-## 1. Copy the image into your registry
+## 1. Copy the image into your registry {#1-copy-the-image-into-your-registry}
 
 On a machine that reaches both `ghcr.io` and your registry, verify the release ([Verify the image](/installation/verify-image)),
 then copy it with [crane](https://github.com/google/go-containerregistry/blob/main/cmd/crane/README.md) (or
@@ -25,7 +25,7 @@ crane digest registry.example.internal/openconsole/kubernetes-openconsole:2.22.0
 
 The digest is the same as on `ghcr.io`, so the provenance you verified there holds for your copy.
 
-## 2. Bring the manifests in as files
+## 2. Bring the manifests in as files {#2-bring-the-manifests-in-as-files}
 
 The [usual kustomization](/installation/kubernetes) fetches `deploy/` from GitHub. Download it once instead:
 
@@ -74,7 +74,7 @@ kubectl -n kubernetes-openconsole get pod -l app=kubernetes-openconsole \
 If your registry needs credentials, add an `imagePullSecrets` entry to the same patch. The Elasticsearch files
 ([Elastic](/operations/elastic)) are in the same `deploy/elk` folder.
 
-## What the browser loads
+## What the browser loads {#what-the-browser-loads}
 
 | From | What | Without it |
 |---|---|---|
@@ -86,7 +86,7 @@ OpenConsole itself and works without these. This release has no setting to serve
 your users' browsers may reach `cdn.jsdelivr.net` through a proxy, the editor works as usual. The Content Security
 Policy allows exactly these sources ([Security model](/operations/security#http)).
 
-## Upgrading
+## Upgrading {#upgrading}
 
 Per release: copy the new image (step 1), download the new `deploy/` (step 2), change the digest, and follow
 [Upgrading](/installation/upgrading).

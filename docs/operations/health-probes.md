@@ -27,7 +27,7 @@ The manifest in `deploy/` uses them like this (and you shouldn't need to change 
 | liveness | `/livez` | after 10 s, every 15 s, 3 s timeout, restart after 3 failures |
 | readiness | `/readyz` | after 5 s, every 10 s, 3 s timeout, out of the Service after 3 failures |
 
-## Why the clusters are not part of readiness
+## Why the clusters are not part of readiness {#why-the-clusters-are-not-part-of-readiness}
 
 OpenConsole connects to several clusters, each with its own credentials. If readiness depended on them, one
 unreachable cluster, or one expired token, would take the whole console out of its Service: nobody could sign in,
@@ -38,7 +38,7 @@ the log ([Troubleshooting](/operations/troubleshooting#a-cluster-shows-empty-lis
 
 Liveness doesn't check the database either, so a short database hiccup doesn't restart the pod.
 
-## Logging
+## Logging {#logging}
 
 Successful probe and `/metrics` requests are logged only at `LOG_LEVEL=debug`, so the kubelet's probes every 10–15
 seconds don't fill the log. A failing probe keeps its level: `/readyz` answering 503 is an `error` line.

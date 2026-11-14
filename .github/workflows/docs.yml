@@ -37,6 +37,9 @@ jobs:
       - run: npm run reference:check
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Pages without Turkish: listed in the job summary and as warnings; never
+      # fails (the tr site shows the English page with a note).
+      - run: npm run translations:check
       - name: Preview (download, then npx serve build)
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4

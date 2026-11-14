@@ -12,7 +12,7 @@ import Screenshot from '@site/src/components/Screenshot';
 LDAP works next to local accounts. By default a person must have an OpenConsole account before they can sign in, so you
 **import** them; or you let OpenConsole **create the account on their first sign-in**.
 
-## 1. Configure
+## 1. Configure {/* #1-configure */}
 
 **Admin → LDAP** (the values below are examples):
 
@@ -39,7 +39,7 @@ checked (filed as a bug). For an encrypted **and** verified connection use **Use
 certificate must then be trusted by a public CA, since there is no field for your own CA yet.
 :::
 
-## 2. Import people (or create them on first sign-in)
+## 2. Import people (or create them on first sign-in) {/* #2-import-people-or-create-them-on-first-sign-in */}
 
 **Import**: Admin → Users → New user → **Import from LDAP…** (or below the settings on Admin → LDAP). Type part of a
 name and search: the user filter runs with `%s` replaced by what you typed, up to 100 results per base DN. For prefix
@@ -53,7 +53,7 @@ accounts**, save. Then:
 - new accounts are never admins (`user.create` with `auto_provisioned: true`);
 - to lock someone out, **disable** the account: a deleted one is simply created again at their next sign-in.
 
-## 3. Limit who may sign in
+## 3. Limit who may sign in {/* #3-limit-who-may-sign-in */}
 
 Put the condition in the **user filter**. Only members of one directory group:
 
@@ -64,14 +64,14 @@ Put the condition in the **user filter**. Only members of one directory group:
 Directory groups are not mapped to OpenConsole groups; membership in OpenConsole groups is set at import, by the
 first-sign-in groups, or by an admin.
 
-## Signing in
+## Signing in {/* #signing-in */}
 
 People type their directory username and password in the normal form. OpenConsole finds their DN with the user filter
 and binds as them, so the directory checks the password every time; a disabled or expired directory account can't
 sign in. A wildcard filter is safe: at sign-in OpenConsole also requires an **exact match** on the username attribute,
 so `jo` never signs in as `john`. Turning **Enabled** off stops every LDAP sign-in at once.
 
-## When it doesn't work
+## When it doesn't work {/* #when-it-doesnt-work */}
 
 | Symptom | Usually |
 |---|---|

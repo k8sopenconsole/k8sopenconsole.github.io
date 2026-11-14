@@ -16,7 +16,7 @@ API keys for `API_KEY_READ_RETENTION_DAYS`, 7) and on stdout as one JSON line ea
 
 <Screenshot id="admin-audit" alt="Admin → Audit Logs filtered to deployment.*: bob's scale and restart events, and alice's refused deployment.restart opened to show reason forbidden, source IP, account source, request ID and user agent" />
 
-## Filters
+## Filters {/* #filters */}
 
 - **User**, **Action** and **Namespace** suggest the values that occur as you type; typed text matches anywhere.
   Picking an action matches it exactly; a family such as `pod.*` or `deployment.*` takes all of its actions.
@@ -24,7 +24,7 @@ API keys for `API_KEY_READ_RETENTION_DAYS`, 7) and on stdout as one JSON line ea
   **Resource type**, **Cluster**, **Source** (web or API key, and the key's name), and a date range.
 - *Everything refused*: Outcome = `denied`. *Every secret value read*: Action = `secret.reveal`.
 
-## Reading an event
+## Reading an event {/* #reading-an-event */}
 
 | Field | Example | Meaning |
 |---|---|---|
@@ -41,13 +41,13 @@ API keys for `API_KEY_READ_RETENTION_DAYS`, 7) and on stdout as one JSON line ea
 What is not audited: lists the UI reloads on its own (the Dashboard's 10-second refresh); calls that read no cluster
 resource (`/api/auth/me`, `/api/features`, …). The request log on stdout still has every request.
 
-## From an event to the request log
+## From an event to the request log {/* #from-an-event-to-the-request-log */}
 
 Every HTTP response carries an `X-Request-Id` header. The same ID is the event's *request ID* and appears on the
 `http.request` line in OpenConsole's stdout (and `trace_id` too when tracing is on). Search your log platform for it
 to see the HTTP status, duration and the other lines of the same request.
 
-## CSV
+## CSV {/* #csv */}
 
 **Export CSV** exports what the filters show, one column per field (details as JSON, plus `api_key_name`). Each
 export is audited too. For access reviews, add the CSV of Users and Groups ([Users and groups](/administration/users#access-reviews)).

@@ -5,7 +5,7 @@ description: "Release tags, pinning a version, and checking an image's provenanc
 
 # Verify the image
 
-## Tags
+## Tags {#tags}
 
 Images are published to `ghcr.io/vurulkan/kubernetes-openconsole` for **linux/amd64** and **linux/arm64**
 (Graviton, Ampere, Apple silicon); the runtime picks the right one. Only the project's CI publishes them.
@@ -37,7 +37,7 @@ images:
     digest: sha256:f4d193cf9d2d65aa0c1c863e3221ced13eb0d17cd3d18cff09ecd3cac91935b2   # 2.22.0
 ```
 
-## Provenance and SBOM
+## Provenance and SBOM {#provenance-and-sbom}
 
 Every release image has two attestations, signed by the CI workflow with
 [GitHub artifact attestations](https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations)

@@ -14,7 +14,7 @@ Account menu (your name, top right) → **API keys**, or `⌘K` → *Go to API k
 
 <Screenshot id="api-keys" alt="The API keys page: two keys, ci-smoke-test and claude-code, with note, prefix, permissions, last use and expiry" />
 
-## Create one
+## Create one {/* #create-one */}
 
 **New API key**, then:
 
@@ -31,7 +31,7 @@ Account menu (your name, top right) → **API keys**, or `⌘K` → *Go to API k
    Cells you don't hold yourself, or that your admin's policy doesn't allow for keys, are closed.
 5. **Create** shows the key (`oc_…`) **once**, with a ready `curl` line. Copy it now; OpenConsole keeps only a hash.
 
-## What a key can do
+## What a key can do {/* #what-a-key-can-do */}
 
 At most what it lists **and** what you hold at the moment of the call. If a permission is taken away from you, the key
 loses it at once; if you get more, the key does not grow by itself (except *all my namespaces*). The list warns
@@ -39,7 +39,7 @@ loses it at once; if you get more, the key does not grow by itself (except *all 
 
 Shells and commands run with a key are always recorded. Every call is audited with your name and the key's name.
 
-## Stop or replace one
+## Stop or replace one {/* #stop-or-replace-one */}
 
 From the **⋯** menu of a key:
 

@@ -21,7 +21,7 @@ flowchart LR
   OC --- D[(SQLite volume<br/>users, roles, credentials,<br/>audit, recordings)]
 ```
 
-## What OpenConsole can reach in a cluster
+## What OpenConsole can reach in a cluster {#what-openconsole-can-reach-in-a-cluster}
 
 - **Only what an admin connects.** OpenConsole talks to a cluster only with the credentials an admin adds under
   Admin → Clusters (a ServiceAccount token or a kubeconfig). It finds no cluster on its own and doesn't use the
@@ -40,7 +40,7 @@ flowchart LR
   cached and are fetched from the API server for each request ([resources.go#L521-L540](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/kube/resources.go#L521-L540),
   the rule's comment [rbac.yaml#L44-L47](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/deploy/rbac.yaml#L44-L47)).
 
-## Who may do what
+## Who may do what {#who-may-do-what}
 
 - **Permissions are granted in OpenConsole**, per role: a resource and an action (`pods:exec`, `secrets:reveal`, …)
   in a namespace, on one cluster or all of them ([engine.go#L13-L28](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/rbac/engine.go#L13-L28)).
@@ -68,7 +68,7 @@ flowchart LR
   A key can never manage keys, change a password, pick the user's cluster or save views
   ([`denyAPIKey`, apikeys.go#L244](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/apikeys.go#L244)).
 
-## Sign-in and sessions
+## Sign-in and sessions {#sign-in-and-sessions}
 
 - **Local passwords** are stored as bcrypt hashes ([password.go#L12](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/auth/password.go#L12)), at least
   `PASSWORD_MIN_LENGTH` (8) characters and at most 72 bytes ([password.go#L23-L35](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/auth/password.go#L23-L35)).
@@ -96,7 +96,7 @@ flowchart LR
   lifetime), can be revoked by their owner or an admin, and are limited to 10 requests per second each, bursts of 30
   ([apikeys.go#L43-L44](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/apikeys.go#L43-L44)).
 
-## Where data is kept
+## Where data is kept {#where-data-is-kept}
 
 Everything OpenConsole stores is in one SQLite database on its volume (`/data/app.db`), plus shell recordings in
 `/data/recordings`: users and password hashes, groups, roles, cluster credentials, LDAP and Azure AD settings,
@@ -116,7 +116,7 @@ Prometheus settings, sessions, API key digests and the audit log.
 - **Shell recordings hold everything a shell printed**, including any secret someone displayed. They are on the same
   volume and only admins can replay or download them.
 
-## What is recorded
+## What is recorded {#what-is-recorded}
 
 - **Every action and every resource read is an audit event**, allowed or refused: who, from which address, with
   which API key, on which cluster, namespace and object, and the outcome. Events are kept in the database for
@@ -134,7 +134,7 @@ Prometheus settings, sessions, API key digests and the audit log.
   always recorded, and refused if it can't be ([pod_exec.go#L192-L198](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/pod_exec.go#L192-L198),
   [pod_exec_command.go#L181-L186](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/pod_exec_command.go#L181-L186)).
 
-## HTTP
+## HTTP {#http}
 
 - OpenConsole serves plain HTTP on port 8080; TLS ends at your Ingress or Gateway
   ([Install on Kubernetes](/installation/kubernetes#ingress-with-tls)).
@@ -150,7 +150,7 @@ Prometheus settings, sessions, API key digests and the audit log.
   `X-Real-Ip`, then the connection's address ([router.go#L484-L499](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/router.go#L484-L499)). Put
   OpenConsole behind a proxy that sets `X-Forwarded-For`, and don't expose the Service any other way.
 
-## The container
+## The container {#the-container}
 
 The manifest runs one replica as a non-root user (65532), with `seccompProfile: RuntimeDefault`, every capability
 dropped, no privilege escalation and no ServiceAccount token

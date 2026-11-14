@@ -8,7 +8,7 @@ description: "Rate limits, log and command size and time limits, truncation, Web
 What OpenConsole refuses or cuts, so a script or an agent can handle it. Every refusal below is audited with outcome
 `rate_limited` (or `denied` / `failed`).
 
-## Requests
+## Requests {#requests}
 
 | Limit | Applies to | Over it |
 |---|---|---|
@@ -20,7 +20,7 @@ What OpenConsole refuses or cuts, so a script or an agent can handle it. Every r
 
 Both variables are on [Environment variables](/reference/environment-variables).
 
-## Reading a log: `GET …/pods/{name}/logs`
+## Reading a log: `GET …/pods/{name}/logs` {#reading-a-log-get-podsnamelogs}
 
 | Parameter | Default | Limit |
 |---|---|---|
@@ -31,7 +31,7 @@ Both variables are on [Environment variables](/reference/environment-variables).
 The answer is plain text of at most **5 MiB**. A longer log is cut at a line end and the response carries
 `X-OpenConsole-Truncated: true`: ask for fewer lines or a shorter `sinceSeconds`.
 
-## Running a command: `POST …/pods/{name}/exec`
+## Running a command: `POST …/pods/{name}/exec` {#running-a-command-post-podsnameexec}
 
 | | |
 |---|---|
@@ -45,7 +45,7 @@ The answer is plain text of at most **5 MiB**. A longer log is cut at a line end
 A command run with a key is always recorded; the audit event keeps the program (`command[0]`), the exit code, bytes,
 duration and the recording id, never the arguments.
 
-## WebSockets
+## WebSockets {#websockets}
 
 Live logs, shells and the event stream are WebSockets. A key is never accepted in a URL, so:
 

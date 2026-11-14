@@ -7,7 +7,7 @@ import Screenshot from '@site/src/components/Screenshot';
 
 # Users and groups
 
-## Users
+## Users {/* #users */}
 
 **Admin → Users** lists every account with its source, API access, admin flag, status and groups.
 
@@ -23,7 +23,7 @@ The source decides how a password is checked: LDAP accounts only against the dir
 password. A failed sign-in always gets the same answer, so the form doesn't reveal whether an account exists; the
 audit event `user.login` records the real reason.
 
-### Create
+### Create {/* #create */}
 
 **New user** creates a local account: username, first password, groups, and **Grant admin privileges** for an
 admin. With LDAP or Azure AD turned on, the arrow next to it opens a menu:
@@ -35,7 +35,7 @@ admin. With LDAP or Azure AD turned on, the arrow next to it opens a menu:
 
 A user in no group sees no namespaces. A local user is not forced to change the password you set; tell them to.
 
-### Edit, reset, disable, delete
+### Edit, reset, disable, delete {/* #edit-reset-disable-delete */}
 
 <Screenshot id="admin-user-edit" alt="Edit alice: username, Active and Admin checkboxes, groups, API access (By roles / Off / Safe read-only / All of their permissions) with a preview, and Revoke all their keys" />
 
@@ -46,7 +46,7 @@ A user in no group sees no namespaces. A local user is not forced to change the 
 - **Delete** (bin): removes the account and its memberships; the audit log keeps what it did.
 - The last active admin can't be disabled, demoted or deleted.
 
-## Groups
+## Groups {/* #groups */}
 
 **Admin → Groups**: a group is a set of users that gets roles.
 
@@ -55,7 +55,7 @@ A user in no group sees no namespaces. A local user is not forced to change the 
 **New group** asks for a name; then **Edit** (pencil) → *Assign roles…* and members. You can also set a user's groups
 from Admin → Users → Edit, or pick groups while importing from LDAP.
 
-## Access reviews
+## Access reviews {/* #access-reviews */}
 
 **Export CSV** on Users and on Groups: users with source, admin and active flags and groups; groups with members and
 roles. Each export is audited (`admin.export`). Together with the roles' grants this answers "who can do what, and

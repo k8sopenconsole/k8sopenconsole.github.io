@@ -14,7 +14,7 @@ It refreshes on its own every 10 seconds; **Refresh** (or `r`) does it now.
 
 <Screenshot id="dashboard-pods" alt="The Dashboard on the Pods tab of namespace shop: five pods with their status (Running, Error, OOMKilled), containers, restarts, controller, CPU, memory and age" />
 
-## Tabs
+## Tabs {/* #tabs */}
 
 Pods, Deployments, DaemonSets, StatefulSets, HPAs, Services, ConfigMaps, Secrets, Ingresses, CronJobs and Jobs;
 you see the ones you may list. `[` and `]` move to the previous and next tab (on a Turkish keyboard `ğ` and `ü`).
@@ -24,21 +24,21 @@ pods is crashing:
 
 <Screenshot id="dashboard-deployments" alt="The Deployments tab: catalog and checkout are Progressing with a red '1 pod failing' badge, storefront is Available with 2/2 replicas" />
 
-## List or cards
+## List or cards {/* #list-or-cards */}
 
 The two buttons next to the search switch between a table and cards. The table sorts by any column (click its
 header). Cards show the same facts with the action buttons on each card:
 
 <Screenshot id="dashboard-cards" alt="The Pods tab as cards: each pod with status, start time, restarts, controller, CPU and memory, and Logs / Events / Shell buttons" />
 
-## Columns
+## Columns {/* #columns */}
 
 In the table, the **⋮** at the right end of the header row chooses which columns show, per tab. *Name* always
 stays; *Reset to default* shows all of them again. The choice is kept in this browser only.
 
 <Screenshot id="dashboard-columns" alt="The column menu open on the Pods tab: checkboxes for Status, Containers, Restarts, Controlled By, CPU, Memory and Age, and Reset to default" />
 
-## Search and label filters
+## Search and label filters {/* #search-and-label-filters */}
 
 Press `/` (or click the search box) and type. Every word you type must match, in any order, ignoring case; part of
 a word is enough. A word matches the name **or the text of any column**, hidden columns included, so the table and
@@ -61,7 +61,7 @@ them with words: `label:tier=web storefront`.
 
 <Screenshot id="dashboard-search" alt="The search box with label:tier=web, leaving the two storefront pods" />
 
-## What each pod row offers
+## What each pod row offers {/* #what-each-pod-row-offers */}
 
 - **Logs**, **Events** and, if you may, **Shell** ([Logs](/user-guide/logs), [Pod shell](/user-guide/pod-shell)).
 - Click the row (or select it and press `Enter`) for the pod's details ([Detail drawers](/user-guide/detail-drawers)).

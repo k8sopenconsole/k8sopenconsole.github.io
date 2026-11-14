@@ -10,6 +10,9 @@ const BASE_URL = '/';
 
 const CODE_REPO = 'https://github.com/vurulkan/kubernetes-openconsole';
 
+// Docusaurus builds each locale on its own; the Open Graph image follows it.
+const LOCALE = process.env.DOCUSAURUS_CURRENT_LOCALE ?? 'en';
+
 const config: Config = {
   title: 'Kubernetes OpenConsole',
   tagline:
@@ -44,7 +47,8 @@ const config: Config = {
 
   i18n: {
     defaultLocale: 'en',
-    // tr is filled in M23; until then it has no dropdown entry.
+    // Turkish pages live in i18n/tr/ (rules and terms: i18n/tr/GLOSSARY.md); a page
+    // without a translation shows the English one with a note.
     locales: ['en', 'tr'],
     localeConfigs: {
       en: {label: 'English', htmlLang: 'en'},
@@ -117,7 +121,7 @@ const config: Config = {
   ],
 
   themeConfig: {
-    image: 'img/screenshot-dark.png',
+    image: `img/og-${LOCALE === 'tr' ? 'tr' : 'en'}.png`,
     colorMode: {
       defaultMode: 'light',
       respectPrefersColorScheme: true,
@@ -131,6 +135,7 @@ const config: Config = {
       items: [
         {type: 'docSidebar', sidebarId: 'docs', position: 'left', label: 'Docs'},
         {to: '/release-notes', label: 'Release notes', position: 'left'},
+        {type: 'localeDropdown', position: 'right'},
         {href: CODE_REPO, label: 'GitHub', position: 'right'},
       ],
     },
