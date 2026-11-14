@@ -16,10 +16,11 @@ the [Security model](/operations/security).
   through OpenConsole on a cluster, connect it with the view-only ClusterRole
   ([Full or read-only](/installation/connect-cluster#full-or-read-only)). In the full one, drop the Secrets rule if you
   grant no `secrets:*` permission, and its `update` verb if you grant no `secrets:edit`. Uncomment `services/proxy`
-  only for Prometheus, and only for your Prometheus Service. Every rule and what it is for:
-  [Kubernetes permissions](/reference/kubernetes-permissions).
-- **One ServiceAccount per cluster, never a personal kubeconfig**, and a plan to rotate its token
-  ([Rotate the token](/installation/connect-cluster#rotate-the-token)).
+  only for Prometheus, and only for your Prometheus Service. OpenConsole doesn't use port-forward, so it needs no
+  rule for it. Every rule and what it is for: [Kubernetes permissions](/reference/kubernetes-permissions).
+- **One ServiceAccount per cluster, never a personal kubeconfig**, and a plan to rotate its token, for example every
+  6 to 12 months ([Rotate the token](/installation/connect-cluster#rotate-the-token)). Don't keep the generated tokens
+  in Git.
 - **Protect the OpenConsole namespace in each cluster it runs in.** Whoever may `exec` into the OpenConsole pod,
   read its volume, or read its Secrets in Kubernetes gets every cluster credential OpenConsole holds. Keep those
   Kubernetes permissions to the people who run OpenConsole.
@@ -93,6 +94,8 @@ the [Security model](/operations/security).
 - **Ship the audit log** to your log platform and keep it as long as you must; the database keeps 30 days
   ([Elastic](/operations/elastic#keep-the-audit-trail-as-long-as-you-need)).
 - **Alert** on refused actions, locked sign-ins and revealed secrets ([Metrics and alerts](/operations/metrics#alerts)).
+- **Review the `secret.reveal`, `secret.view_yaml`, `secret.apply` and `pod.exec` audit events**: these are the actions
+  that can expose credentials ([Audit events](/reference/audit-events)).
 - **Keep shell recording on** and set its retention (Admin → Recordings). Recordings contain whatever a shell
   printed; only admins can replay them ([Session recording](/administration/recordings)).
 

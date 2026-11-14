@@ -1,3 +1,4 @@
+import {existsSync, readFileSync} from 'node:fs';
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
@@ -12,6 +13,24 @@ const CODE_REPO = 'https://github.com/vurulkan/kubernetes-openconsole';
 
 // Docusaurus builds each locale on its own; the Open Graph image follows it.
 const LOCALE = process.env.DOCUSAURUS_CURRENT_LOCALE ?? 'en';
+
+// Frozen docs versions, newest first (npm run docs:freeze -- X.Y at a minor
+// release); the newest is the default. "Next" (docs/, what dev holds) is built
+// for pull request previews only (DOCS_NEXT=1), never published.
+const json = (f: string) => (existsSync(f) ? JSON.parse(readFileSync(f, 'utf8')) : []);
+const VERSIONS: string[] = json('versions.json');
+const ARCHIVED: string[] = json('versions-archived.json');
+const WITH_NEXT = VERSIONS.length === 0 || process.env.DOCS_NEXT === '1';
+const DOCS_REPO = 'https://github.com/k8sopenconsole/k8sopenconsole.github.io';
+
+// Endpoint pages per version, from the API description of that version.
+const endpointDocs = (spec: string, outputDir: string): OpenApiPlugin.Options => ({
+  specPath: spec,
+  outputDir,
+  sidebarOptions: {groupPathsBy: 'tag', categoryLinkSource: 'tag'},
+  hideSendButton: true,
+  showSchemas: false,
+});
 
 const config: Config = {
   title: 'Kubernetes OpenConsole',
@@ -72,15 +91,14 @@ const config: Config = {
       {
         id: 'openapi',
         docsPluginId: 'classic',
-        config: {
-          openconsole: {
-            specPath: 'openapi/openapi.site.yaml', // from openapi.yaml by scripts/openapi-site.mjs
-            outputDir: 'docs/api/endpoints',
-            sidebarOptions: {groupPathsBy: 'tag', categoryLinkSource: 'tag'},
-            hideSendButton: true,
-            showSchemas: false,
-          } satisfies OpenApiPlugin.Options,
-        },
+        // *.site.yaml come from the committed *.yaml by scripts/openapi-site.mjs
+        config: Object.fromEntries([
+          ['openconsole', endpointDocs('openapi/openapi.site.yaml', 'docs/api/endpoints')],
+          ...VERSIONS.map((v) => [
+            `openconsole_${v.replace('.', '_')}`,
+            endpointDocs(`openapi/versions/${v}.site.yaml`, `versioned_docs/version-${v}/api/endpoints`),
+          ]),
+        ]),
       },
     ],
   ],
@@ -111,6 +129,11 @@ const config: Config = {
           docItemComponent: '@theme/ApiItem',
           editUrl: 'https://github.com/k8sopenconsole/k8sopenconsole.github.io/edit/main/',
           showLastUpdateTime: false,
+          ...(VERSIONS.length > 0 && {
+            lastVersion: VERSIONS[0],
+            onlyIncludeVersions: WITH_NEXT ? ['current', ...VERSIONS] : VERSIONS,
+            versions: {current: {label: 'Next', path: 'next', banner: 'unreleased'}},
+          }),
         },
         blog: false,
         theme: {
@@ -135,6 +158,19 @@ const config: Config = {
       items: [
         {type: 'docSidebar', sidebarId: 'docs', position: 'left', label: 'Docs'},
         {to: '/release-notes', label: 'Release notes', position: 'left'},
+        ...(VERSIONS.length > 0
+          ? [
+              {
+                type: 'docsVersionDropdown',
+                position: 'right' as const,
+                // Older docs: the frozen sources at the docs-X.Y tag; 2.22 and older were the README.
+                dropdownItemsAfter: [
+                  ...ARCHIVED.map((v) => ({href: `${DOCS_REPO}/tree/docs-${v}/versioned_docs/version-${v}`, label: v})),
+                  {href: `${CODE_REPO}/blob/v2.22.0/README.md`, label: '2.22 and older (README)'},
+                ],
+              },
+            ]
+          : []),
         {type: 'localeDropdown', position: 'right'},
         {href: CODE_REPO, label: 'GitHub', position: 'right'},
       ],

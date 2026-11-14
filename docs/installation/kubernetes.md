@@ -62,7 +62,8 @@ kubectl apply -k .
 kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole --timeout=5m
 ```
 
-What gets created, all in namespace `kubernetes-openconsole`:
+What gets created, all in namespace `kubernetes-openconsole` (`deploy/elk/` is optional and not applied by
+kustomize; see [Elastic](/operations/elastic)):
 
 | Object | What |
 |---|---|

@@ -34,7 +34,8 @@ For US Government or China clouds set `AZURE_AD_AUTHORITY` ([Environment variabl
 
 ## 3. Give people access {/* #3-give-people-access */}
 
-Either let them sign in once (the account is created with source *Azure AD*, in no group) and then add them to groups,
+Either let them sign in once (the account is created with source *Azure AD*, in no group, named after the token's
+`preferred_username`, or `email` / `upn` when that is missing) and then add them to groups,
 or, better, **pre-create** them: Admin → Users → New user → **Azure AD user**, their UPN or e-mail
 (`jane@example.com`) and their groups. Their first Microsoft sign-in uses that account and they see their namespaces
 at once.

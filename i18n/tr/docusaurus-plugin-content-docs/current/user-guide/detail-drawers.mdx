@@ -1,0 +1,42 @@
+---
+title: "Ayrıntı panelleri"
+description: "Bir pod, Deployment, StatefulSet ya da DaemonSet hakkında her şey tek bir panelde."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Ayrıntı panelleri
+
+**Yapmak istediğiniz:** bir iş yükü hakkındaki her şeyi beş ekran açmadan görmek.
+
+Listede bir pod'a, Deployment'a, StatefulSet'e ya da DaemonSet'e tıklayın (ya da seçili satırda `Enter`'a basın).
+Ayrıntı paneli sağda açılır; `Esc` kapatır.
+
+## Pod {/* #pod */}
+
+<Screenshot id="pod-drawer" alt="checkout pod'unun ayrıntı paneli: özet, çıkış kodu açıklanmış container, restart geçmişi, kaynak kullanımı ve condition'lar; altta YAML, Önceki loglar, Shell ve Loglar düğmeleri" />
+
+- **Özet**: durum, hazır container'lar, restart sayısı, node, pod IP, QoS sınıfı ve sahibi (iş yüküne bir link).
+- **Container'lar**: imaj, durum, request ve limit'ler, probe'lar, kullanım ve açıklamasıyla son çıkış kodu.
+- **Restart geçmişi**, **Kaynak kullanımı** (1h / 6h / 24h, Prometheus ile daha fazlası), **Condition'lar**
+  ve **Olaylar**; uyarılar en üstte.
+- Altta, izinlerinizin elverdiği düğmeler: **YAML**, **Önceki loglar**, **Shell**, **Loglar**.
+
+## Deployment, StatefulSet, DaemonSet {/* #deployment-statefulset-daemonset */}
+
+<Screenshot id="deployment-drawer" alt="storefront Deployment'ının ayrıntı paneli: Hazır durumdaki rollout; istenen / güncel / hazır / erişilebilir, strateji, revizyon ve imaj; limit'lere karşı CPU ve memory grafikleri, iki pod'u, restart geçmişi; YAML, Ölçekle, Yeniden başlat ve Loglar düğmeleri" />
+
+- **Rollout**: istenen, güncel, hazır ve erişilebilir replika sayıları, strateji, revizyon ve imaj.
+  `ProgressDeadlineExceeded` durumunda kırmızıya döner ve kaç pod'un hatalı olduğunu söyler.
+- **Kaynak kullanımı**: tüm pod'larının toplamı, limit'lerine karşı.
+- **Pod'lar**: her biri node, restart sayısı ve durumuyla; açmak için birine tıklayın.
+- Pod'larının **Restart geçmişi**; yerine yenisini koyduğu pod'lar da dahil.
+- Deployment ayrıca **revizyonlarını** imajları ve restart zamanlarıyla listeler (salt okuma; rollback yok).
+- İzinlerinizin elverdiği düğmeler: **YAML**, **Ölçekle**, **Yeniden başlat**, **Loglar** (tüm pod'lar birlikte).
+
+:::info[Göremiyor ya da yapamıyor musunuz?]
+- Bir düğme yok: bu namespace'te onun izni sizde yok: `pods:logs`, `pods:exec`, `deployments:restart`,
+  `deployments:scale` / `statefulsets:scale`, YAML değişiklikleri için `<kind>:edit`.
+- Revizyon yok: cluster bağlantısı ReplicaSet'leri okuyamıyor; yöneticinize sorun.
+- Node bir link değil: node'ları yalnızca yöneticiler açabilir.
+:::

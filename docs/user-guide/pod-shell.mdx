@@ -32,7 +32,8 @@ type is recorded only as far as the shell echoes it back (password prompts don't
 - A shell with no input for **5 minutes** closes (your admin may set another time).
 - You can have **3** shells open at once; a fourth is refused until you close one.
 - Each session is in the audit log twice: `pod.exec` with `phase: start` (container, command) and `phase: end` (exit
-  code, bytes in and out, duration).
+  code, bytes in and out, duration). `exit_code` is `-1` when the session was cut (idle timeout, closed tab, network).
+  A shell that ends with a non-zero status, e.g. after a failed last command, is a normal end (outcome `success`).
 
 Treat the shell as what it is: you act inside a production container, as the container's user.
 

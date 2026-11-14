@@ -29,7 +29,7 @@ API keys for `API_KEY_READ_RETENTION_DAYS`, 7) and on stdout as one JSON line ea
 | Field | Example | Meaning |
 |---|---|---|
 | action | `deployment.restart` | `<resource type>.<verb>` |
-| outcome, reason | `denied`, `forbidden` | what happened, and why it was refused or failed (`forbidden`, `feature_disabled`, `admin_only`, `k8s_forbidden`, `not_found`, `conflict`, `api_access_policy`, …) |
+| outcome, reason | `denied`, `forbidden` | what happened, and why it was refused or failed (`forbidden`, `feature_disabled`, `admin_only`, `k8s_forbidden`, `not_found`, `conflict`, `invalid`, `api_access_policy`, …) |
 | user, account source | `alice`, `local` | who, and where the account signs in |
 | cluster, namespace, resource | `prod-eu`, `shop`, `deployment storefront` | the target; the cluster is the one the action **ran on** |
 | details | `replicas_from: 3`, `replicas_to: 2` | typed facts of the action; never a secret value or a YAML body |
@@ -38,8 +38,9 @@ API keys for `API_KEY_READ_RETENTION_DAYS`, 7) and on stdout as one JSON line ea
 
 **Details** on a row shows them. Every field and every detail key: [Audit events](/reference/audit-events).
 
-What is not audited: lists the UI reloads on its own (the Dashboard's 10-second refresh); calls that read no cluster
-resource (`/api/auth/me`, `/api/features`, …). The request log on stdout still has every request.
+What is not audited: lists the UI fetches on its own (the Dashboard's 10-second refresh, and the namespace list behind
+the command palette and the role editor; they send `X-OpenConsole-Refresh: auto`, which is ignored with an API key, so
+every read with a key is audited); calls that read no cluster resource (`/api/auth/me`, `/api/features`, …). The request log on stdout still has every request.
 
 ## From an event to the request log {/* #from-an-event-to-the-request-log */}
 

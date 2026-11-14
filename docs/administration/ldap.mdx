@@ -31,6 +31,16 @@ LDAP works next to local accounts. By default a person must have an OpenConsole 
 | User filter | `%s` is what the person typed. Active Directory `(sAMAccountName=%s)`, OpenLDAP `(uid=%s)` |
 | Username attribute | the attribute that becomes the OpenConsole username: `sAMAccountName` or `uid` |
 
+An example Active Directory setup (fictitious values):
+
+| Field | Value |
+|---|---|
+| Host + Port | `10.10.20.15` and `389` |
+| Bind DN | `CN=svc-openconsole,OU=ServiceAccounts,OU=IT,DC=example,DC=corp` |
+| User base DN | `OU=Engineering,OU=Users,DC=example,DC=corp` |
+| User filter | `(sAMAccountName=%s)` |
+| Username attribute | `sAMAccountName` |
+
 **Save LDAP settings**, then **Test connection**: it binds with the service account and searches each base DN.
 
 :::warning[TLS in 2.22.0]
@@ -44,12 +54,14 @@ certificate must then be trusted by a public CA, since there is no field for you
 **Import**: Admin → Users → New user → **Import from LDAP…** (or below the settings on Admin → LDAP). Type part of a
 name and search: the user filter runs with `%s` replaced by what you typed, up to 100 results per base DN. For prefix
 search use `(sAMAccountName=%s*)` as the filter. Pick the people and the **groups** they join, and import. Existing
-accounts are listed apart and skipped. Each import is audited (`admin.import`).
+accounts are listed apart and skipped. Each import is audited (`user.import`).
 
 **On first sign-in** (off by default): tick *Create an account on a user's first sign-in*, pick the **groups for new
 accounts**, save. Then:
 
-- anyone the user filter finds who signs in with a valid directory password gets an account at once, in those groups;
+- anyone the user filter finds who signs in with a valid directory password gets an account at once, in those groups,
+  under the name the directory uses (typing `John` signs in to `john`);
+- an unknown user with a wrong password is rejected; nothing is created;
 - new accounts are never admins (`user.create` with `auto_provisioned: true`);
 - to lock someone out, **disable** the account: a deleted one is simply created again at their next sign-in.
 

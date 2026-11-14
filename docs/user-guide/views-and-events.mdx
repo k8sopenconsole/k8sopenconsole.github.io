@@ -17,7 +17,8 @@ import Screenshot from '@site/src/components/Screenshot';
 
 - **Save current view** stores the cluster, namespace, tab, search and list / card mode under a name.
 - A view lives on the server, so it follows you to any browser. Opening a view saved on another cluster switches
-  you to that cluster.
+  you to that cluster. Views that versions before 2.14.0 kept in the browser move to the server the first time you
+  open the Dashboard.
 - The share icon makes a view visible to **every user**, marked with your name. Others can use it; only you can
   rename, unshare or delete it (admins can remove shared views).
 - A shared view never grants access: someone without permission in its namespace just sees an empty list.

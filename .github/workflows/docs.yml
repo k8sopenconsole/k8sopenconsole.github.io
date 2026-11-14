@@ -28,9 +28,12 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck
+      # Pull requests also build the unreleased "Next" docs (docs/), so their links
+      # are checked and the preview shows them; main publishes frozen versions only.
       - run: npm run build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCS_NEXT: ${{ github.event_name == 'pull_request' && '1' || '' }}
       # docs/reference/*.md and openapi/openapi.yaml must be the code repo's at
       # the ref in reference.json, and the endpoint reference must have one page
       # per operation.

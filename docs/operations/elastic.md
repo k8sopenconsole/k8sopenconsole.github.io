@@ -55,6 +55,12 @@ policy. The integration's pipeline calls `logs-kubernetes.container_logs@custom`
 that pipeline call `openconsole-logs`, and the OpenConsole lines move to the two data streams above. Lines written
 before the installation stay as they arrived.
 
+The pipeline merges the decoded record into the document, so Agent's `kubernetes.*`, `container.*` and
+`log.file.path` fields stay; it also fills `event.outcome` on audit events from older versions that lack it.
+Without the pipeline the lines still arrive, but unparsed: each one is a single JSON string in `message` in
+`logs-kubernetes.container_logs-*`, with nothing to filter on, audit and application records mixed, and the
+shipper's `@timestamp` instead of the record's own.
+
 ### Filebeat or Elastic Agent standalone {#filebeat-or-elastic-agent-standalone}
 
 Read the OpenConsole pod's log files, keep the line as it is, and hand it to the same pipeline:

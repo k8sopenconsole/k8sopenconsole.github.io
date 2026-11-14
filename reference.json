@@ -1,5 +1,5 @@
 {
   "repo": "vurulkan/kubernetes-openconsole",
-  "ref": "9975c7d5e4951de287f26e732ea4a9e25863b293",
+  "ref": "ad94d187d19a889193183dfe9b73589a4b1ab4a2",
   "note": "The code repo commit the generated reference is copied from (npm run reference:sync). Pin it to the release tag (v2.23.0, \u2026) when one ships."
 }

@@ -18,9 +18,11 @@
     "reference:sync": "node scripts/sync-reference.mjs",
     "reference:check": "node scripts/sync-reference.mjs --check && node scripts/check-endpoints.mjs",
     "translations:check": "node scripts/check-translations.mjs",
+    "docs:freeze": "node scripts/freeze-docs.mjs",
     "pretypecheck": "npm run api-docs",
     "prestart": "npm run release-notes && npm run api-docs",
     "prebuild": "npm run release-notes && npm run api-docs",
+    "postbuild": "node scripts/sitemap.mjs",
     "screenshots": "node screenshots/shoot.mjs",
     "screenshots:record": "screenshots/cluster.sh up && node screenshots/seed.mjs && node screenshots/record.mjs"
   },

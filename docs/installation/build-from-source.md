@@ -5,7 +5,7 @@ description: "Build your own image and run the tests."
 
 # Build from source
 
-## Option A — your own image {#option-a--your-own-image}
+## Your own image {#option-a--your-own-image}
 
 ```bash
 docker build -t kubernetes-openconsole:local .

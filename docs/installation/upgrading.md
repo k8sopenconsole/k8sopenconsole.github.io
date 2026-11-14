@@ -83,3 +83,11 @@ Before 2.17 the outcome was part of the action (`deployment.restart.success`), r
 - **API**: `?action=deployment.restart.success` still works; the outcome is split off.
 - **Elastic**: re-run `deploy/elk/install.sh`. The new mapping applies from the next rollover of `logs-openconsole.audit-*` (`POST logs-openconsole.audit-default/_rollover` to apply it now). The pipeline gives 2.16 lines the 2.17 shape (action without the outcome, `openconsole.verb`, `openconsole.outcome`, `event.type`), so one query finds old and new events. Saved searches, visualizations and alerts that filter on `event.action : *.success` / `*.denied` must be changed to `event.action` + `event.outcome` (or `openconsole.outcome`).
 - **Console**: the extra `deployment.action`, `workload.action`, `secret.action`, `yaml.apply`, `recording.action`, `pod.exec.start` / `pod.exec.end`, `*.logs.start`, `user.password_reset` and `user.auto_provision` lines are gone, and so are the `level=error` lines `deployment.restart.failed`, `deployment.scale.failed`, `statefulset.scale.failed` and `<resource>.apply.failed`; the `audit` line has all their fields. A failed action is `event.outcome : "failure"` with `event.reason` and `error.message`. `level=error` is left for faults in OpenConsole itself (e.g. `http.panic`).
+
+### Upgrading from older versions {#upgrading-from-older-versions}
+
+- **Before 2.13**: accounts created then show the source **Local** in Admin → Users. LDAP accounts switch to LDAP on
+  their next directory sign-in; to fix the sources up front, follow the procedure in the
+  [2.22.0 README](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/README.md#users).
+- **Before 2.3**: session tokens issued by the old version are honoured until they expire, so an upgrade
+  doesn't sign anyone out.

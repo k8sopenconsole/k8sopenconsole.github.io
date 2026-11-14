@@ -104,6 +104,9 @@ certificate error is the TLS settings.
 | `Too many log streams; try again shortly.` | the per-user log stream limit | close log viewers you don't need |
 | a WebSocket answers `401` | its ticket was used already or is older than 30 seconds | the UI gets a new ticket for every connection; a script must too (`POST /api/ws-ticket`) |
 
+A live log or shell is a WebSocket from the browser to OpenConsole and a stream from the OpenConsole pod to the
+Kubernetes API server, so the OpenConsole pod must reach the API server too.
+
 ## Error answers {#error-answers}
 
 Every error answer is JSON, `{"error": "<reason or message>"}`. `401` has no body: the session or API key is
@@ -136,4 +139,5 @@ The first six are also the `reason` of the `denied` audit event. For API keys an
 | `400` `cluster "<name>" is unknown or not reachable with this key` | the `X-OpenConsole-Cluster` header names a cluster that doesn't exist or the key doesn't cover |
 | `429` (no body) with an API key | more than 10 requests per second (bursts of 30) for that key |
 | `429` `too many open shells (limit 3 per user); close one first` | the shell limit, from a client that isn't a browser |
+| `404`, `409`, `400` or `504` from restart, scale, YAML apply or a Secret request | Kubernetes answered NotFound, Conflict (e.g. a stale `resourceVersion`), Invalid or Timeout; OpenConsole passes that status on, so a proxy doesn't wrap a 5xx around a 4xx. The `failed` audit event has the reason (`not_found`, `conflict`, `invalid`) and the `error` |
 | `503` from `/readyz`: `db not reachable` | the database file can't be opened: check the volume ([Health probes](/operations/health-probes)) |

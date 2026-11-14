@@ -1,0 +1,35 @@
+---
+title: "Oturumlar"
+description: "Kimin giriş yaptığını görün, birinin tüm oturumlarını kapatın ve bir girişin ne kadar geçerli kalacağını ayarlayın."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Oturumlar
+
+## Aktif oturumlar {/* #active-sessions */}
+
+**Yapmak istediğiniz:** kimin giriş yaptığını görmek ya da birinin oturumlarını hemen sonlandırmak.
+
+**Yönetim → Oturumlar** her giriş token'ını listeler: kullanıcı, durum, adres ve tarayıcı, ne zaman verildiği, en son ne
+zaman kullanıldığı ve ne zaman sona ereceği. *Sadece aktif oturumlar* süresi dolmuş ve iptal edilmiş olanları gizler.
+
+<Screenshot id="admin-sessions" alt="Yönetim → Oturumlar: ayse.yilmaz, bob, alice ve admin kullanıcılarının aktif oturumları; adres, tarayıcı, verilme, son kullanım ve bitiş zamanı, iptal düğmeleri" />
+
+- Satırdaki **çöp kutusu** yalnızca o oturumu kapatır; diğer düğme o kullanıcının **tüm** oturumlarını kapatır.
+- Kullanıcının şifresini değiştirmesi ya da bir yöneticinin şifreyi sıfırlaması da o kullanıcının tüm oturumlarını
+  kapatır.
+- Her iptal audit'e yazılır (`session.revoke`; bir kullanıcının tüm oturumları için `all: true`).
+
+Oturumları iptal etmek kullanıcının [API anahtarlarını](/administration/api-access-policy) durdurmaz; onları ayrıca
+iptal edin ya da kullanıcıyı devre dışı bırakın.
+
+## Oturum süresi ve API anahtarı süresi {/* #session-lifetime-and-api-key-expiry */}
+
+**Yönetim → Oturum**:
+
+<Screenshot id="admin-session-settings" alt="Yönetim → Oturum: 60 dakikalık oturum süresi ve API anahtarı süre politikası (en uzun süre, süresiz anahtarlara izin ver)" />
+
+- **Oturum süresi**: bir girişin kaç dakika geçerli kalacağı (varsayılan 60). Yeni girişlere uygulanır.
+- **API anahtarı süresi**: yeni ya da yeniden üretilen bir anahtarın alabileceği en uzun süre ve süresiz anahtarlara
+  izin verilip verilmediği ([API erişim politikası](/administration/api-access-policy#expiry-policy)).

@@ -29,7 +29,8 @@ Both variables are on [Environment variables](/reference/environment-variables).
 | `previous`, `timestamps`, `container` | `false`, `false`, the main container | |
 
 The answer is plain text of at most **5 MiB**. A longer log is cut at a line end and the response carries
-`X-OpenConsole-Truncated: true`: ask for fewer lines or a shorter `sinceSeconds`.
+`X-OpenConsole-Truncated: true`: ask for fewer lines or a shorter `sinceSeconds`. Errors: 404 `pod_not_found`;
+400 `container_not_found`, `not_ready` (the container hasn't started) or `previous_unavailable`.
 
 ## Running a command: `POST …/pods/{name}/exec` {#running-a-command-post-podsnameexec}
 
@@ -41,9 +42,12 @@ The answer is plain text of at most **5 MiB**. A longer log is cut at a line end
 | Timeout | What was printed so far, `exitCode: -1`, `truncated: true`. Kubernetes doesn't stop the process; it may go on running in the container. |
 | Exit code | A non-zero exit code is a 200 with that `exitCode`. |
 | Text | Output is text: bytes that aren't UTF-8 become `�`; pipe through `base64` for binary. |
+| Errors | 404 `pod_not_found`; 400 `container_not_found` or `not_ready` (the container isn't running); 502 `exec_failed` when the exec itself fails. |
 
 A command run with a key is always recorded; the audit event keeps the program (`command[0]`), the exit code, bytes,
-duration and the recording id, never the arguments.
+duration and the recording id, never the arguments. The recording reads like a shell's: its first line is
+`$ <command>`, then the output. Both endpoints on this page (log and command) work with a web session too, not
+only with a key.
 
 ## WebSockets {#websockets}
 
@@ -52,7 +56,10 @@ Live logs, shells and the event stream are WebSockets. A key is never accepted i
 1. `POST /api/ws-ticket` with the key and `{"path": "/ws/namespaces/<ns>/pods/<pod>/logs"}` (the socket's path);
    the answer is `{"ticket": "…"}`.
 2. Open the socket at that path with `?ticket=<ticket>` within **30 seconds**. A ticket works once, for that path
-   only.
+   only. `?token=` is not accepted.
+
+The shell socket (`/ws/namespaces/<ns>/pods/<pod>/exec`) also takes `container` and `command` next to `ticket`, for
+example `command=/bin/sh`; without `command` it tries bash, then ash, then sh.
 
 ```bash
 curl -s -H "Authorization: Bearer $OPENCONSOLE_API_KEY" -H "Content-Type: application/json" \

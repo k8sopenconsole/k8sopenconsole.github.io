@@ -36,6 +36,8 @@ flowchart LR
   [Kubernetes permissions](/reference/kubernetes-permissions).
 - **Kubernetes sees OpenConsole, not the person.** The API server's audit log shows the connected identity for
   every user's action. Who did it is in OpenConsole's own audit log ([below](#what-is-recorded)).
+- **A shell runs in the existing container, as its user**, through the API server's `pods/exec`. The cluster's own
+  pod policies (for example non-root admission policies) still apply to shells.
 - **Secrets are read on demand.** Lists and workloads come from an in-memory watch cache; Secrets are not watched or
   cached and are fetched from the API server for each request ([resources.go#L521-L540](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/kube/resources.go#L521-L540),
   the rule's comment [rbac.yaml#L44-L47](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/deploy/rbac.yaml#L44-L47)).
@@ -142,7 +144,9 @@ Prometheus settings, sessions, API key digests and the audit log.
   `Content-Security-Policy` (scripts only from the app itself and `cdn.jsdelivr.net` for the YAML editor,
   `frame-ancestors 'none'`), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`,
   `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` turning off geolocation, camera,
-  microphone and payment.
+  microphone and payment. The CSP also has `worker-src blob:` and, in `script-src`, `'wasm-unsafe-eval'`, so the
+  bundled recording player can compile its WebAssembly terminal; that allows WebAssembly compilation only, not
+  JavaScript `eval`.
 - **Without sign-in** answer only: `/livez`, `/readyz`, `/healthz`, `/metrics`, the sign-in endpoints, the logo, and
   `/api/openapi.json` (the API description, which holds no host names or secrets)
   ([router.go#L174-L210](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/router.go#L174-L210)).

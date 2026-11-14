@@ -44,12 +44,15 @@ nothing), `feature_disabled` (switched off by the operator). The full list is in
 
 - **Audit:** every action and every resource read made with a key is an audit event with your user **and the key's
   name** (`api_key_name`; `openconsole.api_key.name` in ECS). Helper calls (`/api/auth/me`, `/api/ws-ticket`,
-  `/api/features`, `/api/openapi.json`) are not audited; the request log still has them. See
+  `/api/features`, `/api/openapi.json`, `/api/version`) are not audited; the request log still has them. See
   [Audit events](/reference/audit-events).
 - **Shells and commands** run with a key are always recorded, even when recording is switched off for web sessions,
   and refused (503 `recording_unavailable`) when they can't be.
 - **Key events:** `api_key.create`, `update`, `regenerate`, `revoke`, `delete`, and `api_key.use` when a key is
-  refused or rate limited.
+  refused or rate limited. A refused key's `api_key.use` is `denied` with the reason `expired`, `revoked`,
+  `owner_inactive`, `must_change_password` or `api_access_off`, written at most once a minute per key and reason (every
+  request still gets its 401 / 403). An unknown key has no user, so it is only a warning line in the console log, with
+  the source IP.
 
 ## Keep the key out of the prompt {#keep-the-key-out-of-the-prompt}
 

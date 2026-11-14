@@ -16,6 +16,9 @@ Images are published to `ghcr.io/vurulkan/kubernetes-openconsole` for **linux/am
 | `latest` | the newest release, the same image (same digest) as its `X.Y.Z` | yes, on each release |
 | `dev-<number>`, `dev-latest` | test builds of unreleased branches | never run these in production |
 
+A release is published by pushing its `vX.Y.Z` git tag: CI builds the image once and pushes it as `:X.Y.Z` and
+`:latest`. Pushes to `main` are built and tested but publish nothing, and `:latest` never points to a `dev-` image.
+
 The manifests in `deploy/` use `:latest` with `imagePullPolicy: Always`, so any restart of the pod could move you
 to a new release. Pin the version as in [Install on Kubernetes](/installation/kubernetes) (`images:` → `newTag`).
 To pin the exact bytes, use the digest instead of the tag:
