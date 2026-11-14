@@ -1,8 +1,10 @@
 // Docusaurus writes one sitemap per locale (build/sitemap.xml, build/tr/sitemap.xml).
 // After the build this merges them into build/sitemap.xml: every page of both
-// languages, each with its hreflang alternates (en, tr, x-default = en), which is
-// what search engines read for a translated site. The search page is left out.
-import {readFileSync, writeFileSync, existsSync} from 'node:fs';
+// languages, one element per line. The language pairs (hreflang en / tr /
+// x-default) are in every page's <head>, which search engines read; repeating them
+// here as xhtml:link would make browsers render the file as run-together text.
+// The search page is left out.
+import {readFileSync, writeFileSync, existsSync, rmSync} from 'node:fs';
 
 const build = new URL('../build/', import.meta.url);
 const SITE = 'https://k8sopenconsole.github.io';
@@ -15,14 +17,17 @@ const tr = new Set(locs('tr/sitemap.xml'));
 const toTr = (u) => u.replace(SITE, `${SITE}/tr`);
 const pages = en.filter((u) => !/\/search$/.test(u));
 
-const alt = (lang, href) => `<xhtml:link rel="alternate" hreflang="${lang}" href="${href}"/>`;
-const entry = (loc, enUrl) => {
-  const links = [alt('en', enUrl), ...(tr.has(toTr(enUrl)) ? [alt('tr', toTr(enUrl))] : []), alt('x-default', enUrl)];
-  return `<url><loc>${loc}</loc>${links.join('')}</url>`;
-};
-const urls = pages.flatMap((u) => [entry(u, u), ...(tr.has(toTr(u)) ? [entry(toTr(u), u)] : [])]);
+const urls = pages.flatMap((u) => [u, ...(tr.has(toTr(u)) ? [toTr(u)] : [])]);
 writeFileSync(
   new URL('sitemap.xml', build),
-  `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">${urls.join('')}</urlset>\n`,
+  [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ...urls.map((u) => `  <url><loc>${u}</loc></url>`),
+    '</urlset>',
+    '',
+  ].join('\n'),
 );
+// The tr build's own sitemap would be a second, partial one.
+rmSync(new URL('tr/sitemap.xml', build), {force: true});
 console.log(`sitemap: ${urls.length} URLs (${pages.length} pages, en + tr)`);

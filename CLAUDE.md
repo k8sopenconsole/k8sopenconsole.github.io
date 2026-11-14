@@ -23,7 +23,7 @@ code repo; its `CLAUDE.md` maps the code). Served at `https://k8sopenconsole.git
 | `src/theme/NavbarItem/LocaleDropdownNavbarItem/` | the language switch drawn as the app's `EN \| TR` toggle (replaces the dropdown; keeps page, query and `#section`) |
 | `src/theme/DocVersionBanner/` | the "Bu sayfa Türkçeye çevrilmedi" note on a page that falls back to English |
 | `scripts/check-translations.mjs` | `npm run translations:check`: English pages without Turkish, and Turkish pages whose code blocks, anchors, links or screenshots differ from English (CI warnings + job summary, never fails) |
-| `scripts/sitemap.mjs` | postbuild: one `sitemap.xml` for both languages with hreflang alternates; `static/robots.txt` points to it |
+| `scripts/sitemap.mjs` | postbuild: one `sitemap.xml` with every page of both languages (the hreflang pairs are in each page's `<head>`); `static/robots.txt` points to it |
 | `src/components/Screenshot.tsx` | `<Screenshot id alt />` in `.mdx` pages: picks locale + theme, sizes from `static/img/screens/screens.json` |
 | `src/css/custom.css` | colors = the app's brand indigo + slate dark surfaces; contrast overrides for the endpoint pages |
 | `src/clientModules/apiListRoles.ts` | list roles the openapi theme leaves out (accessibility) |
