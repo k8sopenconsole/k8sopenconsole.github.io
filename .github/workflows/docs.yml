@@ -9,6 +9,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Daily rebuild: the release notes page picks up a new GitHub release even if
+  # nobody runs the workflow by hand after `gh release create`.
+  schedule:
+    - cron: '17 4 * * *'
 
 permissions:
   contents: read

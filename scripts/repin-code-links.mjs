@@ -37,6 +37,8 @@ for (const page of pages) {
   let last = 0;
   for (const m of text.matchAll(re)) {
     const [link, path, a, b] = m;
+    // The top-level README was the manual up to 2.22.0; links into it point at that tag on purpose.
+    if (path.startsWith('README.md')) continue;
     let out = `blob/${to}/${path}`;
     if (a) {
       const oldLines = await file(from, path);
@@ -62,7 +64,8 @@ for (const page of pages) {
     last = m.index + link.length;
   }
   parts.push(text.slice(last));
-  const next = parts.join('');
+  // A link text that names the lines ([api.ts#L78](…#L80)) follows its target.
+  const next = parts.join('').replace(/\[([^\]]*?)#L\d+(-L\d+)?\]\((https:\/\/github\.com\/[^)#]+)(#L\d+(?:-L\d+)?)\)/g, (_, name, _r, url, anchor) => `[${name}${anchor}](${url}${anchor})`);
   if (next !== text) writeFileSync(page, next);
 }
 console.log(`moved ${moved} link(s) from ${from} to ${to}`);

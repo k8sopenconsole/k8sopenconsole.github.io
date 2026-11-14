@@ -13,7 +13,7 @@ description: "Yeni bir sürüme nasıl geçilir, veritabanına ne olur ve nasıl
 2. **Volume'ün yedeğini alın** ([Yedekleme ve geri yükleme](/installation/backup-restore)). Yükseltmeden önceki
    duruma birebir dönmenin tek yolu bu.
 3. Deployment'ın `strategy: Recreate` kullandığından emin olun ([Kubernetes'e kurulum](/installation/kubernetes)).
-   Varsayılan rolling update'te yeni pod, eskisi hâlâ çalışırken veritabanını açar; 2.22.0'da bu, bir sonraki
+   Varsayılan rolling update'te yeni pod, eskisi hâlâ çalışırken veritabanını açar; 2.23.0'da bu, bir sonraki
    restart'a kadar yazılanların kaybolmasına yol açabilir.
 
 Sürüm atlayabilirsiniz: 2.21.0'dan 2.22.0'a ya da 2.16'dan 2.22'ye geçiş tek adımdır. Her sürüm kendi veritabanı
@@ -25,17 +25,17 @@ değişikliklerini beraberinde getirir ve açılışta eksik olanları uygular.
 
 ```yaml title="kustomization.yaml"
 resources:
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.22.0   # was v2.21.0
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.0   # was v2.22.0
 images:
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.22.0"                                                         # was 2.21.0
+    newTag: "2.23.0"                                                         # was 2.22.0
 ```
 
 ```bash
 kubectl diff -k .      # the image tag, plus whatever the release changed in deploy/
 kubectl apply -k .
 kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole --timeout=5m
-kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.22.0"
+kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.23.0"
 ```
 
 Oturumlar geçerli kalır; giriş yapmış kullanıcılar sayfayı yenileyip kaldıkları yerden devam eder. `Recreate` ile

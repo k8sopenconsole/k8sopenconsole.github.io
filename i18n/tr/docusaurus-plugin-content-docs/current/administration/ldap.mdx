@@ -28,7 +28,7 @@ verirsiniz.
 | TLS sertifika doğrulamasını atla | yalnızca test için |
 | Zaman aşımı | LDAP işlemi başına saniye (varsayılan 10) |
 | Bind DN / Bind şifresi | dizinde arama yapan servis hesabı, örn. `CN=svc-openconsole,OU=ServiceAccounts,DC=example,DC=corp`. Şifre şifrelenerek saklanır; **Bind şifresini güncelle**'yi yalnızca şifreyi değiştirirken işaretleyin |
-| Kullanıcı Base DN (tek) | kişilerin arandığı yer, örn. `OU=Users,DC=example,DC=corp`. Kişiler birden çok OU'daysa ortak üst OU'yu kullanın (2.22.0'da *Kullanıcı Base DN'leri (virgülle ayrılmış)* alanı bir DN'i kendi virgüllerinden böler, bu yüzden tam bir DN yazılamaz) |
+| Kullanıcı Base DN (tek) | kişilerin arandığı yer, örn. `OU=Users,DC=example,DC=corp`. Kişiler birden çok OU'daysa ortak üst OU'yu kullanın (2.23.0'da *Kullanıcı Base DN'leri (virgülle ayrılmış)* alanı bir DN'i kendi virgüllerinden böler, bu yüzden tam bir DN yazılamaz) |
 | Kullanıcı filtresi | `%s`, kişinin yazdığı değerdir. Active Directory `(sAMAccountName=%s)`, OpenLDAP `(uid=%s)` |
 | Kullanıcı adı attribute'u | OpenConsole kullanıcı adı olacak attribute: `sAMAccountName` ya da `uid` |
 
@@ -44,8 +44,8 @@ verirsiniz.
 
 Önce **LDAP ayarlarını kaydet**, sonra **Bağlantıyı test et**: servis hesabıyla bind olur ve her base DN'de arama yapar.
 
-:::warning[2.22.0'da TLS]
-2.22.0'da **StartTLS yalnızca *TLS sertifika doğrulamasını atla* işaretliyken bağlanır**: sunucu sertifikası
+:::warning[2.23.0'da TLS]
+2.23.0'da **StartTLS yalnızca *TLS sertifika doğrulamasını atla* işaretliyken bağlanır**: sunucu sertifikası
 doğrulanamıyor (hata olarak kaydedildi). Hem şifreli **hem de** doğrulanmış bir bağlantı için port 636'da **SSL kullan
 (ldaps)** seçin. Bu durumda sertifika genel (public) bir CA'dan gelmelidir, çünkü kendi CA'nızı girebileceğiniz bir
 alan henüz yok.
@@ -94,7 +94,7 @@ girişleri anında durur.
 |---|---|
 | Test: connection refused / timeout | host ya da port yanlış, ya da OpenConsole pod'u ile dizin arasında bir firewall var |
 | Test: `x509: certificate signed by unknown authority` | kendi CA'nızın sertifikasıyla ldaps; yukarıdaki TLS notuna bakın |
-| Test: *TLS sertifika doğrulamasını atla* olmadan StartTLS başarısız | yukarıdaki 2.22.0 kısıtı |
+| Test: *TLS sertifika doğrulamasını atla* olmadan StartTLS başarısız | yukarıdaki 2.23.0 kısıtı |
 | Test: `Invalid Credentials (49)` | bind DN ya da bind şifresi yanlış (AD'de bind DN tam `CN=…` ya da `user@domain` biçimindedir) |
 | Test çalışıyor ama bir kişi giriş yapamıyor | kullanıcı filtresi kişiyi base DN'lerin altında bulamıyor ya da kullanıcı adı attribute'u kişinin yazdığından farklı; ya da (ilk giriş seçeneği kapalıyken) kişi hiç içe aktarılmamış |
 | Giriş yaptı ama hiçbir şey görmüyor | rolü olan hiçbir OpenConsole grubunda değil |

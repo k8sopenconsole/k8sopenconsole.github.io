@@ -30,7 +30,7 @@ OpenConsole'un çalıştığı cluster'da [kurulum](/installation/kubernetes) bu
 ```bash
 kubectl --context <cluster> create namespace kubernetes-openconsole
 kubectl --context <cluster> apply -f \
-  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.22.0/deploy/rbac.yaml
+  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/rbac.yaml
 ```
 
 Bu komut şunları oluşturur:
@@ -157,12 +157,12 @@ NS=kubernetes-openconsole
 kubectl --context $CTX -n $NS delete serviceaccount openconsole-reader          # its token Secret goes with it
 kubectl --context $CTX -n $NS wait --for=delete secret/openconsole-reader-token --timeout=60s
 kubectl --context $CTX apply -f \
-  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.22.0/deploy/rbac.yaml
+  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/rbac.yaml
 ```
 
 Yalnızca Secret'ı silip yeniden oluşturursanız **aynı token'ı yeniden alırsınız**: Kubernetes ServiceAccount
 token'ını ServiceAccount'tan ve Secret'ın adından türetir; "yeni" token aynısıdır ve eskisi çalışmaya devam eder.
-Yeni bir ServiceAccount ise yeni bir kimlik alır ve eski token hemen reddedilir. (`rbac.yaml` 2.22.0'daki yorum hâlâ
+Yeni bir ServiceAccount ise yeni bir kimlik alır ve eski token hemen reddedilir. (`rbac.yaml` 2.23.0'daki yorum hâlâ
 yalnızca Secret'ı silme yolunu anlatıyor; bu yanlış.)
 
 Ardından yeni token'ı ve CA'yı okuyun (2. adım), **Yönetim → Cluster'lar** ekranında cluster'ın **Düzenle**

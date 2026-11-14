@@ -49,7 +49,7 @@ Bunları sırayla yapın; her adım bir öncekine dayanır.
      "Microsoft ile giriş yap" denemelerinde bir şey görürler. [Azure AD](/administration/azure-ad)
 6. **Bir kullanıcının ne gördüğünü kontrol edin.** Gizli bir pencerede yönetici olmayan biri olarak giriş yapın:
    yalnızca onun namespace'leri görünür; Yönetim, Genel bakış ya da Node'lar yoktur; izni yoksa restart / ölçekleme
-   / düzenleme / shell de yoktur. (2.22.0, `pods:logs` olmadan da bir **Loglar** düğmesi gösterir; düğme
+   / düzenleme / shell de yoktur. (2.23.0, `pods:logs` olmadan da bir **Loglar** düğmesi gösterir; düğme
    *Bu logu okuma yetkiniz yok* yanıtını verir.)
 7. **Opsiyonel ayarlar**:
    - Yönetim → Oturum: bir girişin ne kadar geçerli kalacağı (varsayılan 60 dakika) ve API anahtarı süre politikası

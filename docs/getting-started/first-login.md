@@ -45,7 +45,7 @@ Do these in order; each step needs the one before.
      pre-create users with their groups (New user → Azure AD user) so they see something on their first
      "Sign in with Microsoft". [Azure AD](/administration/azure-ad)
 6. **Check what a user sees.** Sign in as a non-admin in a private window: only their namespaces, no Admin,
-   Overview or Nodes, no restart / scale / edit / shell without the permission. (2.22.0 still shows a **Logs**
+   Overview or Nodes, no restart / scale / edit / shell without the permission. (2.23.0 still shows a **Logs**
    button without `pods:logs`; it answers *You may not read this log*.)
 7. **Optional settings**:
    - Admin → Session: how long a sign-in lasts (default 60 minutes) and the API key expiry policy

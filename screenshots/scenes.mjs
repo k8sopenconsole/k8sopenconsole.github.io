@@ -52,7 +52,7 @@ export const SCENES = [
       await page.keyboard.press('c');
       await page.getByText('prod-eu').last().waitFor();
     }},
-  {id: 'pod-drawer', as: 'alice', storage: shop('pods'),
+  {id: 'pod-drawer', tolerance: 0.02, /* usage charts */ as: 'alice', storage: shop('pods'),
     run: async (page) => {
       await row(page, 'checkout-').click();
       await page.locator('[role=dialog]').getByText('OOMKilled').first().waitFor();

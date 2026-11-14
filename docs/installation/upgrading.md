@@ -13,7 +13,7 @@ description: "How to move to a new release, what happens to the database, and ho
 2. **Back up the volume** ([Backup and restore](/installation/backup-restore)). It is the only way back to the
    exact state before the upgrade.
 3. Make sure the Deployment uses `strategy: Recreate` ([Install on Kubernetes](/installation/kubernetes)). With
-   the default rolling update the new pod opens the database while the old one still runs; on 2.22.0 that can
+   the default rolling update the new pod opens the database while the old one still runs; on 2.23.0 that can
    lose writes until the next restart.
 
 You can skip versions: going from 2.21.0 to 2.22.0 or from 2.16 to 2.22 is one step. Each release brings its
@@ -25,17 +25,17 @@ Change the version in both places of your `kustomization.yaml` and apply it:
 
 ```yaml title="kustomization.yaml"
 resources:
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.22.0   # was v2.21.0
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.0   # was v2.22.0
 images:
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.22.0"                                                         # was 2.21.0
+    newTag: "2.23.0"                                                         # was 2.22.0
 ```
 
 ```bash
 kubectl diff -k .      # the image tag, plus whatever the release changed in deploy/
 kubectl apply -k .
 kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole --timeout=5m
-kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.22.0"
+kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.23.0"
 ```
 
 Sessions stay valid, so signed-in users carry on after a page reload. With `Recreate` the console is unavailable

@@ -18,11 +18,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   # the manifests of one release
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.22.0
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.0
 images:
   # the image of the same release
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.22.0"
+    newTag: "2.23.0"
 patches:
   - patch: |-
       apiVersion: apps/v1
@@ -48,10 +48,10 @@ patches:
 ```
 
 - `?ref=` kaynağı `git` ile çekilir; bu yüzden `kubectl`'ı çalıştıran makinede `git` ve GitHub erişimi olmalıdır.
-- **Sürümü iki yerde de sabitleyin** (`ref=v2.22.0` ve `newTag`). `images:` override'ı olmadan manifest `:latest`
+- **Sürümü iki yerde de sabitleyin** (`ref=v2.23.0` ve `newTag`). `images:` override'ı olmadan manifest `:latest`
   çalıştırır; o zaman bir pod restart'ı sizi haber vermeden yeni sürüme yükseltebilir.
 - **`Recreate`** önemlidir. Varsayılan rolling update'te yeni pod, eskisi veritabanını hâlâ tutarken başlar;
-  2.22.0'da bu durum, iki pod'un çakıştığı andan sonra bir sonraki restart'a kadar yapılan yazmaların kaybolmasına
+  2.23.0'da bu durum, iki pod'un çakıştığı andan sonra bir sonraki restart'a kadar yapılan yazmaların kaybolmasına
   yol açabilir. Bunun bedeli, sürüm yükseltmelerinde ve `rollout restart`'ta yeni pod başlarken birkaç saniyelik
   kesintidir.
 - Diğer değişkenleri aynı `env:` listesine ekleyin (bkz. [aşağısı](#settings-you-may-want-to-change)).
@@ -80,11 +80,15 @@ dosyaları tek tek listeleyin:
 
 ```yaml
 resources:
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.22.0/deploy/namespace.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.22.0/deploy/pvc.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.22.0/deploy/service.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.22.0/deploy/deployment.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/namespace.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/pvc.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/service.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/deployment.yaml
 ```
+
+[Salt okuma](/installation/connect-cluster#full-or-read-only) bir konsol için dosyaları aynı şekilde listeleyin ve
+`https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/rbac-readonly.yaml` satırını ekleyin.
+Klasörle kurulursa her `kubectl apply -k` tam `rbac.yaml`'ı geri getirir.
 
 ## Neden tam olarak bir replica {#why-exactly-one-replica}
 

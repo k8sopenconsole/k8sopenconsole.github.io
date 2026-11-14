@@ -31,7 +31,7 @@ cluster:
 ```bash
 kubectl --context <cluster> create namespace kubernetes-openconsole
 kubectl --context <cluster> apply -f \
-  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.22.0/deploy/rbac.yaml
+  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/rbac.yaml
 ```
 
 This creates:
@@ -157,12 +157,12 @@ NS=kubernetes-openconsole
 kubectl --context $CTX -n $NS delete serviceaccount openconsole-reader          # its token Secret goes with it
 kubectl --context $CTX -n $NS wait --for=delete secret/openconsole-reader-token --timeout=60s
 kubectl --context $CTX apply -f \
-  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.22.0/deploy/rbac.yaml
+  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/rbac.yaml
 ```
 
 Deleting and re-creating only the Secret gives you **the same token again**: Kubernetes derives a ServiceAccount
 token from the ServiceAccount and the Secret's name, so the "new" token is identical and the old one keeps working.
-A new ServiceAccount gets a new identity, and the old token is refused at once. (The comment in `rbac.yaml` 2.22.0
+A new ServiceAccount gets a new identity, and the old token is refused at once. (The comment in `rbac.yaml` 2.23.0
 still describes the Secret-only way; it is wrong.)
 
 Then read the new token and CA (step 2), click **Edit** on the cluster in **Admin → Clusters**, tick **Replace
