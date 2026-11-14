@@ -21,3 +21,13 @@ DOCS_NEXT=1 npm run build              # also build the unreleased "Next" docs (
 - Every page has a Turkish translation under `i18n/tr/` (rules and terms: `i18n/tr/GLOSSARY.md`).
 - Docs are versioned per minor release (`npm run docs:freeze -- X.Y`); the newest frozen version is the default, the
   unreleased "Next" (`docs/`) is only built for pull request previews.
+
+## License
+
+The documentation (the pages in `docs/` and `i18n/`, and the images) is licensed under
+[CC BY 4.0](LICENSE). The code in this repository (`scripts/`, `src/`, `screenshots/`, the configuration) is licensed
+under [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0), like
+[OpenConsole](https://github.com/vurulkan/kubernetes-openconsole) itself. The OpenConsole name and logo are not
+covered by either license: see [TRADEMARKS.md](https://github.com/vurulkan/kubernetes-openconsole/blob/main/TRADEMARKS.md).
+Contributions are accepted under these licenses, with a DCO sign-off (`git commit -s`).
+

@@ -66,6 +66,8 @@ code repo; its `CLAUDE.md` maps the code). Served at `https://k8sopenconsole.git
   bytes twice. User-guide pages start with the task ("**You want to:**") and end with a *Can't see it?* box naming the
   missing permission.
 
+License: docs CC BY 4.0 (`LICENSE`), code Apache-2.0 (README); commits signed off (`git commit -s`).
+
 Plan: <https://github.com/vurulkan/milestones> → `kubernetes-openconsole/M17`–`M23` (docs series).
 
 Keep this file current: if you change the layout, a command or a rule above, update it in the same change.
