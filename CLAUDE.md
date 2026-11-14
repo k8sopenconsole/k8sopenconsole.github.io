@@ -20,6 +20,7 @@ code repo; its `CLAUDE.md` maps the code). Served at `https://k8sopenconsole.git
 | `docs/operations/` | logging, Elastic (KQL and ES-QL examples), metrics + alerts, tracing, health probes, security model, hardening checklist, air-gapped, troubleshooting (403 reason table), FAQ |
 | `src/pages/index.tsx` | home page; `static/img/screenshot-{light,dark}.png` from a k3d cluster with `hack/k3d/crashlab.yaml` |
 | `screenshots/` | every docs screenshot: `scenes.mjs` (what to click), `record.mjs` (k3d → `fixtures/`), `shoot.mjs` (fixtures → `static/img/screens/*.webp`, en/tr × light/dark, deterministic); see its README |
+| `src/theme/NavbarItem/LocaleDropdownNavbarItem/` | the language switch drawn as the app's `EN \| TR` toggle (replaces the dropdown; keeps page, query and `#section`) |
 | `src/theme/DocVersionBanner/` | the "Bu sayfa Türkçeye çevrilmedi" note on a page that falls back to English |
 | `scripts/check-translations.mjs` | `npm run translations:check`: English pages without Turkish, and Turkish pages whose code blocks, anchors, links or screenshots differ from English (CI warnings + job summary, never fails) |
 | `scripts/sitemap.mjs` | postbuild: one `sitemap.xml` for both languages with hreflang alternates; `static/robots.txt` points to it |
