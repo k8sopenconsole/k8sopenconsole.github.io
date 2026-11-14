@@ -144,6 +144,8 @@ const config: Config = {
   ],
 
   themeConfig: {
+    // Google Search Console ownership (URL-prefix property https://k8sopenconsole.github.io/).
+    metadata: [{name: 'google-site-verification', content: 'HcLzFunUkJItR4rZT5Aw7xcS_SCfG-XyMizbZ4HT61o'}],
     image: `img/og-${LOCALE === 'tr' ? 'tr' : 'en'}.png`,
     colorMode: {
       defaultMode: 'light',
