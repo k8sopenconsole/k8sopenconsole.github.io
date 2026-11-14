@@ -197,7 +197,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Kubernetes OpenConsole. Built with Docusaurus.`,
+      copyright: `Kubernetes OpenConsole. Documentation CC BY 4.0, code Apache-2.0. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,
