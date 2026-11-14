@@ -1,0 +1,47 @@
+---
+title: "Pod shell"
+description: "Çalışan bir container'da terminal açın: container seçimi, kayıt, boşta kalma süresi, aynı anda kaç shell."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Pod shell
+
+**Yapmak istediğiniz:** çalışan bir container'ın içinde komut çalıştırmak; `kubectl exec -it … -- sh` gibi.
+
+Pod satırında, pod kartında ya da pod'un ayrıntı panelinde **Shell**'e tıklayın.
+
+<Screenshot id="shell" alt="Bir storefront pod'unda shell: kırmızı 'Bu oturum kaydediliyor.' bandı, hostname ve ls çıktısı" />
+
+## Hangi container, hangi shell {/* #which-container-and-which-shell */}
+
+- Birden fazla container'ı olan bir pod önce hangisini istediğinizi sorar. Ana container en üsttedir ve seçili gelir
+  (`Enter` onu açar); çalışmayan container'lar soluk görünür. Container'ı sonradan terminalden de değiştirebilirsiniz.
+- Sağ üstteki menü shell'i seçer: *Otomatik* sırayla `bash`, `ash` ve `sh`'yi dener. Minimal imajlarda (distroless,
+  scratch) hiç shell yoktur; bu durumda shell açılamaz.
+- **Yeniden bağlan** aynı container'da yeni bir oturum başlatır.
+
+## Oturum kaydedilir {/* #it-is-recorded */}
+
+Kırmızı bant oturumun kaydedildiğini gösterir: terminalde görünen her şey saklanır ve adminler tarafından tekrar
+oynatılabilir; ekrana bastığınız gizli bilgiler de dahil. Bant yalnızca sunucu kaydı onayladığında görünür. Yazdıklarınız
+ancak shell onları ekrana geri bastığı ölçüde kaydedilir (şifre istemleri ekrana basmaz).
+
+## Sınırlar {/* #limits */}
+
+- **5 dakika** hiç girdi almayan bir shell kapanır (yöneticiniz başka bir süre belirlemiş olabilir).
+- Aynı anda **3** shell açık tutabilirsiniz; birini kapatana kadar dördüncüsü reddedilir.
+- Her oturum audit log'da iki kez yer alır: `pod.exec`, `phase: start` ile (container, komut) ve `phase: end` ile
+  (çıkış kodu, giren ve çıkan byte, süre). Oturum kesildiyse (boşta kalma süresi, kapatılan sekme, ağ) `exit_code`
+  `-1` olur. Sıfırdan farklı bir durumla biten shell, örneğin son komut başarısız olduysa, normal bir bitiştir (sonuç
+  `success`).
+
+Shell'i hafife almayın: bir production container'ının içinde, container'ın kullanıcısı olarak işlem yapıyorsunuz.
+
+:::info[Göremiyor ya da yapamıyor musunuz?]
+- **Shell düğmesi yok**: bu namespace'te `pods:exec` izniniz yok ya da yöneticiniz shell'i herkes için kapatmış.
+- **"too many open shells"**: diğer üç shell'inizden birini kapatın.
+- **Shell bir dakika sessizlikten sonra kapanıyor**: OpenConsole'un önündeki bir proxy boştaki bağlantıları kesiyor;
+  yöneticinize sorun ([Kubernetes'e kurulum](/installation/kubernetes#ingress-with-tls)).
+- **Kubernetes'ten 403**: cluster bağlantısının kendisi exec yapamıyor olabilir; yöneticinize sorun.
+:::

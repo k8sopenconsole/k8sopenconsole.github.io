@@ -45,3 +45,7 @@
 [data-theme='dark'] .active:hover {
   color: #0f172a;
 }
+
+.mobile {
+  padding: 0.5rem var(--ifm-menu-link-padding-horizontal);
+}

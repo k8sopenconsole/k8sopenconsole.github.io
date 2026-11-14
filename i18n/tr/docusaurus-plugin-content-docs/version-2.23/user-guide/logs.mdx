@@ -1,0 +1,57 @@
+---
+title: "Loglar"
+description: "Bir container'ın logunu canlı izleyin, son restart öncesindeki logu okuyun, arayın, indirin; limitler neler."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Loglar
+
+**Yapmak istediğiniz:** bir container'ın ne yazdığını ya da crash etmeden önce ne yazdığını okumak.
+
+Bir pod satırından (**Loglar**), bir pod'un ayrıntı panelinden ya da bir Deployment'tan / Job'dan (tüm pod'ları
+birlikte) açın.
+
+<Screenshot id="logs" alt="Bir storefront pod'unun JSON log satırlarını canlı izleyen log penceresi; Canlı / Son restart öncesi, Logda ara, Duraklat, Satır kaydır, Kopyala ve İndir" />
+
+## Canlı {/* #live */}
+
+Log, container yazdıkça akar. Container restart etse de devam eder. Bağlantı koparsa (bir proxy, uyku moduna geçen
+bir laptop) yeniden bağlanır ve kaldığı yerden sürer; satır kaçırmaz, tekrarlamaz. **Duraklat** kaydırmayı durdurur,
+yeni satırlar ise toplanmaya devam eder.
+
+Pencere **son 10.000 satırı** tutar; daha eskileri üstten düşer. Daha fazlası için **İndir**'i ya da log
+platformunuzu kullanın.
+
+## Hangi container {/* #which-container */}
+
+Birden çok container'ı olan bir pod, ana container'ında açılır: `kubectl.kubernetes.io/default-container`
+annotation'ında adı geçen container, yoksa iş yüküyle aynı adı taşıyan. Böylece listede ilk sırada duran bir sidecar
+yanlışlıkla seçilmez. Container menüsünden geçiş yapabilirsiniz; init container'lar da oradadır.
+
+## Son restart öncesi {/* #before-the-last-restart */}
+
+**Son restart öncesi**, çıkış yapan container instance'ının, yani hatayı içerenin logunu gösterir. Bu
+`kubectl logs --previous`'tur ve bir `CrashLoopBackOff` için aradığınız şey budur:
+
+<Screenshot id="logs-previous" alt="catalog pod'unun son restart öncesi logu: 'catalog 3.4.1 starting', 'connecting to postgres:5432', 'error: dial tcp postgres:5432: connection refused'" />
+
+## Arama, satır kaydırma, kopyalama, indirme {/* #find-wrap-copy-download */}
+
+- **Logda ara** eşleşmeleri vurgular; oklar (ya da `Enter` / `Shift+Enter`) eşleşmeler arasında gezinir.
+- **Satır kaydır** uzun satırları yana kaydırmak yerine alt satıra böler.
+- **Kopyala** pencerede olanı kopyalar; **İndir** bunu bir metin dosyası olarak kaydeder.
+
+## Limitler {/* #limits */}
+
+- Kullanıcı başına aynı anda on log akışı açılabilir, sonra saniyede bir tane daha; bunu aşarsanız biraz bekleyin.
+- Açtığınız her log audit'e yazılır (`pod.logs`; restart öncesi log için `previous: true`).
+
+:::info[Göremiyor ya da yapamıyor musunuz?]
+- **Loglar düğmesi yok**, ya da *Bu logu okuma yetkiniz yok.*: bu namespace'te `pods:logs` izniniz yok. `pods:logs`
+  isteyin; listeyi okumak (`pods:list`) ayrı bir izindir.
+- Restart öncesi logda **"unable to retrieve container logs"**: container, runtime logunu tutamayacak kadar hızlı
+  öldü.
+- Şirket proxy'nizin arkasında **akış bir dakikalık sessizlikten sonra duruyor**: yöneticinize WebSocket idle
+  timeout'unu sorun ([Kubernetes'e kurulum](/installation/kubernetes#ingress-with-tls)).
+:::

@@ -1,0 +1,46 @@
+---
+title: "Kayıtlı görünümler ve Canlı olaylar"
+description: "Namespace, sekme ve aramayı bir adla kaydedip paylaşın; değişiklikleri ve Kubernetes olaylarını anında izleyin."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Kayıtlı görünümler ve Canlı olaylar
+
+## Kayıtlı görünümler {/* #saved-views */}
+
+**Yapmak istediğiniz:** "staging'de shop'taki hatalı pod'lar" görünümüne tek tıkla dönmek ya da onu ekibinizle
+paylaşmak.
+
+Aramanın yanındaki **Görünümler** (ya da `v`) sizin görünümlerinizi ve herkesle paylaşılanları listeler:
+
+<Screenshot id="views-menu" alt="Kayıtlı görünümler menüsü: 'Shop · failing pods' ve paylaşılan 'Shop · web tier', her biri cluster, namespace, sekme ve aramasıyla; altta Mevcut görünümü kaydet" />
+
+- **Mevcut görünümü kaydet** cluster'ı, namespace'i, sekmeyi, aramayı ve liste / kart modunu bir adla saklar.
+- Görünüm sunucuda durur; hangi tarayıcıyı kullanırsanız kullanın sizinle gelir. Başka bir cluster'da kaydedilmiş bir
+  görünümü açmak sizi o cluster'a geçirir. 2.14.0'dan önceki sürümlerin tarayıcıda tuttuğu görünümler, Panel'i ilk
+  açtığınızda sunucuya taşınır.
+- Paylaş simgesi görünümü **her kullanıcıya** açar ve adınızla işaretler. Başkaları kullanabilir; yeniden adlandırmak,
+  paylaşımı kaldırmak ya da silmek yalnızca size aittir (adminler paylaşılan görünümleri kaldırabilir).
+- Paylaşılan bir görünüm hiçbir zaman erişim vermez: görünümün namespace'inde izni olmayan biri yalnızca boş bir liste
+  görür.
+- Menü açıkken `1`–`9` sıradaki görünümü açar.
+
+## Canlı olaylar {/* #live-events */}
+
+**Yapmak istediğiniz:** şu anda olanı izlemek: oluşturulan ve sonlandırılan pod'lar, Kubernetes'ten gelen uyarılar.
+
+Üst çubuktaki **Canlı olaylar** (ya da `e`) bir yan panel açar. Panel, listeleyebildiğiniz nesnelerdeki değişiklikleri
+ve Kubernetes Event'lerini (tekrarlayan bir olayın her tekrarı dahil) en yenisi üstte olacak şekilde akıtır:
+
+<Screenshot id="live-events" alt="Pod'lar sekmesinin yanında Canlı olaylar paneli: Deployment ve Pod güncellemeleri, bir checkout pod'u için BackOff uyarısı, Started ve Created olayları" />
+
+- **Tümü**, **K8s olayları** ya da yalnızca **Uyarılar**.
+- Panel yalnızca listeleyebildiğiniz nesneleri gösterir; olaylar ilgili oldukları nesneyle eşleştirilir.
+- Duraklatma ve temizleme sağ üstte.
+
+:::info[Göremiyor musunuz?]
+- **Paylaşılan bir görünüm hiçbir şey göstermiyor**: o görünümün namespace'inde ya da cluster'ında izniniz yok.
+- **Bir namespace için olay yok**: orada bir şey değişmedi ya da o türdeki nesneleri listeleyemiyorsunuz. Node olayları
+  ve diğer cluster genelindeki olaylar yalnızca adminler içindir.
+:::

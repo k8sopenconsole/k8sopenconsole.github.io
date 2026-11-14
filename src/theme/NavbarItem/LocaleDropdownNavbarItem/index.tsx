@@ -16,8 +16,8 @@ export default function LocaleToggle({mobile}: {mobile?: boolean}): ReactNode {
   const search = useHistorySelector((h) => h.location.search);
   const hash = useHistorySelector((h) => h.location.hash);
   const label = currentLocale === 'tr' ? 'Dil' : 'Language';
-  return (
-    <div className={clsx(styles.toggle, mobile ? 'menu__list-item' : 'navbar__item')} role="group" aria-label={label}>
+  const toggle = (
+    <div className={clsx(styles.toggle, !mobile && 'navbar__item')} role="group" aria-label={label}>
       <IconLanguage className={styles.icon} aria-hidden="true" />
       {locales.map((locale) => {
         const active = locale === currentLocale;
@@ -37,4 +37,6 @@ export default function LocaleToggle({mobile}: {mobile?: boolean}): ReactNode {
       })}
     </div>
   );
+  // The mobile menu is a list.
+  return mobile ? <li className={clsx('menu__list-item', styles.mobile)}>{toggle}</li> : toggle;
 }
