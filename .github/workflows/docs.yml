@@ -9,6 +9,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Daily rebuild: the release notes page picks up a new GitHub release even if
+  # nobody runs the workflow by hand after `gh release create`.
+  schedule:
+    - cron: '17 4 * * *'
 
 permissions:
   contents: read
@@ -28,15 +32,21 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck
+      # Pull requests also build the unreleased "Next" docs (docs/), so their links
+      # are checked and the preview shows them; main publishes frozen versions only.
       - run: npm run build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCS_NEXT: ${{ github.event_name == 'pull_request' && '1' || '' }}
       # docs/reference/*.md and openapi/openapi.yaml must be the code repo's at
       # the ref in reference.json, and the endpoint reference must have one page
       # per operation.
       - run: npm run reference:check
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Pages without Turkish: listed in the job summary and as warnings; never
+      # fails (the tr site shows the English page with a note).
+      - run: npm run translations:check
       - name: Preview (download, then npx serve build)
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4

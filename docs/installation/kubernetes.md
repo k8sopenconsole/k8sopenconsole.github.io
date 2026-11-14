@@ -9,7 +9,7 @@ OpenConsole is one Deployment with one pod, a 5 GiB volume and a ClusterIP Servi
 [`deploy/`](https://github.com/vurulkan/kubernetes-openconsole/tree/main/deploy) folder of the code repository;
 you apply them with kustomize, which is built into `kubectl`.
 
-## 1. Write a kustomization
+## 1. Write a kustomization {#1-write-a-kustomization}
 
 Create a folder (keep it in Git) with this `kustomization.yaml`:
 
@@ -18,11 +18,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   # the manifests of one release
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.22.0
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.0
 images:
   # the image of the same release
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.22.0"
+    newTag: "2.23.0"
 patches:
   - patch: |-
       apiVersion: apps/v1
@@ -48,21 +48,22 @@ patches:
 ```
 
 - The `?ref=` resource is fetched with `git`, so the machine running `kubectl` needs `git` and access to GitHub.
-- **Pin the release** in both places (`ref=v2.22.0` and `newTag`). Without the `images:` override the manifest runs
+- **Pin the release** in both places (`ref=v2.23.0` and `newTag`). Without the `images:` override the manifest runs
   `:latest`, and a pod restart could then upgrade you without notice.
 - **`Recreate`** is important. With the default rolling update the new pod starts while the old one still holds
-  the database; on 2.22.0 that can lose the writes made after the overlap until the next restart. Upgrades and
+  the database; on 2.23.0 that can lose the writes made after the overlap until the next restart. Upgrades and
   `rollout restart` then have a few seconds of downtime while the new pod starts.
 - Add other variables to the same `env:` list (see [below](#settings-you-may-want-to-change)).
 
-## 2. Apply it
+## 2. Apply it {#2-apply-it}
 
 ```bash
 kubectl apply -k .
 kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole --timeout=5m
 ```
 
-What gets created, all in namespace `kubernetes-openconsole`:
+What gets created, all in namespace `kubernetes-openconsole` (`deploy/elk/` is optional and not applied by
+kustomize; see [Elastic](/operations/elastic)):
 
 | Object | What |
 |---|---|
@@ -78,20 +79,24 @@ the files instead of the folder:
 
 ```yaml
 resources:
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.22.0/deploy/namespace.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.22.0/deploy/pvc.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.22.0/deploy/service.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.22.0/deploy/deployment.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/namespace.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/pvc.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/service.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/deployment.yaml
 ```
 
-## Why exactly one replica
+For a [read-only](/installation/connect-cluster#full-or-read-only) console, list the files the same way and add
+`https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/rbac-readonly.yaml`. Installed with
+the folder, every `kubectl apply -k` would put the full `rbac.yaml` back.
+
+## Why exactly one replica {#why-exactly-one-replica}
 
 The database is a SQLite file on a ReadWriteOnce volume. A second pod would either not start (the volume is
 attached to another node) or open the same file next to the first one, which loses or corrupts writes. Don't
 scale the Deployment and don't add an HPA. One pod serves a large team: lists come from an in-memory cache, not
 from the API server.
 
-## Resources
+## Resources {#resources}
 
 The manifest requests `300m` CPU and `384Mi` memory and limits them to `1` CPU and `1Gi`. Memory grows with the
 number of pods, Deployments, Services, … in the connected clusters, since OpenConsole keeps them in memory, plus
@@ -100,7 +105,7 @@ about 10 KB per pod for 24 hours of usage samples. If the pod is OOMKilled, rais
 The volume holds the database (small: users, roles, the audit log for `LOG_RETENTION_DAYS`) and shell recordings,
 which are capped at 2 GiB by default (Admin → Recordings). 5 GiB is enough for most installations.
 
-## Settings you may want to change
+## Settings you may want to change {#settings-you-may-want-to-change}
 
 Everything else is configured in the UI and stored in the database. These are read from the environment on start:
 
@@ -116,7 +121,7 @@ Everything else is configured in the UI and stored in the database. These are re
 
 The full list, including feature flags and limits: [Environment variables](/reference/environment-variables).
 
-## Ingress with TLS
+## Ingress with TLS {#ingress-with-tls}
 
 The Service is ClusterIP; put your Ingress or Gateway in front of it. OpenConsole needs nothing special from it
 except WebSockets (logs, shell, live events), which every common controller passes through. Example for a
@@ -167,7 +172,7 @@ of the Ingress); set it above the shell idle timeout, `EXEC_IDLE_TIMEOUT` (5 min
 Don't route `/metrics` from outside: it is unauthenticated, for your Prometheus inside the cluster
 ([Metrics](/operations/metrics)).
 
-## Next
+## Next {#next}
 
 1. [Connect a cluster](/installation/connect-cluster): this one (the ServiceAccount is already there) and any others.
 2. [First login](/getting-started/first-login): change the admin password, set up users and roles.

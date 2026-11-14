@@ -6,7 +6,7 @@ description: "The default admin, the password policy, and the first things to se
 
 # First login and admin checklist
 
-## First login
+## First login {#first-login}
 
 On its very first start OpenConsole creates one admin: **`admin` / `admin`**. Sign in with it and choose a new
 password; until you do, every other page and API call is refused. After the change you are signed out; sign in
@@ -16,7 +16,7 @@ Local passwords must be at least 8 characters (`PASSWORD_MIN_LENGTH`), at most 7
 must actually change the password. Five failed sign-ins for one user from one address lock that pair for five
 minutes.
 
-## Admin checklist
+## Admin checklist {#admin-checklist}
 
 Do these in order; each step needs the one before.
 
@@ -41,11 +41,11 @@ Do these in order; each step needs the one before.
      groups (Admin → Users → New user → Import from LDAP…), or turn on *Create an account on a user's first
      sign-in* with default groups. Sign in once as an LDAP user before telling everyone.
      [LDAP / Active Directory](/administration/ldap)
-   - **Azure AD (Entra ID)**: create the app registration, fill in Admin → Azure AD, **Test configuration**, then
+   - **Azure AD (Entra ID)**: create the app registration, fill in Admin → Azure AD, **Test Connection**, then
      pre-create users with their groups (New user → Azure AD user) so they see something on their first
      "Sign in with Microsoft". [Azure AD](/administration/azure-ad)
 6. **Check what a user sees.** Sign in as a non-admin in a private window: only their namespaces, no Admin,
-   Overview or Nodes, no restart / scale / edit / shell without the permission. (2.22.0 still shows a **Logs**
+   Overview or Nodes, no restart / scale / edit / shell without the permission. (2.23.0 still shows a **Logs**
    button without `pods:logs`; it answers *You may not read this log*.)
 7. **Optional settings**:
    - Admin → Session: how long a sign-in lasts (default 60 minutes) and the API key expiry policy

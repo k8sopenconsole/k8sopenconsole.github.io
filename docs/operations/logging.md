@@ -17,7 +17,7 @@ container runtime keeps the lines and your log shipper reads them. Four kinds of
 
 To send the lines to Elasticsearch with parsed fields and their own data streams, see [Elastic](/operations/elastic).
 
-## Format
+## Format {#format}
 
 `LOG_FORMAT` picks one of three formats. The manifest in `deploy/` sets `ecs`; the built-in default is `text`.
 
@@ -26,6 +26,9 @@ To send the lines to Elasticsearch with parsed fields and their own data streams
 | `ecs` | Elastic: nested JSON in [Elastic Common Schema](https://www.elastic.co/guide/en/ecs/current/index.html) field names, `event.*` filled in |
 | `json` | Loki, Vector, your own parsing: flat JSON with short names (`time`, `level`, `msg`, `user`, …) |
 | `text` | reading `kubectl logs` by eye |
+
+With `ecs` or `json`, every line (client-go's messages too) is one JSON object, so Elastic Agent, Filebeat,
+Logstash, Fluent Bit or Vector read it without grok.
 
 The same failed sign-in in each format, as 2.22.0 prints it (one line each; the `ecs` lines are wrapped here):
 
@@ -71,12 +74,12 @@ What each `json` field is called in `ecs`:
 | `duration_ms` | `event.duration` (nanoseconds, measured, not rounded) |
 | — | `http.response.body.bytes` |
 | `event` (audit action), `reason`, `error`, `trace_id` | `event.action`, `event.reason`, `error.message`, `trace.id` |
-| `api_key_id`, `api_key_name` | `openconsole.api_key.id`, `openconsole.api_key.name`: on audit events **and** on request lines; absent for a web session |
+| `api_key_id`, `api_key_name` | `openconsole.api_key.id`, `openconsole.api_key.name`: on audit events **and** on request lines; absent for a web session. Tell API from web with `openconsole.api_key.id : *`, not the user agent, which the client chooses |
 | everything else (`verb`, `outcome`, `cluster`, `namespace`, `resource_name`, audit details such as `replicas_to`, …) | `openconsole.<name>` |
 
 Every `ecs` record has `event.dataset`: `openconsole.audit` for audit events, `openconsole.app` for everything else,
-and `log.logger` is `http` or `audit` on those two kinds. Request records carry `event.category: [web]`,
-`event.type: [access]` and `event.outcome` (`failure` for 4xx / 5xx). Audit events carry `event.outcome`
+and `log.logger` is `http` or `audit` on those two kinds. Both kinds carry `event.kind: event`. Request records carry
+`event.category: [web]`, `event.type: [access]` and `event.outcome` (`failure` for 4xx / 5xx). Audit events carry `event.outcome`
 (`success`, or `failure` for denied / failed / rate_limited / locked; the exact value is `openconsole.outcome`),
 `event.type` from the verb (`access` for reads, `change`, `creation`, `deletion`, `start` / `end` for shells and
 sign-ins) and, where it applies, `event.category` (`authentication`, `session`, `process`, `iam`,
@@ -89,7 +92,7 @@ that wrote the line; the two never mix.
 With tracing on, the start-up line `tracing enabled` is printed before the JSON logger is set up, so it arrives as
 plain text (`2026/11/14 11:42:09 INFO tracing enabled service=openconsole`). Every other line follows `LOG_FORMAT`.
 
-## Levels
+## Levels {#levels}
 
 `LOG_LEVEL` is `debug`, `info` (default), `warn` or `error`.
 
@@ -103,7 +106,7 @@ plain text (`2026/11/14 11:42:09 INFO tracing enabled service=openconsole`). Eve
 
 `debug` adds only the successful probe and scrape lines; it doesn't log request bodies.
 
-## Linking a request and its audit event
+## Linking a request and its audit event {#linking-a-request-and-its-audit-event}
 
 Every response carries an `X-Request-Id` header. The same id is on the request line (`http.request.id`) and on
 the audit events the request caused, so one search finds both:
@@ -120,7 +123,7 @@ request lines also carry `trace.id`.
 The Admin → Audit Logs screen shows the same request id on each event
 ([From an event to the request log](/administration/audit-log#from-an-event-to-the-request-log)).
 
-## Other settings
+## Other settings {#other-settings}
 
 | Variable | Default | Meaning |
 |---|---|---|
@@ -132,7 +135,7 @@ The Admin → Audit Logs screen shows the same request id on each event
 
 All variables: [Environment variables](/reference/environment-variables).
 
-## Retention
+## Retention {#retention}
 
 The database keeps audit events for `LOG_RETENTION_DAYS` (30), and successful reads made with an API key for
 `API_KEY_READ_RETENTION_DAYS` (7). stdout lines are not affected by either: how long they stay is up to your log

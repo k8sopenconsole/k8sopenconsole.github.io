@@ -1,37 +1,25 @@
 {
- "time": 1794606861576,
+ "time": 1794686813718,
  "sockets": [
   {
-   "path": "/ws/namespaces/shop/pods/catalog-575885dfd9-56vnv/logs",
+   "path": "/ws/namespaces/shop/pods/catalog-7f4ff758f7-758vf/logs",
    "frames": [
     {
-     "s": "{\"t\":\"line\",\"ts\":\"2026-11-13T21:51:39.616610040Z\",\"c\":\"catalog\",\"text\":\"catalog 3.4.1 starting\"}\n"
+     "s": "{\"t\":\"line\",\"ts\":\"2026-11-14T20:06:50.368022585Z\",\"c\":\"catalog\",\"text\":\"catalog 3.4.1 starting\"}\n"
     },
     {
-     "s": "{\"t\":\"line\",\"ts\":\"2026-11-13T21:51:39.616826030Z\",\"c\":\"catalog\",\"text\":\"connecting to postgres:5432\"}\n"
+     "s": "{\"t\":\"line\",\"ts\":\"2026-11-14T20:06:50.368229532Z\",\"c\":\"catalog\",\"text\":\"connecting to postgres:5432\"}\n"
     },
     {
-     "s": "{\"t\":\"line\",\"ts\":\"2026-11-13T21:51:41.619180821Z\",\"c\":\"catalog\",\"text\":\"error: dial tcp postgres:5432: connection refused\"}\n"
-    },
-    {
-     "s": "{\"t\":\"end\",\"reason\":\"container_terminated\",\"retry\":true}\n"
+     "s": "{\"t\":\"line\",\"ts\":\"2026-11-14T20:06:52.374145940Z\",\"c\":\"catalog\",\"text\":\"error: dial tcp postgres:5432: connection refused\"}\n"
     }
    ]
   },
   {
-   "path": "/ws/namespaces/shop/pods/catalog-575885dfd9-56vnv/logs",
+   "path": "/ws/namespaces/shop/pods/catalog-7f4ff758f7-758vf/logs",
    "frames": [
     {
-     "s": "{\"t\":\"line\",\"ts\":\"2026-11-13T21:51:39.616610040Z\",\"c\":\"catalog\",\"text\":\"catalog 3.4.1 starting\"}\n"
-    },
-    {
-     "s": "{\"t\":\"line\",\"ts\":\"2026-11-13T21:51:39.616826030Z\",\"c\":\"catalog\",\"text\":\"connecting to postgres:5432\"}\n"
-    },
-    {
-     "s": "{\"t\":\"line\",\"ts\":\"2026-11-13T21:51:41.619180821Z\",\"c\":\"catalog\",\"text\":\"error: dial tcp postgres:5432: connection refused\"}\n"
-    },
-    {
-     "s": "{\"t\":\"end\",\"reason\":\"previous_complete\"}\n"
+     "s": "{\"t\":\"error\",\"reason\":\"previous_unavailable\",\"msg\":\"unable to retrieve container logs for containerd://0729c071a96095540fa7696c88e4fc155b061098e8239f2f967680dacae96948\"}\n"
     }
    ]
   }

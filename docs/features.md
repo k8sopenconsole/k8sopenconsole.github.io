@@ -5,11 +5,11 @@ description: "Everything OpenConsole does, in one list."
 
 # Features
 
-## Observability & live data
+## Observability & live data {#observability--live-data}
 - **Admin overview** (`/overview`, admins only; admins land here after sign-in) — the selected cluster at a glance: pods running, pods needing attention (red / amber), restarts in 24 h, ready Deployments, CPU and memory as % of allocatable (each with a 24 h trend), cluster usage over 24 h against allocatable (Prometheus when configured, else the in-memory samples), the pods needing attention, the workloads restarting most with their usual exit code, restarts per hour, the busiest namespaces (pods near their limits), Warning events of the last 15 minutes and a node strip (a node opens its drawer on Nodes; "All nodes" opens the list). `GET /api/admin/overview` (cached 15 s per cluster) draws the page without waiting for Prometheus; the 24 h usage comes from `GET /api/admin/overview/history` (a Prometheus answer is kept 5 minutes and refreshed in the background). Opening the page is audited as `cluster.view_overview`, its own refreshes are not. Needs `nodes` and `metrics.k8s.io` `nodes` in the ClusterRole for the node data.
 - **Nodes** (`/nodes`, admins only, read only; rail item under Overview, `g n`, command palette; `/nodes?node=<name>` opens a node, as the overview strip and the node name in a pod drawer do) — every node of the selected cluster: status (Ready / NotReady / pressure, cordoned), roles, kubelet version, OS / architecture, age, pods against capacity, and CPU / memory used, requested and limited as % of allocatable. `GET /api/admin/nodes` (cached 15 s per cluster), `GET /api/admin/nodes/{name}` (the node, its pods with requests and usage, its events; from the informer cache, pods by a `spec.nodeName` index), `GET /api/admin/nodes/{name}/metrics/history?range=` (Prometheus: the node's containers by the `node` or `instance` label, else its pods summed; without Prometheus, the in-memory samples of its pods). Click a node (or `j` / `k` and Enter) for its drawer: summary (OS image, kernel, runtime, IPs, cordoned), capacity / allocatable / requests / limits / used for CPU, memory, pods and ephemeral storage, usage history (1 h / 6 h / 24 h, 7 d with Prometheus), its top pods by CPU or memory, every pod on it (all or only those needing attention; a pod opens on the Dashboard), conditions, taints, labels, annotations and events. Search matches the name, a role or a label (`key=value`). Audited as `node.list` / `node.get` (ECS `event.type: access`); a non-admin gets 403 and a `denied` event; the page's refreshes are not audited.
 - **Informer-driven lister cache** — list endpoints read from a `client-go` SharedInformerFactory, so the UI is instant and the API server isn't hammered by polling.
-- **Live Events side panel** (header button or `e`, on the Dashboard and the Overview) — streams `added` / `updated` / `deleted` plus native `corev1.Event` objects (new ones and each repeat of a recurring one) over a WebSocket. Filter by All / K8s events / Warnings. A user sees only objects they may `list` in that namespace (Kubernetes Events by the object they are about); node and other cluster-scoped events are for admins. On Admin → Overview the panel opens for the whole cluster, on Warnings.
+- **Live Events side panel** (header button or `e`, on the Dashboard and the Overview) — streams `added` / `updated` / `deleted` plus native `corev1.Event` objects (new ones and each repeat of a recurring one) over a WebSocket. Filter by All / K8s events / Warnings. A user sees only objects they may `list` in that namespace (Kubernetes Events by the object they are about); node and other cluster-scoped events are for admins. On the Overview the panel opens for the whole cluster, on Warnings.
 - **Prometheus `/metrics`**, dedicated `/livez` (process) and `/readyz` (DB) endpoints. Clusters are left out of readiness, so one unreachable cluster can't take the console down. See [Metrics](/operations/metrics).
 - **Pod health like `kubectl`, and why it restarted** — the STATUS `kubectl get pods` prints (CrashLoopBackOff, OOMKilled, ImagePullBackOff, Init:Error, Unschedulable …) in red / amber / green, and the last exit of a restarted container (`137 OOMKilled · 2m`) with a plain-language explanation; the log of the container before its last restart. See [Pod health, usage and restart history](/user-guide/pod-health).
 - **Detail drawers** for pods, Deployments, StatefulSets and DaemonSets — containers, requests / limits, probes, conditions, events; rollout, the workload's pods, usage, restart history, and a Deployment's revisions (read only). Workload lists flag workloads whose pods are failing.
@@ -17,10 +17,10 @@ description: "Everything OpenConsole does, in one list."
 - **Restart history** — every container exit OpenConsole sees is kept for 30 days, also for pods that no longer exist.
 - **OpenTelemetry tracing** (opt-in): one span per API request, named after its route, with the Kubernetes API calls it made as child spans. Exported over OTLP/HTTP to any collector (Jaeger, Tempo, Elastic APM, …). See [Tracing](/operations/tracing).
 
-## Workloads shown in the Dashboard
+## Workloads shown in the Dashboard {#workloads-shown-in-the-dashboard}
 Pods, Deployments, **DaemonSets**, **StatefulSets**, **HorizontalPodAutoscalers (v2)**, Services, ConfigMaps, **Secrets**, Ingresses, CronJobs, Jobs — card view, list view, label filters, saved views.
 
-## Write operations (opt-in per role, per namespace)
+## Write operations (opt-in per role, per namespace) {#write-operations-opt-in-per-role-per-namespace}
 - **Deployment restart** (`deployments:restart`)
 - **Deployment / StatefulSet scale** (`deployments:scale`, `statefulsets:scale`)
 - **YAML view + edit + server dry-run + apply** for every workload above (`{resource}:edit`), powered by Monaco. Diff view, dry-run returns the server-canonicalized object, optimistic concurrency via `resourceVersion`.
@@ -31,7 +31,7 @@ Pods, Deployments, **DaemonSets**, **StatefulSets**, **HorizontalPodAutoscalers 
 
 Every read and write is an audit event with its own fields: `action` (`deployment.restart`), `verb`, `outcome` (`success` / `denied` / `failed` / `rate_limited` / `locked`), the target cluster, namespace and resource, details such as `restarted_at` or `replicas_from` / `replicas_to`, and who / from where. See [Audit events](/reference/audit-events). The HTTP response carries `X-Request-Id` for correlation with the audit line in stdout.
 
-## Access & identity
+## Access & identity {#access--identity}
 - **User → Groups → Roles → per-cluster, per-namespace permissions** (application-level RBAC, no Kubernetes RBAC for end users).
 - **Namespace discovery is permission-based** (no leakage of names you can't access).
 - **Multi-cluster, per user**: save N clusters. Every user picks their **own** cluster in the header (or with `c`), and admins set a default for everyone else. Permissions can be scoped per cluster, and audit records the cluster.
@@ -41,7 +41,7 @@ Every read and write is an audit event with its own fields: `action` (`deploymen
 - **Session recordings** (Admin → Recordings): filter, replay (1x / 2x / 4x, seek, skip idle), download `.cast`, delete; retention, quota and on/off switch editable in the UI.
 - **Login brute-force protection** (5 fails per IP+user → 5-minute lock, audited). Every sign-in is audited as `user.login` with the outcome (`success` / `failed` / `locked`), the method (`login_method`: `local` / `ldap` / `azure`) and, for a failure, the reason.
 
-## API & AI agents
+## API & AI agents {#api--ai-agents}
 - **API keys** (account menu → API keys) for Claude Code, Cursor or your own scripts: `oc_…` keys limited to chosen clusters, namespaces and a permission matrix, never more than their owner holds at the time of the call; expiry, regenerate, revoke. The key is shown once and stored as a SHA-256 hash. Every action and resource read is audited with the user **and the key's name**; shells and commands run with a key are always recorded.
 - **Admin policy** — per role, how much of it a key may get (Off / Safe read-only / All of the role's permissions), a per-user override, an expiry policy (longest lifetime, no-expiry allowed or not), and Admin → API keys: every user's keys, revoke with a reason, CSV.
 - **OpenAPI 3.1** at `/api/openapi.json` (no sign-in) and an in-app **Documentation** tab: quick start, a text to hand your agent, every endpoint with its permission and a `curl` example, greyed out where your keys can't reach it.
@@ -49,7 +49,7 @@ Every read and write is an audit event with its own fields: `action` (`deploymen
 
 See [API and agents](/api/overview).
 
-## UX
+## UX {#ux}
 - **Light / Dark / System theme** (persisted; respects OS).
 - **Internationalization — English & Turkish** (locale switcher next to the theme toggle; defaults to browser language, persists user override). TR covers nav, Dashboard, Admin, audit, keyboard cheat sheet.
 - **Keyboard-first navigation**: `⌘K` / `Ctrl+K` command palette, `?` cheat sheet, chord shortcuts for nav/theme, `c` cluster switcher, `v` saved views, `e` live events panel, `n` namespace filter focus. TR keyboard positions (`ğ` / `ü` / `.`) are mapped to the US `[` / `]` / `/` by physical key, so the shortcuts don't break on a TR Q layout.
@@ -61,7 +61,7 @@ See [API and agents](/api/overview).
 - **Admin Role Permissions redesign** — role sidebar, grouped grant cards (namespaces that share identical grants merge), bulk Add Permissions modal with templates (Viewer / Developer / SRE / Admin), copy-from-role, inline edit.
 
 
-## Architecture
+## Architecture {#architecture}
 
 - **Backend**: Go + `client-go` + chi router + slog + sqlite (modernc.org/sqlite).
 - **Frontend**: React 18 + TypeScript + Vite + Tailwind + Monaco (lazy, CDN) + react-i18next + xterm.js + asciinema-player (lazy, bundled — no CDN).

@@ -2,7 +2,7 @@
 // Runs before every build / start (npm prebuild / prestart). The file is
 // generated, never edited by hand (it is in .gitignore).
 // GITHUB_TOKEN (set in CI) raises the API rate limit; without it the public API is used.
-import {writeFileSync} from 'node:fs';
+import {writeFileSync, existsSync, readdirSync} from 'node:fs';
 
 const REPO = 'vurulkan/kubernetes-openconsole';
 const OUT = new URL('../docs/release-notes.md', import.meta.url);
@@ -47,4 +47,10 @@ for (const r of releases) {
   parts.push(demote(r.body || '').trim(), '');
 }
 writeFileSync(OUT, parts.join('\n'));
+// Every frozen docs version shows the same, current list (not committed).
+if (existsSync(new URL('../versioned_docs/', import.meta.url))) {
+  for (const v of readdirSync(new URL('../versioned_docs/', import.meta.url))) {
+    writeFileSync(new URL(`../versioned_docs/${v}/release-notes.md`, import.meta.url), parts.join('\n'));
+  }
+}
 console.log(`release-notes: ${releases.length} releases → docs/release-notes.md`);

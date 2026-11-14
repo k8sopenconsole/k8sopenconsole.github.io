@@ -14,7 +14,7 @@ Account menu (your name, top right) → **API keys**, or `⌘K` → *Go to API k
 
 <Screenshot id="api-keys" alt="The API keys page: two keys, ci-smoke-test and claude-code, with note, prefix, permissions, last use and expiry" />
 
-## Create one
+## Create one {/* #create-one */}
 
 **New API key**, then:
 
@@ -28,10 +28,13 @@ Account menu (your name, top right) → **API keys**, or `⌘K` → *Go to API k
    - *Read-only (all)*: list, get and logs everywhere, ConfigMap data and secret values included.
    - *All my permissions* or *Custom*.
 
-   Cells you don't hold yourself, or that your admin's policy doesn't allow for keys, are closed.
+   Cells you don't hold yourself (*You do not have this permission*), or that your admin's policy doesn't allow for keys
+   (*The admin's API access policy does not allow it*), are closed. A cell you hold in only some of the chosen
+   namespaces is marked (*Only in 3 of 5 namespaces*); the key gets it only there. The server checks the same and
+   refuses a permission you hold in none of them (400).
 5. **Create** shows the key (`oc_…`) **once**, with a ready `curl` line. Copy it now; OpenConsole keeps only a hash.
 
-## What a key can do
+## What a key can do {/* #what-a-key-can-do */}
 
 At most what it lists **and** what you hold at the moment of the call. If a permission is taken away from you, the key
 loses it at once; if you get more, the key does not grow by itself (except *all my namespaces*). The list warns
@@ -39,16 +42,20 @@ loses it at once; if you get more, the key does not grow by itself (except *all 
 
 Shells and commands run with a key are always recorded. Every call is audited with your name and the key's name.
 
-## Stop or replace one
+## Stop or replace one {/* #stop-or-replace-one */}
 
 From the **⋯** menu of a key:
 
 - **Edit**: name, note, scope, permissions (the secret and expiry stay).
-- **Regenerate**: a new secret and a new expiry; the old secret stops working at once.
+- **Regenerate**: a new secret and a new expiry; the old secret stops working at once. It also revives a revoked or
+  expired key.
 - **Revoke**: stops it for good. **Delete** removes it from the list.
 
-How to use a key from `curl` or an agent, and every endpoint: **Documentation** tab on the same page, and
-[API and agents](/api/overview).
+How to use a key from `curl` or an agent: **Documentation** tab on the same page, and [API and agents](/api/overview).
+The tab has a quick start, a ready text for your agent (without the key), and every endpoint a key can call, grouped by
+tag, each with its permission, parameters, a `curl` example, an example response and the errors. Endpoints none of
+your keys can call now are greyed out with the reason: *You do not have it*, *Policy does not allow* or *Switched off*.
+Web-only endpoints are left out; admin ones are shown to admins only.
 
 :::info[Can't see it or can't do it?]
 - **No API keys in the menu**: the admin switched API keys off for everyone.

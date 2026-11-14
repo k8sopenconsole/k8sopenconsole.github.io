@@ -20,7 +20,7 @@ ServiceAccount, not even the cluster OpenConsole runs in. Two methods:
 The credentials are checked against the API server before they are saved (a real namespace list, so a wrong
 server, token or CA is refused) and stored encrypted in the database. Every cluster is connected at startup.
 
-## 1. Create the ServiceAccount
+## 1. Create the ServiceAccount {#1-create-the-serviceaccount}
 
 Skip this for a kubeconfig whose identity you already manage; its RBAC must then cover what OpenConsole should do
 ([the table below](#what-each-clusterrole-rule-is-for)).
@@ -31,7 +31,7 @@ cluster:
 ```bash
 kubectl --context <cluster> create namespace kubernetes-openconsole
 kubectl --context <cluster> apply -f \
-  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.22.0/deploy/rbac.yaml
+  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/rbac.yaml
 ```
 
 This creates:
@@ -43,7 +43,7 @@ This creates:
 The OpenConsole pod does **not** run as this ServiceAccount (its Deployment mounts no token). The ServiceAccount
 only exists to mint the token you paste into the UI.
 
-### Full or read-only
+### Full or read-only {#full-or-read-only}
 
 | File | ClusterRole | What works | What Kubernetes refuses (403) |
 |---|---|---|---|
@@ -58,7 +58,7 @@ Secrets are left out of the read-only file on purpose: at the Kubernetes level `
 values, so the OpenConsole permission `secrets:reveal` would be the only protection. If you need the Secrets tab with
 metadata only, uncomment the rule and grant `secrets:list` / `secrets:get` only.
 
-### What each ClusterRole rule is for
+### What each ClusterRole rule is for {#what-each-clusterrole-rule-is-for}
 
 Delete the rules for permissions you will never grant (from a copy of the file).
 
@@ -79,7 +79,7 @@ Delete the rules for permissions you will never grant (from a copy of the file).
 | `nodes`: get / list / watch, `metrics.k8s.io` `nodes`: get / list | Overview (node count, % of allocatable, node strip) and Nodes | the Overview shows absolute CPU / memory and no node strip; Nodes says the token can't list nodes. Without `watch` nodes are listed on every request |
 | `services/proxy`: get on your Prometheus Service (commented out) | Prometheus "in the cluster" mode | the Prometheus test fails at the first step |
 
-## 2. Read the token and CA
+## 2. Read the token and CA {#2-read-the-token-and-ca}
 
 Run this against the cluster you are adding (`CTX` is its kubectl context):
 
@@ -95,9 +95,9 @@ echo "$SERVER"; echo "$TOKEN"; echo "$CA"
 `SERVER` must be reachable **from the OpenConsole pod** (network policies, private endpoints). For the cluster
 OpenConsole runs in, use `https://kubernetes.default.svc` instead.
 
-## 3. Add it in the UI
+## 3. Add it in the UI {#3-add-it-in-the-ui}
 
-### ServiceAccount Token method
+### ServiceAccount Token method {#serviceaccount-token-method}
 
 **Admin → Clusters → Add Cluster**:
 
@@ -113,7 +113,7 @@ OpenConsole runs in, use `https://kubernetes.default.svc` instead.
 **Save Cluster** checks the connection. On the first cluster, click **Set as default**: users who haven't picked a
 cluster work on the default; everyone can switch to another cluster their permissions cover.
 
-### Kubeconfig method
+### Kubeconfig method {#kubeconfig-method}
 
 Under **Method: Kubeconfig → Upload kubeconfig**, upload a kubeconfig whose identity uses a static token or a
 client certificate. To build one from the ServiceAccount above:
@@ -146,7 +146,7 @@ work: the container has none of those programs. They would also make OpenConsole
 dedicated identity.
 :::
 
-## Rotate the token
+## Rotate the token {#rotate-the-token}
 
 The token of `openconsole-reader-token` never expires. To replace it, delete the **ServiceAccount**, not only the
 Secret, and apply the file again:
@@ -157,12 +157,12 @@ NS=kubernetes-openconsole
 kubectl --context $CTX -n $NS delete serviceaccount openconsole-reader          # its token Secret goes with it
 kubectl --context $CTX -n $NS wait --for=delete secret/openconsole-reader-token --timeout=60s
 kubectl --context $CTX apply -f \
-  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.22.0/deploy/rbac.yaml
+  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/rbac.yaml
 ```
 
 Deleting and re-creating only the Secret gives you **the same token again**: Kubernetes derives a ServiceAccount
 token from the ServiceAccount and the Secret's name, so the "new" token is identical and the old one keeps working.
-A new ServiceAccount gets a new identity, and the old token is refused at once. (The comment in `rbac.yaml` 2.22.0
+A new ServiceAccount gets a new identity, and the old token is refused at once. (The comment in `rbac.yaml` 2.23.0
 still describes the Secret-only way; it is wrong.)
 
 Then read the new token and CA (step 2), click **Edit** on the cluster in **Admin → Clusters**, tick **Replace
@@ -178,13 +178,13 @@ For a token that expires on its own instead:
 `kubectl -n kubernetes-openconsole create token openconsole-reader --duration=8760h`. Replace it in the UI before
 it expires.
 
-## Prometheus (optional)
+## Prometheus (optional) {#prometheus-optional}
 
 Without Prometheus, CPU and memory charts cover the last 24 hours, kept in OpenConsole's memory (lost on restart).
 For up to 7 days, set the cluster's Prometheus under **Admin → Clusters → Prometheus**; see
 [Prometheus](/administration/prometheus). Its "in the cluster" mode needs the `services/proxy` rule in the table above.
 
-## Troubleshooting
+## Troubleshooting {#troubleshooting}
 
 - **Save fails**: the API server is not reachable from the pod (network policy, private endpoint, `127.0.0.1` in a
   kubeconfig), or the CA doesn't match.

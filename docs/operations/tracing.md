@@ -9,7 +9,7 @@ description: "Send a span for every API request, with the Kubernetes API calls i
 Tracing is off until an OTLP endpoint is set. Then every API request becomes a span, sent over OTLP/HTTP to any
 receiver that speaks it: an OpenTelemetry Collector, Jaeger, Grafana Tempo, Elastic APM.
 
-## Turn it on
+## Turn it on {#turn-it-on}
 
 Add the endpoint to the container's environment, in the same kustomization as the rest of your settings
 ([Install on Kubernetes](/installation/kubernetes)):
@@ -55,7 +55,7 @@ The standard OpenTelemetry variables apply, as the
 
 `APP_VERSION` and `APP_ENV` become the resource attributes `service.version` and `deployment.environment`.
 
-## What a trace contains
+## What a trace contains {#what-a-trace-contains}
 
 | Span | Name | Attributes |
 |---|---|---|
@@ -81,7 +81,7 @@ kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | grep 4bf9
 {"@timestamp":"2026-11-14T11:42:33.628588Z","log":{"level":"info","logger":"http"},"message":"GET /api/namespaces/crashlab/pods 200", … ,"trace":{"id":"4bf92f3577b34da6a3ce929d0e0e4736"}, …}
 ```
 
-## Jaeger
+## Jaeger {#jaeger}
 
 Jaeger 2 accepts OTLP/HTTP on port 4318 out of the box. A single-pod Jaeger for trying it out (in-memory storage,
 nothing kept across restarts):
@@ -124,7 +124,7 @@ curl -s localhost:16686/api/v3/services
 # {"services":["openconsole","jaeger"]}  → open http://localhost:16686, Service: openconsole
 ```
 
-## Grafana Tempo
+## Grafana Tempo {#grafana-tempo}
 
 Point the endpoint at Tempo's distributor, OTLP/HTTP receiver enabled (`distributor.receivers.otlp.protocols.http`):
 
@@ -141,7 +141,7 @@ With Grafana Cloud or a Tempo behind authentication, add the header:
     secretKeyRef: {name: openconsole-otlp, key: headers}   # e.g. "Authorization=Basic <base64 user:token>"
 ```
 
-## Elastic APM
+## Elastic APM {#elastic-apm}
 
 APM Server (or the Elastic Agent APM integration) accepts OTLP/HTTP on its own port, 8200:
 

@@ -1,0 +1,102 @@
+---
+title: "LDAP / Active Directory"
+description: "Dizini bağlayın, kullanıcıları gruplara içe aktarın ya da hesabı ilk girişte oluşturun, kimlerin giriş yapabileceğini sınırlayın, sık görülen hatalar."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# LDAP / Active Directory
+
+**Yapmak istediğiniz:** kullanıcıların dizin hesaplarıyla giriş yapmasını sağlamak.
+
+LDAP, local hesapların yanında çalışır. Varsayılan olarak bir kişinin giriş yapabilmesi için önce OpenConsole hesabı
+olması gerekir; bu yüzden kişileri **içe aktarırsınız**. Ya da OpenConsole'un **hesabı ilk girişte oluşturmasına** izin
+verirsiniz.
+
+## 1. Yapılandırma {/* #1-configure */}
+
+**Yönetim → LDAP** (aşağıdaki değerler örnektir):
+
+<Screenshot id="admin-ldap" alt="Yönetim → LDAP: host dc01.example.corp, port 389, bind DN, kullanıcı base DN, kullanıcı filtresi (sAMAccountName=%s), kullanıcı adı attribute'u, ilk giriş seçeneği, LDAP ayarlarını kaydet ve Bağlantıyı test et, altta içe aktarma araması" />
+
+| Alan | Anlamı |
+|---|---|
+| Etkin | LDAP girişini tek hamlede açar ya da kapatır |
+| Host + Port ya da URL | `dc01.example.corp` ve `389`, ya da `ldaps://dc01.example.corp:636` |
+| SSL kullan (ldaps) | baştan TLS (port 636) |
+| StartTLS | 389'daki düz bağlantıyı TLS'e yükseltir (aşağıdaki nota bakın) |
+| TLS sertifika doğrulamasını atla | yalnızca test için |
+| Zaman aşımı | LDAP işlemi başına saniye (varsayılan 10) |
+| Bind DN / Bind şifresi | dizinde arama yapan servis hesabı, örn. `CN=svc-openconsole,OU=ServiceAccounts,DC=example,DC=corp`. Şifre şifrelenerek saklanır; **Bind şifresini güncelle**'yi yalnızca şifreyi değiştirirken işaretleyin |
+| Kullanıcı Base DN (tek) | kişilerin arandığı yer, örn. `OU=Users,DC=example,DC=corp`. Kişiler birden çok OU'daysa ortak üst OU'yu kullanın (2.23.0'da *Kullanıcı Base DN'leri (virgülle ayrılmış)* alanı bir DN'i kendi virgüllerinden böler, bu yüzden tam bir DN yazılamaz) |
+| Kullanıcı filtresi | `%s`, kişinin yazdığı değerdir. Active Directory `(sAMAccountName=%s)`, OpenLDAP `(uid=%s)` |
+| Kullanıcı adı attribute'u | OpenConsole kullanıcı adı olacak attribute: `sAMAccountName` ya da `uid` |
+
+Örnek bir Active Directory kurulumu (uydurma değerler):
+
+| Alan | Değer |
+|---|---|
+| Host + Port | `10.10.20.15` ve `389` |
+| Bind DN | `CN=svc-openconsole,OU=ServiceAccounts,OU=IT,DC=example,DC=corp` |
+| Kullanıcı Base DN | `OU=Engineering,OU=Users,DC=example,DC=corp` |
+| Kullanıcı filtresi | `(sAMAccountName=%s)` |
+| Kullanıcı adı attribute'u | `sAMAccountName` |
+
+Önce **LDAP ayarlarını kaydet**, sonra **Bağlantıyı test et**: servis hesabıyla bind olur ve her base DN'de arama yapar.
+
+:::warning[2.23.0'da TLS]
+2.23.0'da **StartTLS yalnızca *TLS sertifika doğrulamasını atla* işaretliyken bağlanır**: sunucu sertifikası
+doğrulanamıyor (hata olarak kaydedildi). Hem şifreli **hem de** doğrulanmış bir bağlantı için port 636'da **SSL kullan
+(ldaps)** seçin. Bu durumda sertifika genel (public) bir CA'dan gelmelidir, çünkü kendi CA'nızı girebileceğiniz bir
+alan henüz yok.
+:::
+
+## 2. Kişileri içe aktarın (ya da ilk girişte oluşturun) {/* #2-import-people-or-create-them-on-first-sign-in */}
+
+**İçe aktarma**: Yönetim → Kullanıcılar → Yeni kullanıcı → **LDAP'tan içe aktar…** (ya da Yönetim → LDAP'ta ayarların
+altından). Adın bir kısmını yazıp arayın: kullanıcı filtresi, `%s` yerine yazdığınız değer konarak çalışır; base DN
+başına en fazla 100 sonuç gelir. Önek araması için filtreye `(sAMAccountName=%s*)` yazın. Kişileri ve katılacakları
+**grupları** seçip içe aktarın. Zaten var olan hesaplar ayrı listelenir ve atlanır. Her içe aktarma audit'e yazılır
+(`user.import`).
+
+**İlk girişte** (varsayılan olarak kapalı): *Kullanıcının ilk girişinde hesabını oluştur* seçeneğini işaretleyin,
+**Yeni hesapları şu gruplara ekle** alanında grupları seçin ve kaydedin. Bundan sonra:
+
+- kullanıcı filtresinin bulduğu ve geçerli bir dizin şifresiyle giriş yapan herkes anında, bu gruplarda ve dizindeki
+  adıyla bir hesap alır (`John` yazan kişi `john` olarak girer);
+- hesabı olmayan ve şifresi yanlış olan kişi reddedilir; hiçbir şey oluşturulmaz;
+- yeni hesaplar asla yönetici olmaz (`auto_provisioned: true` ile `user.create`);
+- birini dışarıda bırakmak için hesabını **devre dışı bırakın**: silinen hesap, kişinin bir sonraki girişinde yeniden
+  oluşturulur.
+
+## 3. Kimlerin giriş yapabileceğini sınırlayın {/* #3-limit-who-may-sign-in */}
+
+Koşulu **kullanıcı filtresine** yazın. Örneğin yalnızca bir dizin grubunun üyeleri:
+
+```text
+(&(sAMAccountName=%s)(memberOf=CN=OpenConsole Users,OU=Groups,DC=example,DC=corp))
+```
+
+Dizin grupları OpenConsole gruplarıyla eşleştirilmez. OpenConsole grup üyeliğini içe aktarma, ilk giriş grupları ya da
+bir yönetici belirler.
+
+## Giriş {/* #signing-in */}
+
+Kişiler normal giriş formuna dizin kullanıcı adlarını ve şifrelerini yazar. OpenConsole kullanıcı filtresiyle DN'lerini
+bulur ve onların kimliğiyle bind olur; yani şifreyi her seferinde dizin kontrol eder. Dizinde devre dışı ya da süresi
+dolmuş bir hesap giriş yapamaz. Joker karakterli filtre güvenlidir: girişte OpenConsole ayrıca kullanıcı adı
+attribute'unda **birebir eşleşme** arar, yani `jo` asla `john` olarak giriş yapamaz. **Etkin** kapatıldığında tüm LDAP
+girişleri anında durur.
+
+## Çalışmadığında {/* #when-it-doesnt-work */}
+
+| Belirti | Genellikle |
+|---|---|
+| Test: connection refused / timeout | host ya da port yanlış, ya da OpenConsole pod'u ile dizin arasında bir firewall var |
+| Test: `x509: certificate signed by unknown authority` | kendi CA'nızın sertifikasıyla ldaps; yukarıdaki TLS notuna bakın |
+| Test: *TLS sertifika doğrulamasını atla* olmadan StartTLS başarısız | yukarıdaki 2.23.0 kısıtı |
+| Test: `Invalid Credentials (49)` | bind DN ya da bind şifresi yanlış (AD'de bind DN tam `CN=…` ya da `user@domain` biçimindedir) |
+| Test çalışıyor ama bir kişi giriş yapamıyor | kullanıcı filtresi kişiyi base DN'lerin altında bulamıyor ya da kullanıcı adı attribute'u kişinin yazdığından farklı; ya da (ilk giriş seçeneği kapalıyken) kişi hiç içe aktarılmamış |
+| Giriş yaptı ama hiçbir şey görmüyor | rolü olan hiçbir OpenConsole grubunda değil |
+
+Denetim Logları'ndaki başarısız `user.login` olayında nedeni yazar (`login_method: ldap`).

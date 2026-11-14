@@ -10,7 +10,7 @@ description: "Create an API key and make the first calls with curl: who am I, po
 You need `curl` and `jq`. The examples were run against a test cluster with the `crashlab` namespace of the code
 repository's `hack/k3d/crashlab.yaml`; your names will differ.
 
-## 1. Create a key
+## 1. Create a key {#1-create-a-key}
 
 In OpenConsole: your name (top right) → **API keys** → **New API key**. Pick the cluster, the namespaces and the
 **Read-only (safe)** template, then copy the key (`oc_` and 40 characters). It is shown once. Details:
@@ -21,7 +21,7 @@ export OC_URL=https://openconsole.example.com   # your OpenConsole address, no t
 export OPENCONSOLE_API_KEY=oc_…                  # the key you copied
 ```
 
-## 2. Who am I
+## 2. Who am I {#2-who-am-i}
 
 ```bash
 curl -s -H "Authorization: Bearer $OPENCONSOLE_API_KEY" "$OC_URL/api/auth/me" \
@@ -39,7 +39,7 @@ curl -s -H "Authorization: Bearer $OPENCONSOLE_API_KEY" "$OC_URL/api/auth/me" \
 `namespaces` and `permissions` in the full answer are what the key reaches **now** (key ∩ your roles ∩ the admin's
 policy); start every script or agent with this call.
 
-## 3. Pick the cluster
+## 3. Pick the cluster {#3-pick-the-cluster}
 
 Each request works on your selected cluster unless it names one with `X-OpenConsole-Cluster`, by name or id. The
 clusters the key can use:
@@ -71,7 +71,7 @@ db-1	Running	0
 
 Lists return the Kubernetes objects as the API server sends them (`metadata`, `spec`, `status`) under `items`.
 
-## 4. Read a log
+## 4. Read a log {#4-read-a-log}
 
 ```bash
 curl -s -H "Authorization: Bearer $OPENCONSOLE_API_KEY" \
@@ -87,7 +87,7 @@ Plain text. `previous=true` is the container run before the current one (the one
 to 500. Right after a restart Kubernetes may answer `unable to retrieve container logs for containerd://…` for a
 while, like `kubectl logs --previous` does: if the container is in `Error` now, read without `previous`.
 
-## 5. Run one command
+## 5. Run one command {#5-run-one-command}
 
 Needs `pods:exec` on the key (the **Read-only** templates don't have it):
 
@@ -104,7 +104,7 @@ curl -s -H "Authorization: Bearer $OPENCONSOLE_API_KEY" -H "Content-Type: applic
 `command` is an argv array, not run in a shell (`["sh", "-c", "…"]` for pipes). A non-zero exit code is still a 200.
 The command is recorded like a shell session; the audit event keeps only the program (`uname`), never the arguments.
 
-## Errors
+## Errors {#errors}
 
 Every refusal is audited. The body names the reason:
 

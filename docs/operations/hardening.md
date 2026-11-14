@@ -10,21 +10,22 @@ OpenConsole holds credentials to your clusters and lets people act on them, so t
 admin accounts like those credentials. Go through this list before you hand it to users. Why each item matters is in
 the [Security model](/operations/security).
 
-## Cluster access
+## Cluster access {#cluster-access}
 
 - **The smallest ClusterRole that covers what you grant.** If nobody restarts, scales, edits or opens shells
   through OpenConsole on a cluster, connect it with the view-only ClusterRole
   ([Full or read-only](/installation/connect-cluster#full-or-read-only)). In the full one, drop the Secrets rule if you
   grant no `secrets:*` permission, and its `update` verb if you grant no `secrets:edit`. Uncomment `services/proxy`
-  only for Prometheus, and only for your Prometheus Service. Every rule and what it is for:
-  [Kubernetes permissions](/reference/kubernetes-permissions).
-- **One ServiceAccount per cluster, never a personal kubeconfig**, and a plan to rotate its token
-  ([Rotate the token](/installation/connect-cluster#rotate-the-token)).
+  only for Prometheus, and only for your Prometheus Service. OpenConsole doesn't use port-forward, so it needs no
+  rule for it. Every rule and what it is for: [Kubernetes permissions](/reference/kubernetes-permissions).
+- **One ServiceAccount per cluster, never a personal kubeconfig**, and a plan to rotate its token, for example every
+  6 to 12 months ([Rotate the token](/installation/connect-cluster#rotate-the-token)). Don't keep the generated tokens
+  in Git.
 - **Protect the OpenConsole namespace in each cluster it runs in.** Whoever may `exec` into the OpenConsole pod,
   read its volume, or read its Secrets in Kubernetes gets every cluster credential OpenConsole holds. Keep those
   Kubernetes permissions to the people who run OpenConsole.
 
-## The deployment
+## The deployment {#the-deployment}
 
 - **Pin the release and use `Recreate`** ([Install on Kubernetes](/installation/kubernetes#1-write-a-kustomization)),
   one replica, and verify the image you run ([Verify the image](/installation/verify-image)).
@@ -71,7 +72,7 @@ the [Security model](/operations/security).
   Kubelet probes and `kubectl port-forward` still work. Outgoing traffic is left open: OpenConsole needs your API
   servers, and, if you use them, LDAP, `login.microsoftonline.com` and Prometheus.
 
-## Accounts and access
+## Accounts and access {#accounts-and-access}
 
 - **Change the `admin` password at the first sign-in**, then sign in through LDAP or Azure AD for daily work and
   keep one local admin for emergencies ([First login](/getting-started/first-login)).
@@ -88,15 +89,17 @@ the [Security model](/operations/security).
   ([API access policy](/administration/api-access-policy)).
 - **Review access regularly**: Admin → Users / Groups → Export CSV, and Admin → API keys for every key.
 
-## Records
+## Records {#records}
 
 - **Ship the audit log** to your log platform and keep it as long as you must; the database keeps 30 days
   ([Elastic](/operations/elastic#keep-the-audit-trail-as-long-as-you-need)).
 - **Alert** on refused actions, locked sign-ins and revealed secrets ([Metrics and alerts](/operations/metrics#alerts)).
+- **Review the `secret.reveal`, `secret.view_yaml`, `secret.apply` and `pod.exec` audit events**: these are the actions
+  that can expose credentials ([Audit events](/reference/audit-events)).
 - **Keep shell recording on** and set its retention (Admin → Recordings). Recordings contain whatever a shell
   printed; only admins can replay them ([Session recording](/administration/recordings)).
 
-## The volume
+## The volume {#the-volume}
 
 - **Back it up, and protect the backups like the cluster credentials.** The database holds the credentials
   (encrypted) and the key that decrypts them ([Backup and restore](/installation/backup-restore)).

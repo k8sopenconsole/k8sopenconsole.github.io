@@ -9,7 +9,7 @@ import Screenshot from '@site/src/components/Screenshot';
 
 **You want to:** let people sign in with their Microsoft work account.
 
-## 1. Register the app
+## 1. Register the app {/* #1-register-the-app */}
 
 Azure portal → **Microsoft Entra ID → App registrations → New registration**:
 
@@ -20,7 +20,7 @@ Azure portal → **Microsoft Entra ID → App registrations → New registration
 
 Note the **Directory (tenant) ID** and **Application (client) ID** on the app's overview page.
 
-## 2. Configure OpenConsole
+## 2. Configure OpenConsole {/* #2-configure-openconsole */}
 
 **Admin → Azure AD** (example values):
 
@@ -32,14 +32,15 @@ shows **Sign in with Microsoft**.
 
 For US Government or China clouds set `AZURE_AD_AUTHORITY` ([Environment variables](/reference/environment-variables)).
 
-## 3. Give people access
+## 3. Give people access {/* #3-give-people-access */}
 
-Either let them sign in once (the account is created with source *Azure AD*, in no group) and then add them to groups,
+Either let them sign in once (the account is created with source *Azure AD*, in no group, named after the token's
+`preferred_username`, or `email` / `upn` when that is missing) and then add them to groups,
 or, better, **pre-create** them: Admin → Users → New user → **Azure AD user**, their UPN or e-mail
 (`jane@example.com`) and their groups. Their first Microsoft sign-in uses that account and they see their namespaces
 at once.
 
-## How the account is found
+## How the account is found {/* #how-the-account-is-found */}
 
 1. By the token's `preferred_username`, usually the UPN.
 2. Otherwise, a **pre-created Azure AD account nobody has signed in to yet** whose name matches `preferred_username`

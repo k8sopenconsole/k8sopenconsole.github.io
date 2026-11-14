@@ -9,9 +9,10 @@ import Screenshot from '@site/src/components/Screenshot';
 
 **You want to:** know why a pod is not running or keeps restarting.
 
-## Why is my pod restarting?
+## Why is my pod restarting? {/* #why-is-my-pod-restarting */}
 
-1. **Look at the status.** On the Pods tab, red means crashing or unable to start (`CrashLoopBackOff`,
+1. **Look at the status.** The Pods tab shows the STATUS `kubectl get pods` prints, worked out the same way (init
+   containers, Terminating, Unschedulable included). Red means crashing or unable to start (`CrashLoopBackOff`,
    `OOMKilled`, `ImagePullBackOff`, `Init:Error`, `Error`), amber means waiting or not ready, green ready, grey
    completed. Hover a red or amber status for its latest Warning events.
 2. **Read the last exit.** Next to the restart count is the last exit of a restarted container, e.g.
@@ -26,7 +27,7 @@ import Screenshot from '@site/src/components/Screenshot';
 5. **Compare with the limits.** If the memory line in *Resource usage* runs into the limit before each restart, the
    limit is too low or the program leaks.
 
-## Exit codes
+## Exit codes {/* #exit-codes */}
 
 | Code | Usually means |
 |---|---|
@@ -39,10 +40,10 @@ import Screenshot from '@site/src/components/Screenshot';
 
 Kubernetes keeps only the last exit of each container. OpenConsole keeps every exit it sees for 30 days (*Restart
 history*), even for pods that no longer exist, so a Deployment shows the restarts of the pods it replaced. A run of
-identical exits is one row with a count. Exits that happen while OpenConsole itself is down are lost unless the pod
-still shows them afterwards.
+identical exits is one row with a count. For pods it meets when it starts, OpenConsole records the last exit they still
+carry. Exits that happen while OpenConsole itself is down are lost unless the pod still shows them afterwards.
 
-## Containers column
+## Containers column {/* #containers-column */}
 
 One square per container, the pod's containers first, then its init containers:
 
@@ -54,15 +55,18 @@ One square per container, the pod's containers first, then its init containers:
 | hollow grey | exited with 0 (e.g. a finished init container) |
 | hollow red | exited with an error |
 
-Hover a square for the container's name, state, start time and restarts. *Controlled By* is the kind of the pod's
-direct controller (ReplicaSet, StatefulSet, DaemonSet, Job, or Node for a static pod), its name on hover.
+Hover a square for the container's name (init containers and sidecars are marked), state, start time and restarts.
+Sorting the column orders pods by their number of containers (most first); among pods with as many containers, the
+ones with more problem containers come first. Cards show the same squares next to the status for pods with more than
+one container. *Controlled By* is the kind of the pod's direct controller (ReplicaSet, StatefulSet, DaemonSet, Job, or Node for a static pod), its name on hover.
 
-## CPU and memory
+## CPU and memory {/* #cpu-and-memory */}
 
 With metrics-server in the cluster, pods and workloads show usage against the limit (or the request when there is
-no limit): amber from 70 %, red from 90 %. Charts cover up to 24 hours from OpenConsole's memory (they start over
-when OpenConsole restarts), or up to 7 days when your admin has connected the cluster's Prometheus. Each chart says
-where its data comes from.
+no limit): amber from 70 %, red from 90 %. OpenConsole samples every pod every 30 seconds and keeps in memory the last
+hour at 30 seconds and up to 24 hours as 5-minute averages (it starts over when OpenConsole restarts). Charts draw on
+that, or cover up to 7 days when your admin has connected the cluster's Prometheus. Each chart says where its data
+comes from.
 
 :::info[Can't see it?]
 - **No CPU / memory, or "No samples yet"**: the cluster has no metrics-server, or OpenConsole started less than a

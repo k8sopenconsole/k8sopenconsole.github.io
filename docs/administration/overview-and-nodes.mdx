@@ -9,7 +9,7 @@ import Screenshot from '@site/src/components/Screenshot';
 
 Both screens are for admins only and read only. They show the cluster selected in the header.
 
-## Overview
+## Overview {/* #overview */}
 
 **You want to:** see in ten seconds whether the cluster is healthy. Admins land here after sign-in; `g o` from
 anywhere.
@@ -24,7 +24,7 @@ anywhere.
 - **Warnings** from the last 15 minutes and a **node strip**; a node opens on the Nodes screen.
 - **Live events** opens for the whole cluster, on Warnings.
 
-## Nodes
+## Nodes {/* #nodes */}
 
 **You want to:** know which node is full, cordoned or under pressure, and what runs on it. `g n`, or the rail.
 
@@ -40,7 +40,7 @@ Summary (OS image, kernel, runtime, IPs, cordoned), capacity / allocatable / req
 pods and ephemeral storage, usage history (1 h / 6 h / 24 h, 7 days with Prometheus), its busiest pods, every pod on
 it, conditions, taints, labels, annotations and events.
 
-## Where the numbers come from
+## Where the numbers come from {/* #where-the-numbers-come-from */}
 
 | Data | Source | Needs in the ClusterRole |
 |---|---|---|

@@ -8,29 +8,29 @@ description: "Run OpenConsole locally with one docker run, sign in and connect a
 
 One container on your machine, enough to look around. For a team, [install it on Kubernetes](/installation/kubernetes).
 
-## 1. Start it
+## 1. Start it {#1-start-it}
 
 ```bash
 docker run -d --name openconsole -p 8080:8080 \
   -v openconsole-data:/data \
-  ghcr.io/vurulkan/kubernetes-openconsole:2.22.0
+  ghcr.io/vurulkan/kubernetes-openconsole:2.23.0
 ```
 
 | Part | Meaning |
 |---|---|
 | `-p 8080:8080` | the UI and API on http://localhost:8080 |
 | `-v openconsole-data:/data` | the SQLite database and shell recordings, kept across restarts. Leave it out for a throwaway run |
-| `:2.22.0` | the release. Images are `linux/amd64` and `linux/arm64` |
+| `:2.23.0` | the release. Images are `linux/amd64` and `linux/arm64` |
 
 Check that it is up: `curl http://localhost:8080/readyz` answers `ready`.
 
-## 2. Sign in
+## 2. Sign in {#2-sign-in}
 
 Open http://localhost:8080 and sign in as **`admin` / `admin`**. You are asked to choose a new password (at least
 8 characters, `PASSWORD_MIN_LENGTH`) before anything else works. After the change you are signed out; sign in with
 the new password.
 
-## 3. Connect a cluster
+## 3. Connect a cluster {#3-connect-a-cluster}
 
 OpenConsole never picks up a cluster on its own. You add one in **Admin → Clusters → Add Cluster** with an API
 server URL, a ServiceAccount token and its CA certificate. [Connect a cluster](/installation/connect-cluster)
@@ -47,7 +47,7 @@ Desktop, kind, k3d) does not work as is: inside the container that address is th
   docker rm -f openconsole
   docker run -d --name openconsole --network k3d-<name> -p 8080:8080 \
     -v openconsole-data:/data \
-    ghcr.io/vurulkan/kubernetes-openconsole:2.22.0
+    ghcr.io/vurulkan/kubernetes-openconsole:2.23.0
   ```
 
   and use `https://k3d-<name>-server-0:6443` as the API server. [Try it on k3d](/getting-started/try-on-k3d) runs
@@ -58,7 +58,7 @@ Desktop, kind, k3d) does not work as is: inside the container that address is th
 After **Save Cluster** (the connection is checked before it is saved), click **Set as default**. The Dashboard now
 shows the cluster's namespaces.
 
-## 4. Stop or remove it
+## 4. Stop or remove it {#4-stop-or-remove-it}
 
 ```bash
 docker stop openconsole && docker rm openconsole   # keeps the data volume

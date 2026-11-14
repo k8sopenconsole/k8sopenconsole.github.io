@@ -7,6 +7,10 @@ docs/release-notes.md
 # generated from openapi/openapi.yaml by npm run api-docs before every build
 docs/api/endpoints/
 openapi/openapi.site.yaml
+# the same for frozen docs versions (npm run docs:freeze)
+versioned_docs/*/api/endpoints/
+versioned_docs/*/release-notes.md
+openapi/versions/*.site.yaml
 .DS_Store
 # screenshot recording: kubeconfig, tokens, port-forward state
 screenshots/.work/

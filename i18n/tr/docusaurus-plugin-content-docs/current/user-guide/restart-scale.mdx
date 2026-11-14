@@ -1,0 +1,50 @@
+---
+title: "Yeniden başlatma ve ölçekleme"
+description: "Bir Deployment'ı yeniden başlatın, bir Deployment ya da StatefulSet'i ölçekleyin: izinler, sınırlar ve audit log'da görünenler."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Yeniden başlatma ve ölçekleme
+
+## Deployment'ı yeniden başlatmak {/* #restart-a-deployment */}
+
+**Yapmak istediğiniz:** bir Deployment'ın bütün pod'larını yeniden başlatmak; örneğin değişen bir Secret ya da
+ConfigMap'i almaları için.
+
+Deployment'ın satırındaki ya da ayrıntı panelindeki **Yeniden başlat** önce onay ister:
+
+<Screenshot id="restart-confirm" alt="Onay penceresi: storefront deployment'ını yeniden başlat? Deployment'taki her pod sırayla yeniden başlatılır; replika = 1 ise kısa kesinti olabilir" />
+
+`kubectl rollout restart` ne yapıyorsa onu yapar: pod şablonu yeni bir zaman damgası alır ve Kubernetes pod'ları
+Deployment'ın stratejisine göre tek tek değiştirir. Tek replikada kısa bir kesinti olabilir.
+
+## Ölçekleme {/* #scale */}
+
+**Yapmak istediğiniz:** bir Deployment ya da StatefulSet için daha fazla veya daha az pod çalıştırmak.
+
+İş yükünün ayrıntı panelindeki **Ölçekle** mevcut sayıyı ve bir hedefi gösterir:
+
+<Screenshot id="scale-dialog" alt="storefront ölçekle penceresi: Mevcut 2, Hedef replika 2, eksi ve artı düğmeleri, İptal ve Uygula" />
+
+Hedef 0 (bütün pod'ları durdurur) ile varsayılan olarak 100 arasında olabilir (üst sınırı yöneticiniz belirler). İş
+yükünü bir HPA yönetiyorsa sayıyı kendiliğinden yine değiştirir.
+
+## İzinler ve audit {/* #permissions-and-audit */}
+
+| Aksiyon | İzin | Audit olayı |
+|---|---|---|
+| Deployment'ı yeniden başlatmak | `deployments:restart` | `deployment.restart`, `restarted_at` ile |
+| Deployment'ı ölçeklemek | `deployments:scale` | `deployment.scale`, `replicas_from` ve `replicas_to` ile |
+| StatefulSet'i ölçeklemek | `statefulsets:scale` | `statefulset.scale`, `replicas_from` ve `replicas_to` ile |
+
+Reddedilen bir deneme de `denied` sonucuyla kaydedilir. Art arda 5 yeniden başlatma ya da ölçekleme yapabilirsiniz,
+sonra 6 saniyede bir; bunun ötesinde OpenConsole *too many requests* yanıtı verir.
+
+:::info[Göremiyor ya da yapamıyor musunuz?]
+- **Yeniden başlat / Ölçekle düğmesi yok**: yukarıdaki izin **bu cluster'daki bu namespace'te** sizde yok. Bir rol
+  bunu staging'de verip production'da vermeyebilir.
+- **Düğmeler herkes için kaybolmuş**: admin iş yükü aksiyonlarını kapatmış (`FEATURE_WORKLOAD_ACTIONS=false`).
+- **Kubernetes reddetti (403)**: cluster bağlantısı salt okuma; yöneticinize sorun.
+- DaemonSet'lerde burada yeniden başlatma düğmesi yok; düzenleme izniniz varsa YAML'larını kullanın.
+:::

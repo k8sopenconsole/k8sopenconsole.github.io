@@ -1,0 +1,55 @@
+---
+title: "Azure AD (Entra ID)"
+description: "Tek tenant'lı Microsoft girişi: uygulama kaydı, ayarlar, önceden oluşturulan hesaplar ve hesapların nasıl eşleştirildiği."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Azure AD (Entra ID)
+
+**Yapmak istediğiniz:** kullanıcıların Microsoft iş hesaplarıyla giriş yapmasını sağlamak.
+
+## 1. Uygulamayı kaydedin {/* #1-register-the-app */}
+
+Azure portal → **Microsoft Entra ID → App registrations → New registration**:
+
+- **Supported account types**: yalnızca bu kuruluş dizinindeki hesaplar (single tenant).
+- **Redirect URI**, platform *Web*: `https://<your OpenConsole host>/api/auth/azure/callback`.
+- **Certificates & secrets → New client secret**; değerini kopyalayın.
+- API izni gerekmez; OpenConsole yalnızca `openid profile email` ister.
+
+Uygulamanın overview sayfasındaki **Directory (tenant) ID** ve **Application (client) ID** değerlerini not edin.
+
+## 2. OpenConsole'u yapılandırın {/* #2-configure-openconsole */}
+
+**Yönetim → Azure AD** (örnek değerler):
+
+<Screenshot id="admin-azure" alt="Yönetim → Azure AD: tenant ID, client ID, redirect URL https://openconsole.example.com/api/auth/azure/callback, client secret, Azure AD ayarlarını kaydet ve Test Connection" />
+
+**Etkin**, **Tenant ID**, **Client ID**, **Client secret** (şifrelenerek saklanır; değiştirmek için **Client secret'ı
+güncelle**'yi işaretleyin), **Redirect URL** (yukarıda kaydettiğiniz URI'nin birebir aynısı). Kaydedin, ardından **Test
+Connection**. Giriş sayfasında artık **Microsoft ile giriş yap** görünür.
+
+US Government ya da China bulutları için `AZURE_AD_AUTHORITY` değişkenini ayarlayın
+([Ortam değişkenleri](/reference/environment-variables)).
+
+## 3. Kişilere erişim verin {/* #3-give-people-access */}
+
+Ya bir kez giriş yapmalarını bekleyin (hesap *Azure AD* kaynağıyla, hiçbir grupta olmadan, token'daki
+`preferred_username` adıyla, o yoksa `email` ya da `upn` ile oluşur) ve sonra onları
+gruplara ekleyin; ya da, daha iyisi, hesaplarını **önceden oluşturun**: Yönetim → Kullanıcılar → Yeni kullanıcı →
+**Azure AD kullanıcısı**, ardından UPN ya da e-posta adresi (`jane@example.com`) ve grupları. İlk Microsoft girişleri bu
+hesabı kullanır ve namespace'lerini hemen görürler.
+
+## Hesap nasıl bulunur {/* #how-the-account-is-found */}
+
+1. Token'daki `preferred_username` ile; bu genellikle UPN'dir.
+2. O tutmazsa, **önceden oluşturulmuş ve henüz kimsenin giriş yapmadığı bir Azure AD hesabı** aranır: adı
+   `preferred_username` ile yalnızca büyük/küçük harf farkıyla eşleşen, ya da token'daki `email` veya `upn` ile eşleşen
+   (UPN `jdoe@corp.onmicrosoft.com` olduğunda önceden oluşturulmuş `jane.doe@corp.com` bulunur).
+
+Local, LDAP ve daha önce kullanılmış hesaplar bu yolla asla devralınmaz; bir hesap bu şekilde sahiplenildiğinde
+`user.login` olayı bunu kaydeder (`linked_by`, `signed_in_as`). Azure AD hesapları asla şifre kabul etmez.
+
+OpenConsole'dan çıkış yapmak kişinin Microsoft oturumunu kapatmaz. Birini durdurmak için OpenConsole hesabını devre dışı
+bırakın ya da Entra ID'de engelleyin.

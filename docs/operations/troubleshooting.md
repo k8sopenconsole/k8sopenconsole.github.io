@@ -5,11 +5,11 @@ description: "Find your symptom by the message OpenConsole shows or logs, and wh
 
 # Troubleshooting
 
-Search this page for the message you see. Messages in `code` are exactly what OpenConsole 2.22.0 shows, answers or
+Search this page for the message you see. Messages in `code` are exactly what OpenConsole 2.23.0 shows, answers or
 logs. The log lines are in `kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole`
 ([Logging](/operations/logging)).
 
-## Adding a cluster fails
+## Adding a cluster fails {#adding-a-cluster-fails}
 
 **Save Cluster** answers `cluster validation failed: cannot list namespaces with these credentials: …`. The end of
 the message says why:
@@ -22,7 +22,7 @@ the message says why:
 | `Unauthorized` | the token is wrong, expired, or its ServiceAccount was deleted | read the token again |
 | `namespaces is forbidden: User "system:serviceaccount:…" cannot list resource "namespaces" …` | the identity has no ClusterRole binding (or not this one) | apply `deploy/rbac.yaml` and bind it to that identity |
 
-## A cluster shows empty lists or 503
+## A cluster shows empty lists or 503 {#a-cluster-shows-empty-lists-or-503}
 
 The cluster was added fine, but now its workload lists are empty, other screens fail, and the log is full of:
 
@@ -46,7 +46,7 @@ A write the ClusterRole doesn't allow answers 403 with the API server's message,
 `restart failed: deployments.apps "web" is forbidden: …` (a view-only ClusterRole, or the `patch` / `update` verb
 removed).
 
-## No CPU or memory figures
+## No CPU or memory figures {#no-cpu-or-memory-figures}
 
 | Message | Cause |
 |---|---|
@@ -56,7 +56,7 @@ removed).
 | `Prometheus is unreachable; showing the last 24 hours from memory` | the cluster's Prometheus setting doesn't answer; use **Test connection** below |
 | `No samples yet; the first arrive within 30 seconds.` | OpenConsole just started or the cluster was just connected; wait |
 
-## Prometheus "Test connection" fails
+## Prometheus "Test connection" fails {#prometheus-test-connection-fails}
 
 Admin → Clusters → Prometheus → **Test connection** stops at the first failing step and says why:
 
@@ -75,7 +75,7 @@ Admin → Clusters → Prometheus → **Test connection** stops at the first fai
 
 More: [Prometheus](/administration/prometheus).
 
-## Sign-in fails
+## Sign-in fails {#sign-in-fails}
 
 | Symptom | Where to look |
 |---|---|
@@ -94,7 +94,7 @@ LDAP Result Code 200 "Network Error": dial tcp: lookup ldap.example.invalid on 1
 `connection refused` / `no such host` are the host and port; `Invalid Credentials` is the bind DN or password; a
 certificate error is the TLS settings.
 
-## Shells or live logs break behind a proxy
+## Shells or live logs break behind a proxy {#shells-or-live-logs-break-behind-a-proxy}
 
 | Symptom | Cause | Fix |
 |---|---|---|
@@ -104,36 +104,40 @@ certificate error is the TLS settings.
 | `Too many log streams; try again shortly.` | the per-user log stream limit | close log viewers you don't need |
 | a WebSocket answers `401` | its ticket was used already or is older than 30 seconds | the UI gets a new ticket for every connection; a script must too (`POST /api/ws-ticket`) |
 
-## Error answers
+A live log or shell is a WebSocket from the browser to OpenConsole and a stream from the OpenConsole pod to the
+Kubernetes API server, so the OpenConsole pod must reach the API server too.
+
+## Error answers {#error-answers}
 
 Every error answer is JSON, `{"error": "<reason or message>"}`. `401` has no body: the session or API key is
 missing, expired or revoked.
 
-### 403 reasons
+### 403 reasons {#403-reasons}
 
-| `error` | Meaning | Source (v2.22.0) |
+| `error` | Meaning | Source (v2.23.0) |
 |---|---|---|
-| `forbidden` | no permission for this action here (namespace, cluster) | [audit_events.go#L91](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/audit_events.go#L91), [router.go#L2642-L2651](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/router.go#L2642-L2651) |
-| `api_access_policy` | with an API key: the owner has the permission and the key lists it, but the admin's API access policy keeps it from keys | [audit_events.go#L95-L97](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/audit_events.go#L95-L97), [router.go#L2612-L2629](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/router.go#L2612-L2629) |
-| `api_access_off` | with an API key: the policy turns API access off for this user | [audit_events.go#L98-L99](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/audit_events.go#L98-L99), [apikeys.go#L205-L208](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/apikeys.go#L205-L208) |
-| `api_key_not_allowed` | an API key may never do this (manage keys, change the password, pick the cluster, save views) | [apikeys.go#L51](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/apikeys.go#L51), [apikeys.go#L244-L252](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/apikeys.go#L244-L252) |
-| `feature_disabled` | the operator switched the capability off (`FEATURE_*=false`) | [audit_events.go#L92](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/audit_events.go#L92), [router.go#L2637-L2640](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/router.go#L2637-L2640) |
-| `admin_only` | an admin screen or endpoint; with an API key, one without the Admin API scope | [audit_events.go#L93](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/audit_events.go#L93), [router.go#L598-L605](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/router.go#L598-L605) |
-| `change your password first` | an API key, or the API keys page, of an account that still has to change its initial password (on other screens such an account gets `forbidden`) | [apikeys.go#L196-L199](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/apikeys.go#L196-L199), [apikeys.go#L431-L432](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/apikeys.go#L431-L432) |
-| `you have no permissions on this cluster` | picking a cluster none of your grants cover | [cluster_ctx.go#L172](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/cluster_ctx.go#L172) |
-| `only the owner can change this view` | editing someone else's shared view | [views.go#L161](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/views.go#L161) |
-| `user is disabled` | an Azure AD sign-in for a deactivated account | [router.go#L989-L991](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/router.go#L989-L991) |
-| `the OpenConsole ServiceAccount is not allowed to read <resource> here (check the ClusterRole)` | Kubernetes refused OpenConsole's identity, not you | [secrets.go#L227-L229](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/secrets.go#L227-L229) |
-| `restart failed: …` / `scale failed: …` / the API server's message | Kubernetes refused a write (ClusterRole without that verb) | [deployment_actions.go#L160-L164](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/deployment_actions.go#L160-L164), [yaml_apply.go#L111](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.22.0/backend/internal/api/yaml_apply.go#L111) |
+| `forbidden` | no permission for this action here (namespace, cluster) | [audit_events.go#L91](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L91), [router.go#L2642-L2651](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L2642-L2651) |
+| `api_access_policy` | with an API key: the owner has the permission and the key lists it, but the admin's API access policy keeps it from keys | [audit_events.go#L95-L97](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L95-L97), [router.go#L2612-L2629](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L2612-L2629) |
+| `api_access_off` | with an API key: the policy turns API access off for this user | [audit_events.go#L98-L99](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L98-L99), [apikeys.go#L205-L208](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L205-L208) |
+| `api_key_not_allowed` | an API key may never do this (manage keys, change the password, pick the cluster, save views) | [apikeys.go#L51](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L51), [apikeys.go#L244-L252](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L244-L252) |
+| `feature_disabled` | the operator switched the capability off (`FEATURE_*=false`) | [audit_events.go#L92](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L92), [router.go#L2637-L2640](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L2637-L2640) |
+| `admin_only` | an admin screen or endpoint; with an API key, one without the Admin API scope | [audit_events.go#L93](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L93), [router.go#L598-L605](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L598-L605) |
+| `change your password first` | an API key, or the API keys page, of an account that still has to change its initial password (on other screens such an account gets `forbidden`) | [apikeys.go#L196-L199](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L196-L199), [apikeys.go#L431-L432](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L431-L432) |
+| `you have no permissions on this cluster` | picking a cluster none of your grants cover | [cluster_ctx.go#L172](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/cluster_ctx.go#L172) |
+| `only the owner can change this view` | editing someone else's shared view | [views.go#L161](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/views.go#L161) |
+| `user is disabled` | an Azure AD sign-in for a deactivated account | [router.go#L989-L991](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L989-L991) |
+| `the OpenConsole ServiceAccount is not allowed to read <resource> here (check the ClusterRole)` | Kubernetes refused OpenConsole's identity, not you | [secrets.go#L227-L229](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/secrets.go#L227-L229) |
+| `restart failed: …` / `scale failed: …` / the API server's message | Kubernetes refused a write (ClusterRole without that verb) | [deployment_actions.go#L160-L164](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/deployment_actions.go#L160-L164), [yaml_apply.go#L111](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/yaml_apply.go#L111) |
 
 The first six are also the `reason` of the `denied` audit event. For API keys and agents, see also
 [API overview](/api/overview).
 
-### Other answers
+### Other answers {#other-answers}
 
 | Answer | Meaning |
 |---|---|
 | `400` `cluster "<name>" is unknown or not reachable with this key` | the `X-OpenConsole-Cluster` header names a cluster that doesn't exist or the key doesn't cover |
 | `429` (no body) with an API key | more than 10 requests per second (bursts of 30) for that key |
 | `429` `too many open shells (limit 3 per user); close one first` | the shell limit, from a client that isn't a browser |
+| `404`, `409`, `400` or `504` from restart, scale, YAML apply or a Secret request | Kubernetes answered NotFound, Conflict (e.g. a stale `resourceVersion`), Invalid or Timeout; OpenConsole passes that status on, so a proxy doesn't wrap a 5xx around a 4xx. The `failed` audit event has the reason (`not_found`, `conflict`, `invalid`) and the `error` |
 | `503` from `/readyz`: `db not reachable` | the database file can't be opened: check the volume ([Health probes](/operations/health-probes)) |

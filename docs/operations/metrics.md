@@ -31,7 +31,7 @@ openconsole_cluster_connected{cluster="demo"} 1
 
 The counters live in memory and start from zero when the pod restarts; `rate()` and `increase()` handle that.
 
-## Scrape with the Prometheus Operator
+## Scrape with the Prometheus Operator {#scrape-with-the-prometheus-operator}
 
 With kube-prometheus-stack or another Prometheus Operator setup, add a ServiceMonitor. The Service in `deploy/` has
 no labels, and a ServiceMonitor selects Services by label, so give it one in the same kustomization
@@ -88,7 +88,7 @@ curl -s 'localhost:9090/api/v1/query?query=openconsole_cluster_connected'
  "pod":"kubernetes-openconsole-856cdc7c49-t5rbf","service":"kubernetes-openconsole"} 1
 ```
 
-## Scrape with pod annotations
+## Scrape with pod annotations {#scrape-with-pod-annotations}
 
 A Prometheus with the usual "scrape pods that ask for it" job (the `kubernetes-pods` job of the
 prometheus-community Helm chart, and many hand-written configs) picks the pod up from three annotations:
@@ -138,7 +138,7 @@ scrape_configs:
 
 The pod annotation changes the pod template, so applying it restarts OpenConsole once.
 
-## What to watch
+## What to watch {#what-to-watch}
 
 | Metric | What it tells you |
 |---|---|
@@ -149,7 +149,7 @@ The pod annotation changes the pod template, so applying it restarts OpenConsole
 | `openconsole_pod_exec_active` | shells open right now |
 | `openconsole_cluster_requests_total{cluster}` | which clusters people use |
 
-## Alerts
+## Alerts {#alerts}
 
 A PrometheusRule for the Prometheus Operator (for a plain Prometheus, the `groups:` part goes into a rules file):
 

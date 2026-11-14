@@ -1,0 +1,67 @@
+---
+title: "Oturum kaydı"
+description: "Pod shell kaydı, oynatma, disk koruması, saklama süresi."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Oturum kaydı
+
+**Yapmak istediğiniz:** bir pod shell'inde ne yapıldığını öğrenmek ya da kayıtların diski doldurmasını önlemek.
+
+<Screenshot id="admin-recordings" alt="Yönetim → Kayıtlar: kayıt ayarları (açık, saklama süresi 30 gün, oturum başına 10 MB, 2048 MB kota, 512 MB boş alan, en eski kayıtları sil) ve disk kullanımı, altta filtreli oturum kayıtları listesi" />
+
+Her pod shell oturumu ve `POST …/pods/{name}/exec` ile çalıştırılan her tekil komut bir [asciicast v2](https://docs.asciinema.org/manual/asciicast/v2/) dosyası olarak kaydedilir; yöneticiler bunları yeniden oynatabilir. Kayıt tamamen OpenConsole içinde yapılır, ek ClusterRole izni gerekmez.
+
+**Neler kaydedilir**
+- Container'ın terminale yazdığı her şey (stdout + stderr; shell bir TTY üzerinde çalıştığı için ikisi birleşik), zamanlamasıyla birlikte; ayrıca terminal boyut değişiklikleri.
+- Tuş vuruşları girdi olayı olarak **kaydedilmez**. Shell'in ekrana geri yazdığı her şey (örneğin yazılan komutlar) çıktının parçasıdır, bu yüzden kayıtta yer alır; gizli istemlerdeki girdi (`sudo`, `read -s`) ekrana yansımaz ve kaydedilmez.
+- Tam ekran programların (`vim`, `less`, `top`) escape dizileri olduğu gibi tutulur; böylece birebir oynatılır.
+- Oturum başına metadata: kullanıcı, cluster, namespace, pod, container, başlangıç / bitiş, boyut, kesildi işareti ve exec isteğinin `request_id`'si.
+
+**Gizlilik.** Biri bir secret'ı ekrana yazdırırsa (bağlı bir secret'ı `cat` ile, `env`, `kubectl get secret -o yaml`), o secret artık kayıttadır. Shell bunu söyleyen kırmızı bir *"Bu oturum kaydediliyor"* banner'ı gösterir. Banner yalnızca sunucu oturumun gerçekten kaydedildiğini doğruladığında görünür. Kayıtlar yalnızca yöneticilere açıktır; her izleme ya da indirme audit'e yazılır. Kayıt volume'una audit veritabanı kadar özen gösterin.
+
+**Oynatma (Yönetim → Kayıtlar)**
+
+<Screenshot id="recording-player" alt="Kayıt oynatıcı: alice'in staging'deki bir storefront pod'unda açtığı oturum oynatılıyor; boşta geçen süreyi atla, 1x / 2x / 4x hız ve İndir" />
+
+- Kullanıcıya, namespace'e, pod'a, kaynağa (web / API anahtarı, anahtar adı) ve tarih aralığına göre filtreleyin. Tabloda süre, boyut, *Sürüyor* / *Kesildi* rozetleri, API anahtarıyla açılan shell için anahtar adı ve tek bir komut (`POST …/exec`) için *komut* rozeti görünür.
+- ▶ tarayıcı içi oynatıcıyı açar: oynat / duraklat, zaman çizelgesinde ileri geri gitme, 1x / 2x / 4x ve "Boşta geçen süreyi atla" (2 sn'den uzun duraklamaları kısaltır).
+- ⬇ `.cast` dosyasını indirir. Önce, dosyanın secret içerebileceği ve ticket / chat / e-postada paylaşılmaması gerektiği konusunda uyaran bir onay çıkar. Dosya `asciinema` CLI'da da oynar: `asciinema play file.cast`.
+- 🗑 dosyayı ve satırını siler. Oturumu hâlâ süren bir kayıt silinemez.
+
+**Ayarlar (Yönetim → Kayıtlar → Kayıt ayarları).** Açık/kapalı, saklama süresi, oturum başına sınır, toplam kota, boş alan alt sınırı ve disk politikası. Değişiklikler yeni oturumlara restart gerekmeden hemen uygulanır; süren bir oturum, başladığı andaki limitlerle devam eder. Saklama süresini düşürmek hemen bir temizlik başlatır.
+
+**Disk koruması.** Varsayılan olarak kayıtlar PVC'yi `app.db` ile paylaşır. Bu volume dolarsa SQLite yazamaz hale gelir; giriş ve audit de onunla birlikte bozulur. İki limit bunu önler. İkisi de her yeni oturumdan önce ve oturumlar sürerken 30 sn'de bir kontrol edilir:
+
+| Limit | Varsayılan | Anlamı |
+|---|---|---|
+| Toplam kota | 2048 MB | Tüm kayıtların toplamı, artı tam boyutlu bir oturum daha için yer |
+| Boş alan alt sınırı | 512 MB | Kayıt volume'unda her zaman boş bırakılan alan |
+
+Bir limit aşılacaksa ne olacağına **disk politikası** karar verir:
+
+- `evict_oldest` (varsayılan) — en eski tamamlanmış kayıtlar, saklama süreleri dolmamış olsa bile, sıradaki oturum sığana kadar silinir. Her silme `recording.evict` olarak audit'e yazılır (kullanıcı `system`, neden `quota` / `low_disk`).
+- `stop` — mevcut kayıtlar korunur. Yeni shell'ler yine açılır ama **kaydedilmez** (`recording.create` failed, neden `disk_quota`); süren kayıtlar bir kesilme işaretiyle durur. Yer açılana kadar yönetim ekranında bir uyarı görünür.
+
+Kayıt, shell'in kendisini asla engellemez: kapalı, dolu ya da bozuk bir kaydedici yalnızca oturumun kaydedilmemesi demektir. İstisna, [API anahtarıyla](/api/overview) açılan shell'dir: kayıt kapalı olsa bile kaydedilir, kaydedilemiyorsa reddedilir (503, `pod.exec` failed, neden `recording_unavailable`). Tam izolasyon için kayıtlara ayrı bir PVC verin; `deploy/pvc.yaml` ve `deploy/deployment.yaml` yorum satırı halinde bir örnek içerir. Ardından `SESSION_RECORDING_DIR=/recordings` ayarlayın.
+
+**Saklama süresi.** Bir arka plan işi açılıştan bir dakika sonra, sonra da günde bir çalışır. Saklama süresinden eski kayıtları siler (satır ve dosya; `count` ile `recording.purge` olarak audit'e yazılır) ve veritabanında satırı olmayan sahipsiz `.cast` dosyalarını kaldırır. Süreç bir oturumun ortasında çökerse, bir sonraki açılış açık kalan satırı dosyanın boyutu ve değiştirilme zamanıyla kapatır.
+
+**Audit olayları**
+
+| Olay | Ne zaman |
+|---|---|
+| `recording.create` success | Oturum sonu — kaynak olarak oturum id'si, `pod`, `container`, `size_bytes`, `duration_ms`, `truncate_reason`; `pod.exec` olaylarıyla aynı `request_id` |
+| `recording.create` failed | Kaydedilmedi: neden `disk_quota` (disk politikası `stop`) ya da `error` (örn. dizin yazılabilir değil) |
+| `recording.view` / `recording.download` | Bir yönetici kaydı oynattı ya da indirdi |
+| `recording.delete` (success / denied / failed) | UI / API'den silme — satır ve dosya sonrasında yok olacağı için kaydın `owner`, `started_at`, `size_bytes`, `pod`, `container` ve cluster bilgisini tutar |
+| `recording` üzerinde `settings.update` | Ayar değişikliği |
+| `recording.evict` / `recording.purge` | Disk politikasıyla silme / saklama süresi temizliği (kullanıcı `system`) |
+
+**API (yalnızca yönetici)**
+- `GET /api/admin/recordings?user=&namespace=&pod=&cluster=&from=&to=&limit=&offset=` → `{items, total}`
+- `GET /api/admin/recordings/{id}` — metadata
+- `GET /api/admin/recordings/{id}/cast` — `application/x-asciicast` (ek olarak indirmek için `?download=1`)
+- `DELETE /api/admin/recordings/{id}`
+- `GET` / `PUT /api/admin/recordings/settings` — ayarlar (GET'te + disk kullanımı)

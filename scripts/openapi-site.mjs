@@ -3,11 +3,19 @@
 // example URLs instead, so the endpoint pages are generated from a copy whose
 // server is the address the other pages use as OC_URL, and whose descriptions
 // say what the x-openconsole-* fields say (permission, admin, web only).
-import {readFileSync, writeFileSync} from 'node:fs';
+// Frozen docs versions have their own copy in openapi/versions/<X.Y>.yaml.
+import {readFileSync, writeFileSync, existsSync, readdirSync} from 'node:fs';
 import yaml from 'js-yaml';
 
 const root = new URL('..', import.meta.url);
-const spec = yaml.load(readFileSync(new URL('openapi/openapi.yaml', root), 'utf8'));
+const specs = [['openapi/openapi.yaml', 'openapi/openapi.site.yaml']];
+if (existsSync(new URL('openapi/versions/', root))) {
+  for (const f of readdirSync(new URL('openapi/versions/', root)).filter((f) => /^\d+\.\d+\.yaml$/.test(f))) {
+    specs.push([`openapi/versions/${f}`, `openapi/versions/${f.replace(/\.yaml$/, '.site.yaml')}`]);
+  }
+}
+for (const [from, to] of specs) {
+const spec = yaml.load(readFileSync(new URL(from, root), 'utf8'));
 for (const item of Object.values(spec.paths)) {
   for (const op of Object.values(item)) {
     if (!op || typeof op !== 'object' || !op.summary) continue;
@@ -23,4 +31,5 @@ for (const item of Object.values(spec.paths)) {
   }
 }
 spec.servers = [{url: 'https://openconsole.example.com', description: 'Your OpenConsole address (OC_URL)'}];
-writeFileSync(new URL('openapi/openapi.site.yaml', root), yaml.dump(spec, {lineWidth: -1}));
+writeFileSync(new URL(to, root), yaml.dump(spec, {lineWidth: -1}));
+}
