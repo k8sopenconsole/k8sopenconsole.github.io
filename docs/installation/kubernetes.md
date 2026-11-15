@@ -168,8 +168,9 @@ kubectl -n kubernetes-openconsole create secret tls openconsole-tls --cert=tls.c
 kubectl apply -f ingress.yaml
 ```
 
-**ingress-nginx closes idle WebSockets after 60 seconds**, which ends a pod shell that waits for input and a log
-stream of a quiet container. Raise its timeouts on this Ingress:
+OpenConsole pings every open WebSocket (shell, live log, Live Events) every 25 seconds, so ingress-nginx's 60-second
+idle timeout doesn't close a shell that waits for input or the log of a quiet container. A proxy that doesn't count
+pings as traffic needs a longer idle timeout; for ingress-nginx that would be (optional):
 
 ```yaml
 metadata:
@@ -178,8 +179,8 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
 ```
 
-Other proxies have the same kind of idle timeout (e.g. an Azure Application Gateway or AWS load balancer in front
-of the Ingress); set it above the shell idle timeout, `EXEC_IDLE_TIMEOUT` (5 minutes).
+If shells still close after a minute or so behind another proxy (e.g. an Azure Application Gateway or AWS load
+balancer in front of the Ingress), set its idle timeout above the shell idle timeout, `EXEC_IDLE_TIMEOUT` (5 minutes).
 
 Don't route `/metrics` from outside: it is unauthenticated, for your Prometheus inside the cluster
 ([Metrics](/operations/metrics)).

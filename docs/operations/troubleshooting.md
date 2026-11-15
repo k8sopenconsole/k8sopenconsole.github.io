@@ -22,26 +22,29 @@ the message says why:
 | `Unauthorized` | the token is wrong, expired, or its ServiceAccount was deleted | read the token again |
 | `namespaces is forbidden: User "system:serviceaccount:…" cannot list resource "namespaces" …` | the identity has no ClusterRole binding (or not this one) | apply `deploy/rbac.yaml` and bind it to that identity |
 
-## A cluster shows empty lists or 503 {#a-cluster-shows-empty-lists-or-503}
+## A cluster shows errors instead of lists {#a-cluster-shows-empty-lists-or-503}
 
-The cluster was added fine, but now its workload lists are empty, other screens fail, and the log is full of:
+The cluster was added fine, but now its screens say *The cluster cannot be reached, or it refused OpenConsole's
+credentials* or *OpenConsole's account on this cluster may not read this (check its ClusterRole)*, and the log is full of:
 
 ```text
 …/reflector.go:229: Failed to watch *v1.Pod: failed to list *v1.Pod: Unauthorized
 …/reflector.go:229: Failed to watch *v1.Job: failed to list *v1.Job: jobs.batch is forbidden: User "system:serviceaccount:default:temp" cannot list resource "jobs" in API group "batch" at the cluster scope
 ```
 
-and requests answer `503`, `{"error":"Unauthorized"}`, or
-`{"error":"the OpenConsole ServiceAccount is not allowed to read secrets here (check the ClusterRole)"}`.
+and of `cluster read failed` lines naming the resource, the cluster and the request id. Requests answer
+`502` `{"error":"cluster_unreachable"}`, or `403` `{"error":"cluster_forbidden"}`.
 
 The credentials OpenConsole holds for that cluster stopped working: the token was rotated or its ServiceAccount
-deleted (`Unauthorized`), or the ClusterRole or its binding changed (`forbidden`). The cluster's connection gauge
-still reads `1` ([Metrics](/operations/metrics#what-to-watch)). Fix the identity, then in **Admin → Clusters → Edit**
+deleted (`Unauthorized`), or the ClusterRole or its binding changed (`forbidden`). For `Unauthorized` the cluster's
+connection gauge reads `0` ([Metrics](/operations/metrics#what-to-watch)), and picking the cluster in the header fails
+with `cannot connect to cluster: Unauthorized`. Fix the identity, then in **Admin → Clusters → Edit**
 tick **Replace credentials** and paste the token and the CA ([Rotate the token](/installation/connect-cluster#rotate-the-token)).
 The cluster works again at once; no restart is needed.
 
-`{"error":"the OpenConsole ServiceAccount is not allowed to read <resource> here (check the ClusterRole)"}` alone,
-for one kind of resource, means only that rule is missing ([Kubernetes permissions](/reference/kubernetes-permissions)).
+`403` `{"error":"cluster_forbidden"}` alone, on one tab (say Ingresses), means only that rule is missing
+([Kubernetes permissions](/reference/kubernetes-permissions)); the other tabs and the gauge are unaffected.
+A cluster that answers too slowly gives `504` `{"error":"cluster_timeout"}`.
 A write the ClusterRole doesn't allow answers 403 with the API server's message, e.g.
 `restart failed: deployments.apps "web" is forbidden: …` (a view-only ClusterRole, or the `patch` / `update` verb
 removed).
@@ -83,7 +86,7 @@ More: [Prometheus](/administration/prometheus).
 | the same message after 5 tries, and `429` with `Retry-After` from `/api/auth/login` | that user name is locked for 5 minutes from that address, audited as `user.login` `locked` (`too_many_failures`); after 20 failures from any addresses, the name is locked everywhere for 5 minutes. Wait, or sign in from another machine |
 | everyone's sign-ins and sessions show the same address (the ingress pod's), and one person's typos lock others out | `TRUSTED_PROXIES` doesn't cover your ingress, so `X-Forwarded-For` isn't read: set it to the ingress controller's pod network ([Environment variables](/reference/environment-variables)) |
 | **Sign in with Microsoft** answers `this account can't sign in with this Microsoft account` | `user.login` `failed` with reason `not_azure_account` (a local or LDAP account has that name), `azure_oid_mismatch` (the account belongs to another Entra user, e.g. one deleted and re-created) or `azure_no_oid` ([Azure AD](/administration/azure-ad#how-the-account-is-found)) |
-| `Your session has ended. Please sign in again.` | the session expired (Admin → Sessions sets the lifetime) or an admin revoked it |
+| `Your session has ended. Please sign in again.` | no activity for the inactivity time (Admin → Sessions, 60 minutes by default), 12 hours since sign-in, or an admin revoked it |
 
 The audit reason doesn't say why an LDAP bind failed. Test the directory from **Admin → LDAP → Test connection**,
 which answers with the directory client's message, for example:
@@ -101,7 +104,7 @@ certificate error is the TLS settings.
 | Symptom | Cause | Fix |
 |---|---|---|
 | the shell says `Connection error.` or `Session closed (1006).` at once; the log has `GET /ws/namespaces/…/exec 400`, the answer is `{"error":"a WebSocket upgrade is required"}` | the proxy drops the `Upgrade` / `Connection` headers | pass WebSockets through (ingress-nginx, Traefik and the Gateway API do by default; a hand-written nginx needs `proxy_http_version 1.1` and both headers) |
-| a quiet shell closes after about a minute with `Session closed (1006).`; a quiet log stream shows `Connection dropped; reconnecting…` | the proxy's idle timeout | raise it above `EXEC_IDLE_TIMEOUT` (5 minutes) ([Ingress with TLS](/installation/kubernetes#ingress-with-tls)) |
+| a quiet shell closes after about a minute with `Session closed (1006).`; a quiet log stream shows `Connection dropped; reconnecting…` | the proxy's idle timeout, and the proxy doesn't count WebSocket pings as traffic (OpenConsole pings every open shell, log and Live Events socket every 25 seconds) | raise the proxy's idle timeout above `EXEC_IDLE_TIMEOUT` (5 minutes) ([Ingress with TLS](/installation/kubernetes#ingress-with-tls)) |
 | `You already have 3 shells open, the most allowed. Close one and try again.` | `MAX_EXEC_SESSIONS_PER_USER` (3) open shells; audited `pod.exec` `rate_limited` (`max_sessions`) | close one, or raise the limit |
 | `Too many log streams; try again shortly.` | the per-user log stream limit | close log viewers you don't need |
 | shells, logs and live events fail at once, the log has `ws.origin_mismatch` with `"refused":true` | `WS_ORIGIN_CHECK=enforce`, and the browser's address isn't the one the request arrives with: the proxy changes `Host` and either sends no `X-Forwarded-Host` or isn't in `TRUSTED_PROXIES` | let the proxy keep `Host` or send `X-Forwarded-Host` (and trust it), or add the address to `ALLOWED_ORIGINS` |
@@ -143,7 +146,7 @@ missing, expired or revoked.
 | `only the owner can change this view` | editing someone else's shared view | [views.go#L161](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/views.go#L161) |
 | `user is disabled` | an Azure AD sign-in for a deactivated account | [router.go#L989-L991](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L989-L991) |
 | `this account can't sign in with this Microsoft account` | an Azure AD sign-in for a local or LDAP account, or for an account another Entra user signed in to first (see [Sign-in fails](#sign-in-fails)) | [router.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/router.go) |
-| `the OpenConsole ServiceAccount is not allowed to read <resource> here (check the ClusterRole)` | Kubernetes refused OpenConsole's identity, not you | [secrets.go#L227-L229](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/secrets.go#L227-L229) |
+| `cluster_forbidden` (*OpenConsole's account on this cluster may not read this*) | Kubernetes refused OpenConsole's identity, not you | [kube_errors.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/kube_errors.go) |
 | `restart failed: …` / `scale failed: …` / the API server's message | Kubernetes refused a write (ClusterRole without that verb) | [deployment_actions.go#L160-L164](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/deployment_actions.go#L160-L164), [yaml_apply.go#L111](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/yaml_apply.go#L111) |
 
 The first six are also the `reason` of the `denied` audit event. For API keys and agents, see also
@@ -153,10 +156,11 @@ The first six are also the `reason` of the `denied` audit event. For API keys an
 
 | Answer | Meaning |
 |---|---|
-| `400` `cluster "<name>" is unknown or not reachable with this key` | the `X-OpenConsole-Cluster` header names a cluster that doesn't exist or the key doesn't cover |
+| `400` / `403` `cluster "<name>" is unknown or not yours to use` | the `X-OpenConsole-Cluster` header names a cluster that doesn't exist (`400`), or one the key or the user doesn't cover (`403`, audited `cluster.use` or `api_key.use` `denied`). In the browser: the cluster this tab works on was deleted or your permissions on it were removed; reload the page |
+| `403` `cluster_forbidden`, `502` `cluster_unreachable`, `503` `not_connected`, `504` `cluster_timeout` | the cluster failed the read, not OpenConsole's permissions; see [A cluster shows errors instead of lists](#a-cluster-shows-empty-lists-or-503) |
 | `429` (no body) with an API key | more than 10 requests per second (bursts of 30) for that key |
 | `429` `too many open shells (limit 3 per user); close one first` | the shell limit, from a client that isn't a browser |
-| `400` `kubeconfig_unsupported: user "…" uses exec; …` | the kubeconfig runs a program or reads a file (exec plugin, `auth-provider`, `tokenFile`, a certificate or key path): use one with inline credentials ([Connect a cluster](/installation/connect-cluster)). A cluster saved with such a kubeconfig before doesn't connect: its lists stay empty (`503`), and the pod log has `cluster not connected: its kubeconfig runs a program or reads a file` once; upload an inline kubeconfig under **Admin → Clusters → Edit** |
+| `400` `kubeconfig_unsupported: user "…" uses exec; …` | the kubeconfig runs a program or reads a file (exec plugin, `auth-provider`, `tokenFile`, a certificate or key path): use one with inline credentials ([Connect a cluster](/installation/connect-cluster)). A cluster saved with such a kubeconfig before doesn't connect: its lists say *The cluster is not connected.* (`503` `not_connected`), and the pod log has `cluster not connected: its kubeconfig runs a program or reads a file` once; upload an inline kubeconfig under **Admin → Clusters → Edit** |
 | `409` `a revoked key can't be regenerated; create a new one` | regenerating a revoked API key; only an expired key can be regenerated |
 | `413` `request body too large` | the body is over 1 MiB (4 MiB for a YAML apply) |
 | `400` `username is required` | `PUT /api/admin/users/{id}` without `username`: send the user's name with every update |

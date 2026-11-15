@@ -118,7 +118,9 @@ Every refusal is audited. The body names the reason:
 | 403 | `{"error":"api_key_not_allowed"}` | Web session only (managing keys, password, saved views). |
 | 403 | `{"error":"feature_disabled"}` | The operator switched the feature off (`FEATURE_*=false`). |
 | 403 | `{"error":"admin_only"}` | An admin endpoint, and the key isn't an Admin API key of an admin. |
-| 400 | `{"error":"cluster \"nope\" is unknown or not reachable with this key"}` | `X-OpenConsole-Cluster` names a cluster that doesn't exist or isn't in the key. |
+| 400 | `{"error":"cluster \"nope\" is unknown or not yours to use"}` | `X-OpenConsole-Cluster` names a cluster that doesn't exist (`403` for one the key doesn't cover). |
+| 403 | `{"error":"cluster_forbidden"}` | The cluster refused the read: OpenConsole's ClusterRole there doesn't allow it. |
+| 502 / 503 / 504 | `{"error":"cluster_unreachable"}` / `not_connected` / `cluster_timeout` | The cluster can't be reached or refused OpenConsole's credentials / isn't connected / didn't answer in time. |
 | 429 | empty | More than 10 requests a second for this key; see [Limits](/api/limits). |
 
 Seen on the test cluster with:
@@ -132,7 +134,7 @@ curl -s -w ' %{http_code}\n' -H "Authorization: Bearer $OPENCONSOLE_API_KEY" "$O
 #  403
 curl -s -w ' %{http_code}\n' -H "Authorization: Bearer $OPENCONSOLE_API_KEY" -H "X-OpenConsole-Cluster: nope" \
   "$OC_URL/api/namespaces/crashlab/pods"
-# {"error":"cluster \"nope\" is unknown or not reachable with this key"}
+# {"error":"cluster \"nope\" is unknown or not yours to use"}
 #  400
 curl -s -w ' %{http_code}\n' -H "Authorization: Bearer $OPENCONSOLE_API_KEY" "$OC_URL/api/admin/users"
 # {"error":"admin_only"}

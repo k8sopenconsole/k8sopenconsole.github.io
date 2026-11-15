@@ -71,8 +71,8 @@ curl -sL https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/dev/d
   | sed 's/namespace: team-a/namespace: payments/' | kubectl apply -f -
 ```
 
-Run the second command once per namespace, with its name. Elsewhere Kubernetes refuses: the Secrets tab answers
-`the OpenConsole ServiceAccount is not allowed to read secrets here (check the ClusterRole)`, a shell or a command
+Run the second command once per namespace, with its name. Elsewhere Kubernetes refuses: the Secrets tab says
+*OpenConsole's account on this cluster may not read this (check its ClusterRole).* (`403` `cluster_forbidden`), a shell or a command
 fails (`exec_failed`), and restart, scale and YAML apply fail with the API server's message. Keep the OpenConsole
 roles in line, so users don't get buttons that only fail. If you install with the `deploy/` folder, list the files
 instead ([Install on Kubernetes](/installation/kubernetes#2-apply-it)), or every `kubectl apply -k` puts `rbac.yaml`
@@ -85,7 +85,7 @@ Delete the rules for permissions you will never grant (from a copy of the file).
 | Rule (`rbac.yaml`) | Needed for | Without it |
 |---|---|---|
 | `namespaces, pods, services, configmaps, events`: get / list / watch | every Dashboard tab, Live Events | OpenConsole can't list anything |
-| `secrets`: get / list | `secrets:list`, `secrets:get`, `secrets:reveal` | the Secrets tab says *"ServiceAccount is not allowed to read secrets"* |
+| `secrets`: get / list | `secrets:list`, `secrets:get`, `secrets:reveal` | the Secrets tab says *"OpenConsole's account on this cluster may not read this"* |
 | `secrets`: update | `secrets:edit` | applying a Secret's YAML fails with 403 |
 | `pods/log`: get | pod / deployment / job logs (`pods:logs`) | logs fail with 403 |
 | `pods/exec`: create | pod shell and one-command exec (`pods:exec`) | the shell fails with 403 |
@@ -212,6 +212,7 @@ For up to 7 days, set the cluster's Prometheus under **Admin → Clusters → Pr
 - **Save fails**: the API server is not reachable from the pod (network policy, private endpoint, `127.0.0.1` in a
   kubeconfig), or the CA doesn't match.
 - **A tab is empty or 403 for a user**: check that user's role permissions first, then the ClusterRole rule above.
+  A tab that says *OpenConsole's account on this cluster may not read this* (`cluster_forbidden`) is the ClusterRole.
 - **No CPU / memory**: the cluster has no metrics-server (`kubectl get apiservices v1beta1.metrics.k8s.io`), or the
   ClusterRole lacks `metrics.k8s.io` `pods`. The Pods tab says which.
 - **Prometheus test fails**: the test names the failing step; see [Prometheus](/administration/prometheus).

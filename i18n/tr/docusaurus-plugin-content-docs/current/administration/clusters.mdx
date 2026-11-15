@@ -29,7 +29,10 @@ Aynı cluster, iki farklı kimlikle iki ayrı adla iki kez eklenebilir; örneği
 
 - **Varsayılan yap**, herkesin başka bir cluster seçene kadar başladığı cluster'ı belirler.
 - Her kullanıcı üst bardan (ya da `c` ile) **kendi** cluster'ını seçer; seçim kullanıcı başına saklanır. Seçici
-  yalnızca kullanıcının izinlerinin kapsadığı cluster'ları listeler; yöneticiler hepsini görür.
+  yalnızca kullanıcının izinlerinin kapsadığı cluster'ları listeler; yöneticiler hepsini görür. Her tarayıcı sekmesi
+  gösterdiği cluster'ı her istekle gönderir; bu yüzden bir sekmedeki seçim başka bir sekmenin işlemlerini taşımaz.
+- Bir cluster'ı seçmek ya da varsayılan yapmak cluster'a bir kez sorar: API server'ına ulaşılamayan ya da token'ı
+  reddeden bir cluster orada `cannot connect to cluster: …` ile başarısız olur.
 - Kullanıcının cluster'ı silinirse ya da o cluster'daki tüm izinlerini kaybederse, varsayılan cluster'a geçirilir.
 - Her audit olayı, aksiyonun çalıştığı cluster'ı kaydeder.
 

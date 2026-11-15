@@ -19,10 +19,15 @@ import Screenshot from '@site/src/components/Screenshot';
 - Listede izinlerinizin kapsadığı cluster'lar vardır. **varsayılan** işaretli olan, siz başka birini seçene kadar
   başladığınız cluster'dır.
 - Cluster seçmek **yalnızca sizi** değiştirir. OpenConsole seçiminizi hatırlar; giriş yaptığınız her cihazda.
+- Her tarayıcı sekmesi gösterdiği cluster üzerinde çalışmaya devam eder. İkinci bir sekmede başka bir cluster
+  seçerseniz ilk sekme bunu söyler (*Başka bir sekmede staging seçildi. Bu sekme hâlâ prod-eu üzerinde çalışıyor.*)
+  ve işlemleri yine prod-eu'ya gider; **staging cluster'ına geç** ona geçer, **prod-eu üzerinde kal** notu kapatır.
+  Yenilenen bir sekme son seçiminizle açılır.
 - Açık listede `1`–`9` sıradaki yerine göre seçer, `↑` / `↓` gezinir, `Enter` seçer.
 - Yaptığınız her işlem, çalıştığı cluster ile birlikte kaydedilir.
 
-Cluster'ınız kaldırılırsa ya da üzerindeki tüm izinlerinizi kaybederseniz varsayılana geri alınırsınız.
+Cluster'ınız kaldırılırsa ya da üzerindeki tüm izinlerinizi kaybederseniz varsayılana geri alınırsınız (o cluster'da
+açık kalan bir sekme, yenileyene kadar hata gösterir).
 
 ## Namespace'leriniz {/* #your-namespaces */}
 

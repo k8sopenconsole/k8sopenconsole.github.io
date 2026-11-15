@@ -96,7 +96,7 @@ listeyi baştan sona geçin. Her maddenin neden önemli olduğu [Güvenlik model
 - **Kullanmadığınızı kapatın**, herkes için, özellik bayraklarıyla: `FEATURE_POD_EXEC=false`,
   `FEATURE_SECRET_REVEAL=false`, `FEATURE_API_KEYS=false`, …
   ([Özellik bayrakları](/administration/customization-and-flags#feature-flags)).
-- Politikanıza uyan bir **oturum ömrü** (varsayılan 60 dakika) ve bir **API anahtarı süre politikası**: bir anahtarın
+- Politikanıza uyan bir **hareketsizlik süresi** (varsayılan 60 dakika; oturum en geç 12 saat sonra biter) ve bir **API anahtarı süre politikası**: bir anahtarın
   sahip olabileceği en uzun ömür ([Oturum ömrü ve API anahtarı süresi](/administration/sessions#session-lifetime-and-api-key-expiry)).
 - Agent'lar daha fazlasına ihtiyaç duymadıkça **API erişim politikasını roller için *Güvenli salt okuma*'da tutun**
   ([API erişim politikası](/administration/api-access-policy)).
