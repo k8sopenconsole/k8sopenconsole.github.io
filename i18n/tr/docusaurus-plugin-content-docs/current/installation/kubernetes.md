@@ -192,5 +192,5 @@ shell'ler yine bir dakika kadar sonra kapanıyorsa, onun boşta kalma zaman aş�
 ## Sonraki adımlar {#next}
 
 1. [Cluster bağlayın](/installation/connect-cluster): bu cluster'ı (ServiceAccount zaten hazır) ve diğerlerini.
-2. [İlk giriş](/getting-started/first-login): admin şifresini değiştirin, kullanıcıları ve rolleri kurun.
+2. [İlk giriş](/getting-started/first-login): admin parolasını değiştirin, kullanıcıları ve rolleri kurun.
 3. İlk [sürüm yükseltmenizden](/installation/upgrading) önce volume'u [yedekleyin](/installation/backup-restore).

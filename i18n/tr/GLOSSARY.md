@@ -61,7 +61,7 @@ Navigation and screens (UI path separators stay `→`):
 | Restart history | Restart geçmişi |
 | Resource usage | Kaynak kullanımı |
 | Usage history | Kullanım geçmişi |
-| Change password | Şifre değiştir |
+| Change password | Parola değiştir |
 | Sign in / Sign out | Giriş yap / Çıkış |
 | Language | Dil |
 | Card view / List view | Kart görünümü / Liste görünümü |
@@ -117,7 +117,7 @@ Words in running text:
 | expiry | süre / bitiş |
 | session | oturum |
 | recording | kayıt |
-| password | şifre (UI sign-in and change-password screens) |
+| password | parola ("şifre" is not used for passwords; "şifreleme" stays for encryption) |
 | role / group / user | rol / grup / kullanıcı |
 | cluster, namespace, pod, node, container, Deployment, Secret, ConfigMap, Ingress, label, annotation, taint | unchanged, Turkish suffix after an apostrophe (`cluster'lar`, `namespace'ler`) |
 | log / logs | log / loglar |
@@ -141,5 +141,5 @@ Words in running text:
 | hardening | sıkılaştırma |
 | quick start | Hızlı başlangıç |
 
-The UI is not fully consistent yet (it says both "Şifre" and "Parola", "Pod'lar" and "Pod’lar"); the site uses the
-form the screen being described shows, and the table above otherwise.
+Since 2.23.x the UI says "siz", "Parola" and a straight apostrophe everywhere (`Pod'lar`, `Node'lar`); the site
+uses the same.

@@ -27,8 +27,8 @@ Ayakta olduğunu kontrol edin: `curl http://localhost:8080/readyz` `ready` yanı
 ## 2. Giriş yapın {#2-sign-in}
 
 http://localhost:8080 adresini açın ve **`admin` / `admin`** ile giriş yapın. Başka hiçbir şey çalışmadan önce
-yeni bir şifre seçmeniz istenir (en az 8 karakter, `PASSWORD_MIN_LENGTH`). Değişiklikten sonra oturumunuz kapanır;
-yeni şifreyle tekrar giriş yapın.
+yeni bir parola seçmeniz istenir (en az 8 karakter, `PASSWORD_MIN_LENGTH`). Değişiklikten sonra oturumunuz kapanır;
+yeni parolayla tekrar giriş yapın.
 
 ## 3. Bir cluster bağlayın {#3-connect-a-cluster}
 

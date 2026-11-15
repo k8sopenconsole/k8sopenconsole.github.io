@@ -36,8 +36,8 @@ Her okuma ve yazma, kendi alanları olan bir audit olayıdır: `action` (`deploy
 - **Namespace keşfi izne dayalıdır** (erişemediğiniz namespace'lerin adları sızmaz).
 - **Çoklu cluster, kullanıcı başına**: N tane cluster kaydedin. Her kullanıcı **kendi** cluster'ını header'dan (ya da `c` ile) seçer; yöneticiler diğer herkes için bir varsayılan belirler. İzinler cluster bazında sınırlanabilir ve audit cluster'ı kaydeder.
 - **Yerel kullanıcılar** (bcrypt) + **LDAP** (bind tabanlı, aranabilir + içe aktarılabilir) + **Azure AD** single-tenant giriş — hepsi arayüzden yapılandırılır.
-- **JWT kimlik doğrulama**; ilk girişte şifre değişikliği zorunludur.
-- **Oturum yönetimi** (Yönetim → Oturumlar): tüm aktif token'ları listeleyin, oturumları tek tek ya da bir kullanıcının tüm oturumlarını birden iptal edin; şifre değişikliği hepsini iptal eder.
+- **JWT kimlik doğrulama**; ilk girişte parola değişikliği zorunludur.
+- **Oturum yönetimi** (Yönetim → Oturumlar): tüm aktif token'ları listeleyin, oturumları tek tek ya da bir kullanıcının tüm oturumlarını birden iptal edin; parola değişikliği hepsini iptal eder.
 - **Oturum kayıtları** (Yönetim → Kayıtlar): filtreleme, tekrar oynatma (1x / 2x / 4x, ileri-geri sarma, boşta geçen süreyi atlama), `.cast` indirme, silme; saklama süresi, kota ve açma / kapama anahtarı arayüzden düzenlenir.
 - **Girişte brute-force koruması** (IP+kullanıcı başına 5 hatalı deneme → 5 dakika kilit, audit'e yazılır). Her giriş `user.login` olarak audit'e yazılır: sonucuyla (`success` / `failed` / `locked`), yöntemiyle (`login_method`: `local` / `ldap` / `azure`) ve başarısız girişte nedeniyle.
 

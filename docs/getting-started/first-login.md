@@ -41,7 +41,7 @@ Do these in order; each step needs the one before.
      groups (Admin → Users → New user → Import from LDAP…), or turn on *Create an account on a user's first
      sign-in* with default groups. Sign in once as an LDAP user before telling everyone.
      [LDAP / Active Directory](/administration/ldap)
-   - **Azure AD (Entra ID)**: create the app registration, fill in Admin → Azure AD, **Test Connection**, then
+   - **Azure AD (Entra ID)**: create the app registration, fill in Admin → Azure AD, **Test configuration**, then
      pre-create users with their groups (New user → Azure AD user) so they see something on their first
      "Sign in with Microsoft". [Azure AD](/administration/azure-ad)
 6. **Check what a user sees.** Sign in as a non-admin in a private window: only their namespaces, no Admin,

@@ -55,7 +55,7 @@ kubectl --context k3d-openconsole-demo -n kubernetes-openconsole \
   port-forward svc/kubernetes-openconsole 8080:80
 ```
 
-http://localhost:8080 adresini açın, `admin` / `admin` ile giriş yapın ve yeni bir şifre seçin.
+http://localhost:8080 adresini açın, `admin` / `admin` ile giriş yapın ve yeni bir parola seçin.
 
 ## 5. Cluster'ı bağlayın {#5-connect-the-cluster}
 

@@ -189,9 +189,8 @@ A new ServiceAccount gets a new identity, and the old token is refused at once. 
 2.23.0 described the Secret-only way; it was wrong.)
 
 Then read the new token and CA (step 2), click **Edit** on the cluster in **Admin → Clusters**, tick **Replace
-credentials** and paste the new token **and the CA again**: with *Replace credentials* both fields start empty, and
-a save without the CA fails (`x509: certificate signed by unknown authority`). For a kubeconfig cluster, upload the
-new file.
+credentials** and paste the new token. Leave the CA field empty: the stored CA stays (the API server's certificate
+didn't change). For a kubeconfig cluster, upload the new file.
 
 Until you do, every cluster entry that uses the old token (token and kubeconfig alike) has lost access. The lists may
 still show what OpenConsole had cached, and the Clusters page shows no error; the pod log has

@@ -6,8 +6,8 @@ description: "Run OpenConsole without internet access: the image from your own r
 # Air-gapped install
 
 The OpenConsole server needs no internet access: it talks to your clusters' API servers and, if you use them, your
-LDAP server, Azure AD, Prometheus and trace receiver. Two things come from outside: the image and the manifests,
-which you copy in once per release, and two files the **browser** loads from public CDNs (see
+LDAP server, Azure AD, Prometheus and trace receiver. Only the image and the manifests come from outside;
+you copy them in once per release. The **browser** loads nothing from the internet either (see
 [What the browser loads](#what-the-browser-loads)).
 
 ## 1. Copy the image into your registry {#1-copy-the-image-into-your-registry}
@@ -76,13 +76,9 @@ If your registry needs credentials, add an `imagePullSecrets` entry to the same 
 
 ## What the browser loads {#what-the-browser-loads}
 
-| From | What | Without it |
-|---|---|---|
-| `fonts.googleapis.com`, `fonts.gstatic.com` | the Inter and Fira Code fonts | the browser's own fonts are used; nothing else changes |
-
-Everything else (lists, details, logs, shells, restart and scale, Secrets, the YAML editor, the admin screens) is
-served by OpenConsole itself and works without these. The Content Security Policy allows exactly these sources
-([Security model](/operations/security#http)).
+Everything, the fonts (Inter, Fira Code) and the YAML editor included, is served by OpenConsole itself. The Content
+Security Policy allows no other source ([Security model](/operations/security#http)). Up to 2.23.0 the fonts came
+from `fonts.googleapis.com` / `fonts.gstatic.com`.
 
 ## Upgrading {#upgrading}
 

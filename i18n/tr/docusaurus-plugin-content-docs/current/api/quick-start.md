@@ -113,11 +113,11 @@ Her ret audit'e yazılır. Gövde nedeni söyler:
 | Durum | Gövde | Anlamı |
 |---|---|---|
 | 401 | boş | Anahtar bilinmiyor, süresi dolmuş ya da iptal edilmiş, veya sahibi devre dışı. |
-| 403 | `{"error":"change your password first"}` | Sahibinin şifresini değiştirmesi gerekiyor (ilk giriş ya da admin sıfırlaması). |
+| 403 | `{"error":"change your password first"}` | Sahibinin parolasını değiştirmesi gerekiyor (ilk giriş ya da admin sıfırlaması). |
 | 403 | `{"error":"forbidden"}` | Anahtarda listelenmiyor ya da o namespace'te sizde yok. |
 | 403 | `{"error":"api_access_policy"}` | Web'de sizde var, ama admin'in API erişim politikası anahtarlara vermiyor. |
 | 403 | `{"error":"api_access_off"}` | Politika anahtarlarınıza hiçbir şey vermiyor; `/api/auth/me` dahil her çağrı reddedilir. |
-| 403 | `{"error":"api_key_not_allowed"}` | Yalnızca web oturumunda yapılabilir (anahtar yönetimi, şifre, kayıtlı görünümler). |
+| 403 | `{"error":"api_key_not_allowed"}` | Yalnızca web oturumunda yapılabilir (anahtar yönetimi, parola, kayıtlı görünümler). |
 | 403 | `{"error":"feature_disabled"}` | Operatör özelliği kapattı (`FEATURE_*=false`). |
 | 403 | `{"error":"admin_only"}` | Bir admin ucu ve anahtar bir admin'in Admin API anahtarı değil. |
 | 400 | `{"error":"cluster \"nope\" is unknown or not yours to use"}` | `X-OpenConsole-Cluster`, var olmayan bir cluster'ı belirtiyor (anahtarın kapsamadığı biri için `403`). |

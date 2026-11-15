@@ -87,7 +87,7 @@ listeyi baştan sona geçin. Her maddenin neden önemli olduğu [Güvenlik model
 
 ## Hesaplar ve erişim {#accounts-and-access}
 
-- **`admin` şifresini ilk girişte değiştirin**; günlük işler için LDAP ya da Azure AD ile giriş yapın, acil durumlar
+- **`admin` parolasını ilk girişte değiştirin**; günlük işler için LDAP ya da Azure AD ile giriş yapın, acil durumlar
   için bir yerel yönetici hesabı tutun ([İlk giriş](/getting-started/first-login)).
 - **Az sayıda yönetici.** Bir yönetici, Secret'lar ve shell'ler dahil her cluster'da her izne sahiptir. Diğer
   herkese rol verin ([Erişim modeli](/administration/access-model)).

@@ -9,10 +9,10 @@ Yönetim → Cluster'lar → **Prometheus**, her cluster için ayrı bir ayar. A
 
 | Mod | Ne zaman | Ne gerekir |
 |---|---|---|
-| **Cluster içinden (API server proxy)** | Prometheus'a yalnızca cluster içinden erişilebiliyorsa (ClusterIP Service; olağan kube-prometheus-stack kurulumu) | namespace, Service, port (*Cluster'da bul* bunları doldurur). OpenConsole, cluster'ın kimlik bilgileriyle Kubernetes API üzerinden gider; bu yüzden ağ erişimi ya da Prometheus şifresi gerekmez. Ama ServiceAccount'un o Service üzerinde `services/proxy` `get` iznine ihtiyacı vardır: `deploy/rbac.yaml`'daki kuralın yorumunu kaldırın ve yalnızca kendi Service'inizin adını yazın. |
+| **Cluster içinden (API server proxy)** | Prometheus'a yalnızca cluster içinden erişilebiliyorsa (ClusterIP Service; olağan kube-prometheus-stack kurulumu) | namespace, Service, port (*Cluster'da bul* bunları doldurur). OpenConsole, cluster'ın kimlik bilgileriyle Kubernetes API üzerinden gider; bu yüzden ağ erişimi ya da Prometheus parolası gerekmez. Ama ServiceAccount'un o Service üzerinde `services/proxy` `get` iznine ihtiyacı vardır: `deploy/rbac.yaml`'daki kuralın yorumunu kaldırın ve yalnızca kendi Service'inizin adını yazın. |
 | **Doğrudan URL** | Prometheus'un OpenConsole'un erişebildiği bir adresi varsa (ingress, Thanos / Mimir, yönetilen servis) | URL (path öneki korunur); kimlik doğrulama: yok, basic, bearer token, **Azure AD** client credentials (scope `https://prometheus.monitor.azure.com/.default`; Azure Monitor managed Prometheus için) ya da client sertifikası; ek header'lar (örn. `X-Scope-OrgID`); CA sertifikası ya da doğrulamayı atlama. |
 
-Şifreler, token'lar, client secret'lar, client key'ler ve header değerleri şifrelenerek saklanır ve asla geri döndürülmez; form bir maske gösterir, maskeyi kaydetmek saklanan değeri korur. Bir değişiklik `changed: [prometheus]` ile `cluster.update` olarak audit'e yazılır.
+Parolalar, token'lar, client secret'lar, client key'ler ve header değerleri şifrelenerek saklanır ve asla geri döndürülmez; form bir maske gösterir, maskeyi kaydetmek saklanan değeri korur. Bir değişiklik `changed: [prometheus]` ile `cluster.update` olarak audit'e yazılır.
 
 Tek bir Prometheus birden çok cluster'ı tutuyorsa, onları ayıran label'ı (`cluster`, `cluster_name`, …) ve bu cluster'ın değerini girin; *Bağlantıyı test et* bulduğu değerleri listeler. Bu ayar olmadan grafikler cluster'ları toplar.
 

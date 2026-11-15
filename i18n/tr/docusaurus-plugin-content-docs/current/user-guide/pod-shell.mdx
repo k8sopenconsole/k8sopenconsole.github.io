@@ -18,14 +18,20 @@ Pod satırında, pod kartında ya da pod'un ayrıntı panelinde **Shell**'e tık
 - Birden fazla container'ı olan bir pod önce hangisini istediğinizi sorar. Ana container en üsttedir ve seçili gelir
   (`Enter` onu açar); çalışmayan container'lar soluk görünür. Container'ı sonradan terminalden de değiştirebilirsiniz.
 - Sağ üstteki menü shell'i seçer: *Otomatik* sırayla `bash`, `ash` ve `sh`'yi dener. Minimal imajlarda (distroless,
-  scratch) hiç shell yoktur; bu durumda shell açılamaz.
+  scratch) hiç shell yoktur; bu durumda shell açılamaz. Başka bir shell ya da container seçmek yeni bir oturum başlatır.
 - **Yeniden bağlan** aynı container'da yeni bir oturum başlatır.
+
+## Klavye {/* #keyboard */}
+
+Yazdığınız her tuş shell'e gider, `Tab` ve `Esc` dahil (tamamlama, vim). `Ctrl+]` (Türkçe Q klavyede `Ctrl+Ü`)
+terminalden üstteki menülere çıkar; orada `Esc` pencereyi kapatır ve odak pencereyi açtığınız düğmeye döner.
+Menülerden `Tab` terminale geri götürür. Terminalin üstündeki şerit de bunu yazar.
 
 ## Oturum kaydedilir {/* #it-is-recorded */}
 
 Kırmızı bant oturumun kaydedildiğini gösterir: terminalde görünen her şey saklanır ve adminler tarafından tekrar
 oynatılabilir; ekrana bastığınız gizli bilgiler de dahil. Bant yalnızca sunucu kaydı onayladığında görünür. Yazdıklarınız
-ancak shell onları ekrana geri bastığı ölçüde kaydedilir (şifre istemleri ekrana basmaz).
+ancak shell onları ekrana geri bastığı ölçüde kaydedilir (parola istemleri ekrana basmaz).
 
 ## Sınırlar {/* #limits */}
 

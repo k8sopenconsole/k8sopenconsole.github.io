@@ -14,7 +14,7 @@ OpenConsole'un sakladığı her şey `/data`'ya mount edilen tek bir volume'dedi
 | `/data/recordings/` | pod shell kayıtları (`.cast` dosyaları) |
 
 :::danger Yedeğe bir secret gibi davranın
-Bir yedek; kullanıcıları, audit logunu ve şifreli olarak cluster token'larını, LDAP ve Prometheus şifrelerini ve
+Bir yedek; kullanıcıları, audit logunu ve şifreli olarak cluster token'larını, LDAP ve Prometheus parolalarını ve
 Azure AD client secret'ını içerir. [Şifreleme anahtarını veritabanının dışında tutmadığınız](#keep-the-encryption-key-out-of-the-database)
 sürece anahtar da aynı dosyadadır; kopyaya sahip olan herkes bunları okuyabilir. Kayıtlarda da birinin shell'de
 ekrana bastığı her şey bulunabilir. Yedekleri şifreli saklayın; erişimi en az cluster'ların kendisi kadar sıkı tutun.
@@ -131,7 +131,7 @@ kubectl -n $NS scale deploy/kubernetes-openconsole --replicas=1
 kubectl -n $NS rollout status deploy/kubernetes-openconsole --timeout=5m
 ```
 
-3. **Yedekteki bir hesapla giriş yapın** (şifreler yedeğin alındığı andaki şifrelerdir). Cluster'lar, kullanıcılar,
+3. **Yedekteki bir hesapla giriş yapın** (parolalar yedeğin alındığı andaki parolalardır). Cluster'lar, kullanıcılar,
    roller ve audit logu geri gelir.
 
 Eski bir sürümün yedeği daha yeni bir sürüme geri yüklenebilir: yeni sürüm açılışta veritabanını yükseltir
@@ -233,4 +233,4 @@ Onunla şifrelenmiş değerler geri getirilemez. Yukarıdaki gibi yeni bir anaht
 `ENCRYPTION_KEY_LOST=true` ile bir kez başlatın (`kubectl -n kubernetes-openconsole set env
 deploy/kubernetes-openconsole ENCRYPTION_KEY_LOST=true`): çözülemeyen değerler boşaltılır, her biri loga yazılır.
 Değişkeni yeniden kaldırın (`ENCRYPTION_KEY_LOST-`), sonra cluster kimlik bilgilerini (Yönetim → Cluster'lar →
-Düzenle), LDAP bind şifresini ve Azure AD client secret'ını yeniden girin.
+Düzenle), LDAP bind parolasını ve Azure AD client secret'ını yeniden girin.

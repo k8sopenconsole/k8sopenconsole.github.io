@@ -189,9 +189,9 @@ Yeni bir ServiceAccount ise yeni bir kimlik alır ve eski token hemen reddedilir
 kadar yalnızca Secret'ı silme yolunu anlatıyordu; bu yanlıştı.)
 
 Ardından yeni token'ı ve CA'yı okuyun (2. adım), **Yönetim → Cluster'lar** ekranında cluster'ın **Düzenle**
-butonuna tıklayın, **Credential'ları değiştir** kutusunu işaretleyin ve yeni token'ı **ve CA'yı da yeniden**
-yapıştırın: *Credential'ları değiştir* seçiliyken iki alan da boş gelir ve CA olmadan kaydetmek başarısız olur
-(`x509: certificate signed by unknown authority`). Kubeconfig ile eklenmiş bir cluster için yeni dosyayı yükleyin.
+butonuna tıklayın, **Credential'ları değiştir** kutusunu işaretleyin ve yeni token'ı yapıştırın. CA alanını boş
+bırakın: kayıtlı CA kalır (API sunucusunun sertifikası değişmedi). Kubeconfig ile eklenmiş bir cluster için yeni
+dosyayı yükleyin.
 
 Bunu yapana kadar eski token'ı kullanan her cluster kaydı (token ve kubeconfig fark etmez) erişimini kaybetmiştir.
 Listeler OpenConsole'un cache'inde kalanı göstermeye devam edebilir ve Cluster'lar sayfası hata göstermez; pod

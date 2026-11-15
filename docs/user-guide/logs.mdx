@@ -49,7 +49,7 @@ first is not picked by mistake. The container menu switches; init containers are
 - Every log you open is written to the audit log (`pod.logs`, `previous: true` for the log before a restart).
 
 :::info[Can't see it or can't do it?]
-- **No Logs button**, or *You may not read this log*: you don't hold `pods:logs` in this namespace. Ask for
+- **No Logs button** (on rows, in drawers): you don't hold `pods:logs` in this namespace. Ask for
   `pods:logs`; reading the list (`pods:list`) is a separate permission.
 - **"unable to retrieve container logs"** before a restart: the container died too quickly for the runtime to keep
   its log.
