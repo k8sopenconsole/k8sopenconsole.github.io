@@ -30,6 +30,12 @@ listeyi baştan sona geçin. Her maddenin neden önemli olduğu [Güvenlik model
 
 - **Release'i sabitleyin ve `Recreate` kullanın** ([Kubernetes'e kurulum](/installation/kubernetes#1-write-a-kustomization)),
   tek replica çalıştırın ve çalıştırdığınız imajı doğrulayın ([İmajı doğrulama](/installation/verify-image)).
+- **Manifest'in container ayarlarını koruyun**: `/tmp` `emptyDir`'iyle salt okunur kök dosya sistemi, root olmayan
+  kullanıcı, capability yok, ServiceAccount token'ı yok. İmajda shell yoktur; pod'un içine bakmak için geçici bir
+  container kullanın (`kubectl debug -it <pod> --image=busybox:1.36 --target=dashboard`).
+- **Başka sitelerden gelen WebSocket'leri reddedin**: log bir süre hiç `ws.origin_mismatch` göstermediyse
+  `WS_ORIGIN_CHECK=enforce` ayarlayın. Başka bir sitenin sayfası API'yi çağırmak zorunda değilse `ALLOWED_ORIGINS`'i
+  boş bırakın ([Güvenlik modeli](/operations/security#http)).
 - **TLS Ingress'te olsun, Service'in önünde başka hiçbir şey olmasın.** OpenConsole düz HTTP konuşur. Denetim logu ve
   giriş kilidi için istemci adresini `X-Forwarded-For`'dan yalnızca bağlantı `TRUSTED_PROXIES`'teki bir proxy'den
   geliyorsa alır (manifest özel ağları listeler); bunu Ingress controller'ınızın pod ağına ayarlayın, böylece içeri tek

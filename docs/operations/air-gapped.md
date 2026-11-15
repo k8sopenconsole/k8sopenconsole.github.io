@@ -78,13 +78,11 @@ If your registry needs credentials, add an `imagePullSecrets` entry to the same 
 
 | From | What | Without it |
 |---|---|---|
-| `cdn.jsdelivr.net` | the YAML editor (Monaco), loaded when someone opens a YAML view | the YAML dialog opens and stays at *Loading…*: YAML can't be viewed or edited in OpenConsole. Use `kubectl` for YAML |
 | `fonts.googleapis.com`, `fonts.gstatic.com` | the Inter and Fira Code fonts | the browser's own fonts are used; nothing else changes |
 
-Everything else (lists, details, logs, shells, restart and scale, Secrets, the admin screens) is served by
-OpenConsole itself and works without these. This release has no setting to serve the editor from OpenConsole; if
-your users' browsers may reach `cdn.jsdelivr.net` through a proxy, the editor works as usual. The Content Security
-Policy allows exactly these sources ([Security model](/operations/security#http)).
+Everything else (lists, details, logs, shells, restart and scale, Secrets, the YAML editor, the admin screens) is
+served by OpenConsole itself and works without these. The Content Security Policy allows exactly these sources
+([Security model](/operations/security#http)).
 
 ## Upgrading {#upgrading}
 

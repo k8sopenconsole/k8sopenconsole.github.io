@@ -153,7 +153,7 @@ ayarları, Prometheus ayarları, oturumlar, API anahtarı özetleri ve denetim l
 - OpenConsole 8080 port'unda düz HTTP sunar; TLS, Ingress'inizde ya da Gateway'inizde sonlanır
   ([Kubernetes'e kurulum](/installation/kubernetes#ingress-with-tls)).
 - **Her cevaptaki response header'ları** ([observability.go#L17-L46](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/observability.go#L17-L46)):
-  `Content-Security-Policy` (script'ler yalnızca uygulamanın kendisinden ve YAML editörü için `cdn.jsdelivr.net`'ten,
+  `Content-Security-Policy` (script'ler, YAML editörü dahil, yalnızca uygulamanın kendisinden,
   `frame-ancestors 'none'`), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`,
   `Referrer-Policy: strict-origin-when-cross-origin`, konum, kamera, mikrofon ve ödemeyi kapatan
   `Permissions-Policy`. CSP'de ayrıca `worker-src blob:` ve `script-src` içinde `'wasm-unsafe-eval'` vardır; böylece
@@ -168,6 +168,10 @@ ayarları, Prometheus ayarları, oturumlar, API anahtarı özetleri ve denetim l
   ([clientip.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/clientip.go)). Manifest özel ağlara güvenir; yapabiliyorsanız
   `TRUSTED_PROXIES`'i Ingress'inize daraltın ve Service'i başka bir yoldan açmayın
   ([Ortam değişkenleri](/reference/environment-variables)).
+- **Başka siteler**, origin'leri `ALLOWED_ORIGINS`'te (varsayılan boş) değilse CORS cevabı almaz; konsolun kendi
+  sayfaları aynı origin'dendir ve buna ihtiyaç duymaz. Başka bir sitenin sayfasından açılan bir WebSocket (shell,
+  loglar, canlı olaylar) `ws.origin_mismatch` olarak loglanır, `WS_ORIGIN_CHECK=enforce` ile reddedilir; `Origin`
+  göndermeyen bağlantılar (curl, agent'lar) etkilenmez ([origins.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/origins.go)).
 - **İstek gövdeleri sınırlıdır**: 1 MiB, YAML apply için 4 MiB, logo yükleme için 6 MiB; daha büyüğü, giriş dahil,
   okunmadan `413` ile reddedilir. Kullanıcı adları en fazla 256 karakterdir.
 - **CSV dışa aktarımları** (audit, kullanıcılar, gruplar, API anahtarları) `=`, `+`, `-`, `@`, tab ya da satır başı
@@ -179,5 +183,8 @@ ayarları, Prometheus ayarları, oturumlar, API anahtarı özetleri ve denetim l
 Manifest tek bir replica'yı root olmayan bir kullanıcıyla (65532) çalıştırır: `seccompProfile: RuntimeDefault`,
 bütün capability'ler düşürülmüş, privilege escalation yok, ServiceAccount token'ı yok
 ([deployment.yaml#L24-L31](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/deploy/deployment.yaml#L24-L31), [deployment.yaml#L227-L231](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/deploy/deployment.yaml#L227-L231)).
+Kök dosya sistemi salt okunurdur; sunucu yalnızca kendi volume'una (`/data`) ve `/tmp`'deki bir `emptyDir`'e yazar.
+İmaj distroless'tır: sunucu binary'si, CA sertifikaları ve saat dilimi verisi; shell, paket yöneticisi ya da ağ
+araçları yoktur ([Dockerfile](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/Dockerfile)).
 Release imajları, repository'nin CI'ı tarafından amd64 ve arm64 için, imzalı build provenance ve bir SBOM ile
 derlenir ([İmajı doğrulama](/installation/verify-image)).

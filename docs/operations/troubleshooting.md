@@ -104,6 +104,7 @@ certificate error is the TLS settings.
 | a quiet shell closes after about a minute with `Session closed (1006).`; a quiet log stream shows `Connection dropped; reconnecting…` | the proxy's idle timeout | raise it above `EXEC_IDLE_TIMEOUT` (5 minutes) ([Ingress with TLS](/installation/kubernetes#ingress-with-tls)) |
 | `You already have 3 shells open, the most allowed. Close one and try again.` | `MAX_EXEC_SESSIONS_PER_USER` (3) open shells; audited `pod.exec` `rate_limited` (`max_sessions`) | close one, or raise the limit |
 | `Too many log streams; try again shortly.` | the per-user log stream limit | close log viewers you don't need |
+| shells, logs and live events fail at once, the log has `ws.origin_mismatch` with `"refused":true` | `WS_ORIGIN_CHECK=enforce`, and the browser's address isn't the one the request arrives with: the proxy changes `Host` and either sends no `X-Forwarded-Host` or isn't in `TRUSTED_PROXIES` | let the proxy keep `Host` or send `X-Forwarded-Host` (and trust it), or add the address to `ALLOWED_ORIGINS` |
 | a WebSocket answers `401` | its ticket was used already or is older than 30 seconds | the UI gets a new ticket for every connection; a script must too (`POST /api/ws-ticket`) |
 
 A live log or shell is a WebSocket from the browser to OpenConsole and a stream from the OpenConsole pod to the

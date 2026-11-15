@@ -122,6 +122,8 @@ okunur:
 | `APP_ENV` | (manifest `prod` ayarlar) | her log satırında ve trace'te yer alan ortam etiketi |
 | `LOG_FORMAT` | `text` (manifest `ecs` ayarlar) | Elastic için `ecs`, `json` ya da `text` |
 | `DATA_PATH` | `/data/app.db` | veritabanı dosyası; volume üzerinde olmalıdır |
+| `ALLOWED_ORIGINS` | boş | sayfaları API'yi tarayıcıdan çağırabilecek başka siteler (CORS), örn. `https://tools.example.com`; konsolun kendisi için bir şey gerekmez |
+| `WS_ORIGIN_CHECK` | `warn` | başka bir sitenin sayfasından açılan WebSocket: `warn` `ws.origin_mismatch` loglar, `enforce` reddeder |
 | `TRUSTED_PROXIES` | boş (manifest `10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7` ayarlar) | `X-Forwarded-For`'u audit, oturumlar ve giriş kilidi için istemci adresini veren proxy'ler; Ingress controller'ınızın pod ağına daraltın |
 
 Özellik bayrakları ve limitler dahil tam liste: [Ortam değişkenleri](/reference/environment-variables).

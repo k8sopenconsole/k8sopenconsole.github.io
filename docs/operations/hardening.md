@@ -29,6 +29,12 @@ the [Security model](/operations/security).
 
 - **Pin the release and use `Recreate`** ([Install on Kubernetes](/installation/kubernetes#1-write-a-kustomization)),
   one replica, and verify the image you run ([Verify the image](/installation/verify-image)).
+- **Keep the manifest's container settings**: read-only root filesystem with the `/tmp` `emptyDir`, non-root user,
+  no capabilities, no ServiceAccount token. The image has no shell; to look inside the pod use an ephemeral
+  container (`kubectl debug -it <pod> --image=busybox:1.36 --target=dashboard`).
+- **Refuse WebSockets from other sites**: once the log shows no `ws.origin_mismatch` for a while, set
+  `WS_ORIGIN_CHECK=enforce`. Leave `ALLOWED_ORIGINS` empty unless another site's page must call the API
+  ([Security model](/operations/security#http)).
 - **TLS at the Ingress, and nothing else in front of the Service.** OpenConsole speaks plain HTTP. It takes the
   client address for the audit log and the sign-in lock from `X-Forwarded-For` only when the connection comes from a
   proxy in `TRUSTED_PROXIES` (the manifest lists the private networks); set it to your ingress controller's pod
