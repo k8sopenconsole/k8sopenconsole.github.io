@@ -66,6 +66,18 @@ cluster OpenConsole runs in; on every other connected cluster apply the new `rba
 
 ## Version notes {#version-notes}
 
+### Upgrading to 2.23.1 {#upgrading-to-2231}
+
+- **Your own manifest**: the image is now distroless, and `deploy/deployment.yaml` sets
+  `readOnlyRootFilesystem: true` with an `emptyDir` at `/tmp`. If you copy those settings, add the `/tmp` volume
+  too: it is the only place besides `/data` where the server may write a temporary file.
+- **No shell in the image**: `kubectl exec` into the OpenConsole pod no longer works; use
+  `kubectl debug -it <pod> --image=busybox:1.36 --target=dashboard`.
+- **Cross-site requests**: the API no longer answers CORS for any origin; list other sites in `ALLOWED_ORIGINS` if
+  their pages call it. WebSockets from another site are logged as `ws.origin_mismatch` (still allowed with the
+  default `WS_ORIGIN_CHECK=warn`).
+- **The YAML editor** comes with the image; the browser no longer loads it from `cdn.jsdelivr.net`.
+
 ### Upgrading to 2.22 {#upgrading-to-222}
 
 - **Elastic**: re-run [`deploy/elk/install.sh`](https://github.com/vurulkan/kubernetes-openconsole/blob/main/deploy/elk/README.md) once: it adds the mapping of `openconsole.api_key.id` / `.name`, `openconsole.admin_scope`, `openconsole.expires_at`, `openconsole.api_access`, `openconsole.by_admin`, `openconsole.comment`, `openconsole.mode`, `openconsole.program` and `openconsole.recording_id` (the pipeline is unchanged). If you don't, nothing is lost: the fields are mapped dynamically, and get the right type from the next rollover after you run it.

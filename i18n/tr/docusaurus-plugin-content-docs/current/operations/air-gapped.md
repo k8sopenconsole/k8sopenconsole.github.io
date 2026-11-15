@@ -78,13 +78,11 @@ Registry'niz kimlik bilgisi istiyorsa aynı patch'e bir `imagePullSecrets` girdi
 
 | Nereden | Ne | Olmazsa |
 |---|---|---|
-| `cdn.jsdelivr.net` | YAML editörü (Monaco); biri bir YAML görünümü açtığında yüklenir | YAML penceresi açılır ve *Yükleniyor…*'da kalır: YAML, OpenConsole'da görüntülenemez ve düzenlenemez. YAML için `kubectl` kullanın |
 | `fonts.googleapis.com`, `fonts.gstatic.com` | Inter ve Fira Code fontları | tarayıcının kendi fontları kullanılır; başka hiçbir şey değişmez |
 
-Geri kalan her şey (listeler, ayrıntılar, loglar, shell'ler, restart ve ölçekleme, Secret'lar, yönetim ekranları)
-OpenConsole'un kendisi tarafından sunulur ve bunlar olmadan da çalışır. Bu release'te editörü OpenConsole'dan sunmak
-için bir ayar yok; kullanıcılarınızın tarayıcıları `cdn.jsdelivr.net`'e bir proxy üzerinden erişebiliyorsa editör
-her zamanki gibi çalışır. Content Security Policy tam olarak bu kaynaklara izin verir ([Güvenlik modeli](/operations/security#http)).
+Geri kalan her şey (listeler, ayrıntılar, loglar, shell'ler, restart ve ölçekleme, Secret'lar, YAML editörü, yönetim
+ekranları) OpenConsole'un kendisi tarafından sunulur ve bunlar olmadan da çalışır. Content Security Policy tam olarak bu
+kaynaklara izin verir ([Güvenlik modeli](/operations/security#http)).
 
 ## Sürüm yükseltme {#upgrading}
 

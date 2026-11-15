@@ -67,6 +67,18 @@ cluster'da `deploy/` ile birlikte gelir; bağlı diğer her cluster'da yeni `rba
 
 ## Sürüme özel notlar {#version-notes}
 
+### 2.23.1'e yükseltme {#upgrading-to-2231}
+
+- **Kendi manifest'iniz**: imaj artık distroless ve `deploy/deployment.yaml`, `/tmp`'de bir `emptyDir` ile
+  `readOnlyRootFilesystem: true` ayarlar. Bu ayarları kopyalıyorsanız `/tmp` volume'unu da ekleyin: sunucunun `/data`
+  dışında geçici dosya yazabileceği tek yer orasıdır.
+- **İmajda shell yok**: OpenConsole pod'una `kubectl exec` artık çalışmaz;
+  `kubectl debug -it <pod> --image=busybox:1.36 --target=dashboard` kullanın.
+- **Siteler arası istekler**: API artık hiçbir origin'e CORS cevabı vermez; sayfaları API'yi çağıran başka siteler
+  varsa onları `ALLOWED_ORIGINS`'e yazın. Başka bir siteden gelen WebSocket'ler `ws.origin_mismatch` olarak loglanır
+  (varsayılan `WS_ORIGIN_CHECK=warn` ile hâlâ kabul edilir).
+- **YAML editörü** imajla gelir; tarayıcı onu artık `cdn.jsdelivr.net`'ten yüklemez.
+
 ### 2.22'ye yükseltme {#upgrading-to-222}
 
 - **Elastic**: [`deploy/elk/install.sh`](https://github.com/vurulkan/kubernetes-openconsole/blob/main/deploy/elk/README.md)'yi bir kez yeniden çalıştırın: `openconsole.api_key.id` / `.name`, `openconsole.admin_scope`, `openconsole.expires_at`, `openconsole.api_access`, `openconsole.by_admin`, `openconsole.comment`, `openconsole.mode`, `openconsole.program` ve `openconsole.recording_id` için mapping ekler (pipeline değişmedi). Çalıştırmazsanız hiçbir şey kaybolmaz: alanlar dinamik olarak map'lenir ve doğru tipi, script'i çalıştırdıktan sonraki ilk rollover'da alır.

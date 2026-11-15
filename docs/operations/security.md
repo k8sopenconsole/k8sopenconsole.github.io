@@ -148,7 +148,7 @@ Prometheus settings, sessions, API key digests and the audit log.
 - OpenConsole serves plain HTTP on port 8080; TLS ends at your Ingress or Gateway
   ([Install on Kubernetes](/installation/kubernetes#ingress-with-tls)).
 - **Response headers** on every answer ([observability.go#L17-L46](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/observability.go#L17-L46)):
-  `Content-Security-Policy` (scripts only from the app itself and `cdn.jsdelivr.net` for the YAML editor,
+  `Content-Security-Policy` (scripts only from the app itself, the YAML editor included,
   `frame-ancestors 'none'`), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`,
   `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` turning off geolocation, camera,
   microphone and payment. The CSP also has `worker-src blob:` and, in `script-src`, `'wasm-unsafe-eval'`, so the
@@ -163,6 +163,10 @@ Prometheus settings, sessions, API key digests and the audit log.
   header, `X-Real-Ip` ([clientip.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/clientip.go)). The manifest trusts the private
   networks; narrow `TRUSTED_PROXIES` to your ingress if you can, and don't expose the Service any other way
   ([Environment variables](/reference/environment-variables)).
+- **Other sites** get no CORS answer unless their origin is in `ALLOWED_ORIGINS` (empty by default); the console's
+  own pages are same-origin and need none. A WebSocket (shell, logs, live events) opened from another site's page is
+  logged as `ws.origin_mismatch`, and refused with `WS_ORIGIN_CHECK=enforce`; connections without an `Origin`
+  (curl, agents) are not affected ([origins.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/origins.go)).
 - **Request bodies are capped**: 1 MiB, 4 MiB for a YAML apply, 6 MiB for the logo upload; a larger one is refused
   with `413` before it is read, sign-in included. User names are at most 256 characters.
 - **CSV exports** (audit, users, groups, API keys) put a `'` in front of a cell that starts with `=`, `+`, `-`, `@`, a
@@ -173,5 +177,8 @@ Prometheus settings, sessions, API key digests and the audit log.
 The manifest runs one replica as a non-root user (65532), with `seccompProfile: RuntimeDefault`, every capability
 dropped, no privilege escalation and no ServiceAccount token
 ([deployment.yaml#L24-L31](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/deploy/deployment.yaml#L24-L31), [deployment.yaml#L227-L231](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/deploy/deployment.yaml#L227-L231)).
+The root filesystem is read-only; the server writes only to its volume (`/data`) and an `emptyDir` at `/tmp`. The
+image is distroless: the server binary, CA certificates and time zone data, without a shell, package manager or
+network tools ([Dockerfile](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/Dockerfile)).
 Release images are built by the repository's CI, for amd64 and arm64, with signed build provenance and an SBOM
 ([Verify the image](/installation/verify-image)).
