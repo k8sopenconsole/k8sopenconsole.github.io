@@ -11,7 +11,8 @@ description: "How to move to a new release, what happens to the database, and ho
    The version-specific steps are also [below](#version-notes). Your version: hover the GitHub icon at the bottom of the left
    rail, or read the first log line of the pod (`"version":"…"`).
 2. **Back up the volume** ([Backup and restore](/installation/backup-restore)). It is the only way back to the
-   exact state before the upgrade.
+   exact state before the upgrade. From 2.23.1 on, OpenConsole also copies the database to
+   `/data/backups/app-<time>-pre-upgrade.db` before a new version changes it, but that copy is on the same volume.
 3. Make sure the Deployment uses `strategy: Recreate` ([Install on Kubernetes](/installation/kubernetes)). With
    the default rolling update the new pod opens the database while the old one still runs; on 2.23.0 that can
    lose writes until the next restart.
@@ -54,6 +55,8 @@ cluster OpenConsole runs in; on every other connected cluster apply the new `rba
 - Migrations run automatically on the first start of the new version: they add tables and columns, and some
   releases rewrite existing rows once (2.17 gave old audit rows the new action / outcome fields). There is no step
   to run by hand.
+- From 2.23.1 the migration runs in one transaction: if it fails (a full disk, a damaged file), the pod stops with
+  the error in its log and the database stays as it was.
 - There are no down-migrations. Going back to an older version is not supported. In practice the older version
   usually starts on the newer database because the changes only add (checked: 2.21.0 on a 2.22.0 database), but
   data the newer version wrote can be ignored or misread.
@@ -77,6 +80,18 @@ cluster OpenConsole runs in; on every other connected cluster apply the new `rba
   their pages call it. WebSockets from another site are logged as `ws.origin_mismatch` (still allowed with the
   default `WS_ORIGIN_CHECK=warn`).
 - **The YAML editor** comes with the image; the browser no longer loads it from `cdn.jsdelivr.net`.
+- **Your own manifest**: use `strategy: Recreate` and `terminationGracePeriodSeconds: 30`, as `deploy/` now does.
+  On shutdown open shells close with code 1012 (*server restarting*) and their end and recording are audited.
+- **Database**: the first start copies it to `/data/backups/app-<time>-pre-upgrade.db`. Group memberships and role
+  permissions get foreign keys: rows left behind by users, groups and roles deleted earlier are dropped, and an id
+  that doesn't exist is refused (`400` / `404`) instead of being stored.
+- **Backups**: a copy of the database every day, the newest 7 kept in `/data/backups` (Admin → Backups). Check the
+  free space on the volume: about 7 times the database size.
+- **`LOG_RETENTION_DAYS=0`** now keeps audit events forever (it used to mean 30), and the purge also runs at start.
+- **Audit Logs**: a page has at most 500 rows; **Export CSV** now has every matching row up to 50 000 (it stopped at
+  1 000).
+- **Optional**: keep the encryption key in a Secret
+  ([Keep the encryption key out of the database](/installation/backup-restore)).
 
 ### Upgrading to 2.22 {#upgrading-to-222}
 

@@ -149,6 +149,7 @@ Pod annotation'ı pod template'ini değiştirir; bu yüzden uygulamak OpenConsol
 | `openconsole_http_request_duration_ms_sum` / `_count` | ortalama istek süresi |
 | `openconsole_pod_exec_active` | şu an açık shell'ler |
 | `openconsole_cluster_requests_total{cluster}` | insanların hangi cluster'ları kullandığı |
+| `openconsole_audit_write_failures_total` | veritabanının reddettiği denetim olayları (dolu ya da kilitli volume); her biri logda ayrıca bir `audit write failed` hata satırıdır. `0` kalmalı |
 
 ## Alert'ler {#alerts}
 
@@ -191,6 +192,11 @@ spec:
           labels: {severity: warning}
           annotations:
             summary: OpenConsole requests take more than 1 s on average.
+        - alert: OpenConsoleAuditWriteFailures
+          expr: increase(openconsole_audit_write_failures_total[10m]) > 0
+          labels: {severity: critical}
+          annotations:
+            summary: OpenConsole could not write audit events to its database (full or locked volume).
 ```
 
 `job` label'ı ServiceMonitor'ınkidir; pod annotation'larıyla `job="kubernetes-pods"` kullanın. Eklendiğinden beri

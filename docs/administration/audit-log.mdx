@@ -50,8 +50,8 @@ to see the HTTP status, duration and the other lines of the same request.
 
 ## CSV {/* #csv */}
 
-**Export CSV** exports what the filters show, one column per field (details as JSON, plus `api_key_name`). Each
-export is audited too. For access reviews, add the CSV of Users and Groups ([Users and groups](/administration/users#access-reviews)).
+**Export CSV** exports what the filters show, newest first, up to 50 000 rows, one column per field (details as JSON,
+plus `api_key_name`); narrow the filters for older ones. Each export is audited too. For access reviews, add the CSV of Users and Groups ([Users and groups](/administration/users#access-reviews)).
 
 The audit log is admin-only; see [Recipes → Auditors](/administration/recipes#auditors-read-only-no-secrets-audit-from-outside)
 for giving it to non-admins.

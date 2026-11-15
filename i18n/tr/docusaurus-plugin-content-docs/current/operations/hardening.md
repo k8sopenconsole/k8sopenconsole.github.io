@@ -19,6 +19,8 @@ listeyi baştan sona geçin. Her maddenin neden önemli olduğu [Güvenlik model
   `services/proxy`'nin yorumunu yalnızca Prometheus için ve yalnızca kendi Prometheus Service'iniz için kaldırın.
   OpenConsole port-forward kullanmaz, bu yüzden onun için bir kurala gerek yoktur. Her kural ve ne işe yaradığı:
   [Kubernetes izinleri](/reference/kubernetes-permissions).
+- **Yazma yalnızca gereken yerde**: okumaları cluster genelinde bırakın; Secret'ları, shell'leri ve yazma verb'lerini
+  namespace başına bağlayın ([Yazma yalnızca bazı namespace'lerde](/installation/connect-cluster)).
 - **Her cluster için bir ServiceAccount, asla kişisel bir kubeconfig değil**; token'ını yenilemek için de bir plan,
   örneğin 6 ile 12 ayda bir ([Token'ı yenileme](/installation/connect-cluster#rotate-the-token)). Üretilen token'ları
   Git'te tutmayın.
@@ -42,7 +44,9 @@ listeyi baştan sona geçin. Her maddenin neden önemli olduğu [Güvenlik model
   giriş yolu o proxy olur ([TLS'li Ingress](/installation/kubernetes#ingress-with-tls),
   [Ortam değişkenleri](/reference/environment-variables)).
 - **Yalnızca Ingress controller'ınızı ve Prometheus'unuzu içeri alan bir NetworkPolicy.** `/metrics` giriş istemez;
-  onu Ingress üzerinden de yönlendirmeyin. İki namespace adını kendinizinkilerle değiştirin:
+  onu Ingress üzerinden de yönlendirmeyin. Aynı policy
+  [`deploy/optional/networkpolicy.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/deploy/optional/networkpolicy.yaml)
+  dosyasında da var. İki namespace adını kendinizinkilerle değiştirin:
 
   ```yaml title="networkpolicy.yaml"
   apiVersion: networking.k8s.io/v1
@@ -111,7 +115,10 @@ listeyi baştan sona geçin. Her maddenin neden önemli olduğu [Güvenlik model
 
 ## Volume {#the-volume}
 
-- **Yedeğini alın ve yedekleri cluster kimlik bilgileri gibi koruyun.** Veritabanı kimlik bilgilerini (şifreli) ve
-  onları çözen anahtarı tutar ([Yedekleme ve geri yükleme](/installation/backup-restore)).
+- **Şifreleme anahtarını veritabanının dışında tutun** (bir Secret'tan `ENCRYPTION_KEY_FILE`) ve anahtarın bir
+  kopyasını başka bir yerde saklayın ([Yedekleme ve geri yükleme](/installation/backup-restore)).
+- **Yedekleri volume'un dışına kopyalayın ve cluster kimlik bilgileri gibi koruyun.** OpenConsole her gün
+  `/data/backups`'a, yani aynı volume'a bir yedek yazar; volume kaybolursa onlar da kaybolur. Kullanmıyorsanız
+  Yönetim → Yedekler'de indirmeyi kapalı bırakın ([Yedekleme ve geri yükleme](/installation/backup-restore)).
 - **Volume'u şifreleyin:** platformunuz destekliyorsa depolama katmanında (şifreli StorageClass, şifreli
   snapshot'lar).

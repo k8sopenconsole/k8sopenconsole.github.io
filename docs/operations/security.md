@@ -117,11 +117,15 @@ Prometheus settings, sessions, API key digests and the audit log.
   ([store.go#L571](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/store/store.go#L571)) and Prometheus settings
   ([clusters.go#L235-L245](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/store/clusters.go#L235-L245)), with AES-256-GCM and a random nonce per
   value ([crypto.go#L12-L30](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/store/crypto.go#L12-L30)).
-- **The key is generated on first start and stored in the same database** ([store.go#L37-L55](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/store/store.go#L37-L55)),
-  and the same key signs session tokens ([store.go#L29-L31](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/store/store.go#L29-L31),
-  [router.go#L132](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L132)). Whoever has a copy of the database file has the cluster
-  credentials and can create sessions. Protect the volume, its snapshots and backups like the cluster credentials
-  themselves, and limit who can exec into the OpenConsole pod or read its volume.
+- **Where the key is.** By default it is generated on first start and kept in the same database, and it also signs
+  session tokens: whoever has a copy of the database file (the volume, a snapshot, a backup) has the cluster
+  credentials and can create sessions. With `ENCRYPTION_KEY_FILE` the key lives in a Kubernetes Secret instead: the
+  next start re-encrypts every value with it, deletes the key from the database and rewrites the file so the old key
+  doesn't linger, and signs session tokens with a key derived from it, so everyone signs in once more
+  ([keys.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/store/keys.go),
+  [Backup and restore](/installation/backup-restore)). A copy of the
+  database then doesn't reveal the credentials on its own. Either way, protect the volume, its snapshots and backups,
+  and limit who can attach a debug container to the OpenConsole pod or read its volume.
 - **Shell recordings hold everything a shell printed**, including any secret someone displayed. They are on the same
   volume and only admins can replay or download them.
 

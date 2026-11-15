@@ -148,6 +148,7 @@ The pod annotation changes the pod template, so applying it restarts OpenConsole
 | `openconsole_http_request_duration_ms_sum` / `_count` | average request time |
 | `openconsole_pod_exec_active` | shells open right now |
 | `openconsole_cluster_requests_total{cluster}` | which clusters people use |
+| `openconsole_audit_write_failures_total` | audit events the database refused (full or locked volume); each is also an `audit write failed` error line in the log. Should stay `0` |
 
 ## Alerts {#alerts}
 
@@ -190,6 +191,11 @@ spec:
           labels: {severity: warning}
           annotations:
             summary: OpenConsole requests take more than 1 s on average.
+        - alert: OpenConsoleAuditWriteFailures
+          expr: increase(openconsole_audit_write_failures_total[10m]) > 0
+          labels: {severity: critical}
+          annotations:
+            summary: OpenConsole could not write audit events to its database (full or locked volume).
 ```
 
 The `job` label is the ServiceMonitor's; with pod annotations use `job="kubernetes-pods"`. A cluster nobody has

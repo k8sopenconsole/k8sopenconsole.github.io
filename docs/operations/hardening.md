@@ -18,6 +18,8 @@ the [Security model](/operations/security).
   grant no `secrets:*` permission, and its `update` verb if you grant no `secrets:edit`. Uncomment `services/proxy`
   only for Prometheus, and only for your Prometheus Service. OpenConsole doesn't use port-forward, so it needs no
   rule for it. Every rule and what it is for: [Kubernetes permissions](/reference/kubernetes-permissions).
+- **Writes only where they are needed**: keep the reads cluster-wide and bind Secrets, shells and write verbs per
+  namespace ([Writes in some namespaces only](/installation/connect-cluster)).
 - **One ServiceAccount per cluster, never a personal kubeconfig**, and a plan to rotate its token, for example every
   6 to 12 months ([Rotate the token](/installation/connect-cluster#rotate-the-token)). Don't keep the generated tokens
   in Git.
@@ -41,7 +43,9 @@ the [Security model](/operations/security).
   network, so the only way in is that proxy ([Ingress with TLS](/installation/kubernetes#ingress-with-tls),
   [Environment variables](/reference/environment-variables)).
 - **A NetworkPolicy** that lets in only your Ingress controller and your Prometheus. `/metrics` has no sign-in;
-  don't route it through the Ingress either. Change the two namespace names to yours:
+  don't route it through the Ingress either. The same policy is
+  [`deploy/optional/networkpolicy.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/deploy/optional/networkpolicy.yaml). Change the two namespace names to
+  yours:
 
   ```yaml title="networkpolicy.yaml"
   apiVersion: networking.k8s.io/v1
@@ -109,7 +113,10 @@ the [Security model](/operations/security).
 
 ## The volume {#the-volume}
 
-- **Back it up, and protect the backups like the cluster credentials.** The database holds the credentials
-  (encrypted) and the key that decrypts them ([Backup and restore](/installation/backup-restore)).
+- **Keep the encryption key outside the database** (`ENCRYPTION_KEY_FILE` from a Secret), and keep a copy of the key
+  somewhere else ([Backup and restore](/installation/backup-restore)).
+- **Copy the backups off the volume, and protect them like the cluster credentials.** OpenConsole writes one a day to
+  `/data/backups`, on the same volume, so they don't survive losing it. Leave downloading in Admin → Backups off
+  unless you use it ([Backup and restore](/installation/backup-restore)).
 - **Encrypt the volume** at the storage layer if your platform offers it (encrypted StorageClass, encrypted
   snapshots).

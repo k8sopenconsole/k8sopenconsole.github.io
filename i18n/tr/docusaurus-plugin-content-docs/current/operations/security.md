@@ -120,11 +120,15 @@ ayarları, Prometheus ayarları, oturumlar, API anahtarı özetleri ve denetim l
   ([store.go#L571](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/store/store.go#L571)) ve Prometheus ayarları
   ([clusters.go#L235-L245](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/store/clusters.go#L235-L245)); her değer için rastgele bir nonce ile,
   AES-256-GCM kullanılarak ([crypto.go#L12-L30](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/store/crypto.go#L12-L30)).
-- **Anahtar ilk açılışta üretilir ve aynı veritabanında saklanır** ([store.go#L37-L55](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/store/store.go#L37-L55));
-  oturum token'larını da aynı anahtar imzalar ([store.go#L29-L31](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/store/store.go#L29-L31),
-  [router.go#L132](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L132)). Veritabanı dosyasının bir kopyasına sahip olan, cluster
-  kimlik bilgilerine de sahiptir ve oturum oluşturabilir. Volume'u, snapshot'larını ve yedeklerini cluster kimlik
-  bilgilerinin kendisi gibi koruyun; OpenConsole pod'una kimlerin exec yapabileceğini ya da volume'unu
+- **Anahtar nerede.** Varsayılan olarak ilk açılışta üretilir ve aynı veritabanında tutulur; oturum token'larını da
+  o imzalar: veritabanı dosyasının bir kopyasına (volume, snapshot, yedek) sahip olan, cluster kimlik bilgilerine de
+  sahiptir ve oturum oluşturabilir. `ENCRYPTION_KEY_FILE` ile anahtar bunun yerine bir Kubernetes Secret'ında durur:
+  bir sonraki açılış her değeri onunla yeniden şifreler, anahtarı veritabanından siler ve eski anahtar kalmasın diye
+  dosyayı yeniden yazar; oturum token'larını da ondan türetilen bir anahtarla imzalar, bu yüzden herkes bir kez daha
+  giriş yapar ([keys.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/store/keys.go),
+  [Yedekleme ve geri yükleme](/installation/backup-restore)). Bundan sonra
+  veritabanının bir kopyası tek başına kimlik bilgilerini açığa çıkarmaz. Her iki durumda da volume'u, snapshot'larını
+  ve yedeklerini koruyun; OpenConsole pod'una kimlerin debug container bağlayabileceğini ya da volume'unu
   okuyabileceğini sınırlayın.
 - **Shell kayıtları, bir shell'in ekrana bastığı her şeyi içerir**; birinin görüntülediği herhangi bir secret da buna
   dahildir. Aynı volume'dadırlar ve yalnızca yöneticiler oynatabilir ya da indirebilir.

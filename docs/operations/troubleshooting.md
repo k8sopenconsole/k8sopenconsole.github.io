@@ -110,6 +110,18 @@ certificate error is the TLS settings.
 A live log or shell is a WebSocket from the browser to OpenConsole and a stream from the OpenConsole pod to the
 Kubernetes API server, so the OpenConsole pod must reach the API server too.
 
+## The pod doesn't start {#the-pod-doesnt-start}
+
+The pod restarts (`CrashLoopBackOff`) and its log ends with an `ERROR` line:
+
+| Log line | Cause | Fix |
+|---|---|---|
+| `db error` … `migrate …` | the database migration of a new version failed (a full volume, a damaged file); the database is unchanged | free space on the volume, or [restore](/installation/backup-restore) the `…-pre-upgrade.db` copy and start the previous version |
+| `ENCRYPTION_KEY` … `the key must be base64 of 32 bytes (openssl rand -base64 32)` | the key file or value isn't a key | create it with `openssl rand -base64 32` |
+| `store error` … `the stored credentials are encrypted with an external key: set ENCRYPTION_KEY_FILE (or ENCRYPTION_KEY)` | the key was moved out of the database, and the Deployment no longer mounts it | put `ENCRYPTION_KEY_FILE` and the Secret back |
+| `store error` … `value is encrypted with key <id>, which is neither ENCRYPTION_KEY nor ENCRYPTION_KEY_PREVIOUS` | the Secret holds another key | use the right key; during a rotation also set `ENCRYPTION_KEY_PREVIOUS_FILE`; a key lost for good: [If the key is lost](/installation/backup-restore) |
+| `store error` … `ENCRYPTION_KEY_PREVIOUS / ENCRYPTION_KEY_LOST need ENCRYPTION_KEY (or ENCRYPTION_KEY_FILE)` | the previous key, or the lost-key switch, without the current key | set `ENCRYPTION_KEY_FILE` too |
+
 ## Error answers {#error-answers}
 
 Every error answer is JSON, `{"error": "<reason or message>"}`. `401` has no body: the session or API key is
@@ -126,6 +138,7 @@ missing, expired or revoked.
 | `feature_disabled` | the operator switched the capability off (`FEATURE_*=false`) | [audit_events.go#L92](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L92), [router.go#L2637-L2640](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L2637-L2640) |
 | `admin_only` | an admin screen or endpoint; with an API key, one without the Admin API scope | [audit_events.go#L93](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L93), [router.go#L598-L605](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L598-L605) |
 | `change your password first` | an API key, or the API keys page, of an account that still has to change its initial password (on other screens such an account gets `forbidden`) | [apikeys.go#L196-L199](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L196-L199), [apikeys.go#L431-L432](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L431-L432) |
+| `backup_download_disabled` | downloading backups is off (Admin → Backups → *Allow downloading backups*) | [backups.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/backups.go) |
 | `you have no permissions on this cluster` | picking a cluster none of your grants cover | [cluster_ctx.go#L172](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/cluster_ctx.go#L172) |
 | `only the owner can change this view` | editing someone else's shared view | [views.go#L161](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/views.go#L161) |
 | `user is disabled` | an Azure AD sign-in for a deactivated account | [router.go#L989-L991](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L989-L991) |
@@ -148,4 +161,5 @@ The first six are also the `reason` of the `denied` audit event. For API keys an
 | `413` `request body too large` | the body is over 1 MiB (4 MiB for a YAML apply) |
 | `400` `username is required` | `PUT /api/admin/users/{id}` without `username`: send the user's name with every update |
 | `404`, `409`, `400` or `504` from restart, scale, YAML apply or a Secret request | Kubernetes answered NotFound, Conflict (e.g. a stale `resourceVersion`), Invalid or Timeout; OpenConsole passes that status on, so a proxy doesn't wrap a 5xx around a 4xx. The `failed` audit event has the reason (`not_found`, `conflict`, `invalid`) and the `error` |
+| `400` `unknown group or role id` / `unknown user or group id`, `404` `role not found` | a group, role or user id in the request doesn't exist (deleted meanwhile); nothing was changed |
 | `503` from `/readyz`: `db not reachable` | the database file can't be opened: check the volume ([Health probes](/operations/health-probes)) |

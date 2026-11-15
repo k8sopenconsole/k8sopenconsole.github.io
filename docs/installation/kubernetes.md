@@ -52,7 +52,8 @@ patches:
   `:latest`, and a pod restart could then upgrade you without notice.
 - **`Recreate`** is important. With the default rolling update the new pod starts while the old one still holds
   the database; on 2.23.0 that can lose the writes made after the overlap until the next restart. Upgrades and
-  `rollout restart` then have a few seconds of downtime while the new pod starts.
+  `rollout restart` then have a few seconds of downtime while the new pod starts. From 2.23.1 the
+  manifest itself uses `Recreate`; the patch then changes nothing.
 - Add other variables to the same `env:` list (see [below](#settings-you-may-want-to-change)).
 
 ## 2. Apply it {#2-apply-it}
@@ -100,10 +101,15 @@ from the API server.
 
 The manifest requests `300m` CPU and `384Mi` memory and limits them to `1` CPU and `1Gi`. Memory grows with the
 number of pods, Deployments, Services, … in the connected clusters, since OpenConsole keeps them in memory, plus
-about 10 KB per pod for 24 hours of usage samples. If the pod is OOMKilled, raise the memory limit first.
+about 10 KB per pod for 24 hours of usage samples. The cache leaves out what OpenConsole never reads from it
+(`managedFields` and the `last-applied-configuration` annotation, often half of an object), but ConfigMaps are kept
+with their data. With several large clusters, watch the pod's memory (`kubectl top pod`) after connecting them, and
+if the pod is OOMKilled, raise the memory limit first.
 
-The volume holds the database (small: users, roles, the audit log for `LOG_RETENTION_DAYS`) and shell recordings,
-which are capped at 2 GiB by default (Admin → Recordings). 5 GiB is enough for most installations.
+The volume holds the database (small: users, roles, the audit log for `LOG_RETENTION_DAYS`), up to 7 copies of it in
+`/data/backups` ([Backup and restore](/installation/backup-restore)) and shell recordings, which are capped at 2 GiB
+by default (Admin → Recordings). 5 GiB is enough for most installations; with a large audit log, count the database
+size times 8.
 
 ## Settings you may want to change {#settings-you-may-want-to-change}
 
@@ -112,7 +118,9 @@ Everything else is configured in the UI and stored in the database. These are re
 | Variable | Default | Meaning |
 |---|---|---|
 | `TIMEZONE` | `UTC` (the manifest sets `Europe/Istanbul`) | time zone of audit timestamps in the UI; stored times are UTC |
-| `LOG_RETENTION_DAYS` | `30` | days audit events are kept in the database (`0` or an invalid value means the default, 30) |
+| `LOG_RETENTION_DAYS` | `30` | days audit events are kept in the database; `0` keeps them forever (before 2.23.1 it meant 30) |
+| `BACKUP_INTERVAL` / `BACKUP_KEEP` | `24h` / `7` | how often the database is copied to `/data/backups` (`0` = no scheduled copy) and how many copies are kept ([Backup and restore](/installation/backup-restore)) |
+| `ENCRYPTION_KEY_FILE` | empty (the key is in the database) | file with the key that encrypts the stored credentials, from a Secret ([Keep the encryption key out of the database](/installation/backup-restore)) |
 | `RESTART_HISTORY_RETENTION_DAYS` | `30` | container exits kept for the restart history |
 | `API_KEY_READ_RETENTION_DAYS` | `7` | successful reads made with an API key |
 | `APP_ENV` | (the manifest sets `prod`) | environment label on every log line and trace |
