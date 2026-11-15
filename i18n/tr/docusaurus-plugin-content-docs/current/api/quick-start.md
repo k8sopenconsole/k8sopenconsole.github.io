@@ -120,7 +120,9 @@ Her ret audit'e yazılır. Gövde nedeni söyler:
 | 403 | `{"error":"api_key_not_allowed"}` | Yalnızca web oturumunda yapılabilir (anahtar yönetimi, şifre, kayıtlı görünümler). |
 | 403 | `{"error":"feature_disabled"}` | Operatör özelliği kapattı (`FEATURE_*=false`). |
 | 403 | `{"error":"admin_only"}` | Bir admin ucu ve anahtar bir admin'in Admin API anahtarı değil. |
-| 400 | `{"error":"cluster \"nope\" is unknown or not reachable with this key"}` | `X-OpenConsole-Cluster`, var olmayan ya da anahtarda olmayan bir cluster'ı belirtiyor. |
+| 400 | `{"error":"cluster \"nope\" is unknown or not yours to use"}` | `X-OpenConsole-Cluster`, var olmayan bir cluster'ı belirtiyor (anahtarın kapsamadığı biri için `403`). |
+| 403 | `{"error":"cluster_forbidden"}` | Cluster okumayı reddetti: OpenConsole'un oradaki ClusterRole'ü buna izin vermiyor. |
+| 502 / 503 / 504 | `{"error":"cluster_unreachable"}` / `not_connected` / `cluster_timeout` | Cluster'a ulaşılamıyor ya da OpenConsole'un kimlik bilgilerini reddetti / bağlı değil / zamanında cevap vermedi. |
 | 429 | boş | Bu anahtar için saniyede 10'dan fazla istek; bkz. [Limitler](/api/limits). |
 
 Test cluster'ında şu komutlarla görüldü:
@@ -134,7 +136,7 @@ curl -s -w ' %{http_code}\n' -H "Authorization: Bearer $OPENCONSOLE_API_KEY" "$O
 #  403
 curl -s -w ' %{http_code}\n' -H "Authorization: Bearer $OPENCONSOLE_API_KEY" -H "X-OpenConsole-Cluster: nope" \
   "$OC_URL/api/namespaces/crashlab/pods"
-# {"error":"cluster \"nope\" is unknown or not reachable with this key"}
+# {"error":"cluster \"nope\" is unknown or not yours to use"}
 #  400
 curl -s -w ' %{http_code}\n' -H "Authorization: Bearer $OPENCONSOLE_API_KEY" "$OC_URL/api/admin/users"
 # {"error":"admin_only"}

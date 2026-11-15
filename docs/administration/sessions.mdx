@@ -1,6 +1,6 @@
 ---
 title: "Sessions"
-description: "See who is signed in, sign someone out everywhere, and set how long a sign-in lasts."
+description: "See who is signed in, sign someone out everywhere, and set when an idle session ends."
 ---
 
 import Screenshot from '@site/src/components/Screenshot';
@@ -12,7 +12,7 @@ import Screenshot from '@site/src/components/Screenshot';
 **You want to:** see who is signed in, or end someone's sessions now.
 
 **Admin → Sessions** lists every sign-in token with the user, its status, address and browser, when it was issued and
-last used, and when it expires. *Only active sessions* hides expired and revoked ones.
+last used, and when it expires if nothing more happens. *Only active sessions* hides expired and revoked ones.
 
 <Screenshot id="admin-sessions" alt="Admin → Sessions: active sessions of ayse.yilmaz, bob, alice and admin with address, browser, issued, last used and expiry, and revoke buttons" />
 
@@ -27,8 +27,12 @@ disable the user.
 
 **Admin → Session**:
 
-<Screenshot id="admin-session-settings" alt="Admin → Session: session lifetime 60 minutes, and the API key expiry policy (longest lifetime, allow keys that never expire)" />
+<Screenshot id="admin-session-settings" alt="Admin → Session: sign out after inactivity 60 minutes, and the API key expiry policy (longest lifetime, allow keys that never expire)" />
 
-- **Session lifetime**: how long a sign-in stays valid, in minutes (default 60). It applies to new sign-ins.
+- **Sign out after inactivity**: minutes without activity after which a session ends (default 60). Clicks, key
+  presses and the requests they cause count as activity, in any tab; a screen's own automatic refresh doesn't, so
+  a tab left open still ends. A session ends at the latest **12 hours** after sign-in (or after the inactivity
+  time, if you set it longer), then the user signs in again. A change applies to every session from its next
+  activity on.
 - **API key expiry**: the longest lifetime a new or regenerated key may get, and whether keys without an expiry
   are allowed ([API access policy](/administration/api-access-policy#expiry-policy)).

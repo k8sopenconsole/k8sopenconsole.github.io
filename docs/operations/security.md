@@ -87,8 +87,11 @@ flowchart LR
   ([observability.go#L62-L67](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/observability.go#L62-L67),
   [router.go#L632-L638](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L632-L638)). Every failed sign-in gets the same `401`, so
   the answer doesn't tell whether the account exists ([router.go#L684-L690](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L684-L690)).
-- **Sessions** are signed tokens (JWT, HS256; other algorithms are refused) with a lifetime from Admin → Sessions (60 minutes by default)
-  ([jwt.go#L23-L35](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/auth/jwt.go#L23-L35), [db.go#L344](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/db/db.go#L344)). Each
+- **Sessions** are signed tokens (JWT, HS256; other algorithms are refused) that end after the inactivity time set
+  in Admin → Sessions (60 minutes by default) and at the latest 12 hours after sign-in. Activity moves the end on the
+  server; a screen's automatic refresh and a WebSocket reconnecting on its own don't
+  ([router.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/router.go),
+  [sessions.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/store/sessions.go)). Each
   token has a server-side record that is checked on every request, so an admin can revoke one session or all of a
   user's sessions before they expire ([router.go#L95-L109](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L95-L109)).
   Deactivating a user revokes their sessions at once, and every permission check (shells, logs, reveal, apply, API

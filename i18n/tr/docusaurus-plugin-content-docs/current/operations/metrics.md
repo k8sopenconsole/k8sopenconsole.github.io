@@ -144,7 +144,7 @@ Pod annotation'ı pod template'ini değiştirir; bu yüzden uygulamak OpenConsol
 | Metrik | Size ne söyler |
 |---|---|
 | OpenConsole target'ının `up`'ı | pod yanıt veriyor |
-| `openconsole_cluster_connected{cluster}` | OpenConsole cluster'a bağlantısını açtığında `1`. Bağlantılar açılışta ve bir cluster ilk kullanıldığında açılır; bu yüzden son restart'tan sonra eklenen bir cluster, biri onu seçene kadar `0` gösterir. Değer bundan sonra cluster'ın kimlik bilgilerini takip etmez: iptal edilmiş bir token, 5xx yanıtlar ve [logdaki](/operations/troubleshooting#a-cluster-shows-empty-lists-or-503) `failed to list … Unauthorized` satırları olarak ortaya çıkar |
+| `openconsole_cluster_connected{cluster}` | OpenConsole'un cluster önbelleği nesneleri listelemişken ve watch'larından hiçbiri hata vermiyorken `1`. Cluster açılışta, eklenir eklenmez ve kimlik bilgileri değiştirilir değiştirilmez bağlanır. Reddedilen bir token ya da ulaşılamayan bir API server `0` verir (çalışan bir bağlantı bunu watch'ları bir sonraki yenilendiğinde fark eder); ClusterRole'ün izin vermediği tek bir tür ise vermez, yalnızca o sekmede `403` `cluster_forbidden` döner ([Sorun giderme](/operations/troubleshooting#a-cluster-shows-empty-lists-or-503)) |
 | `openconsole_http_requests_status_total{status="5xx"}` | hatalı yanıtlar: OpenConsole'u reddeden bir cluster, bir veritabanı sorunu |
 | `openconsole_http_request_duration_ms_sum` / `_count` | ortalama istek süresi |
 | `openconsole_pod_exec_active` | şu an açık shell'ler |

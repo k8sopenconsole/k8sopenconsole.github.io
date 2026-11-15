@@ -89,8 +89,11 @@ flowchart LR
   ([observability.go#L62-L67](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/observability.go#L62-L67),
   [router.go#L632-L638](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L632-L638)). Her başarısız giriş aynı `401`'i alır;
   cevap, hesabın var olup olmadığını belli etmez ([router.go#L684-L690](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L684-L690)).
-- **Oturumlar** imzalı token'lardır (JWT, HS256; başka algoritmalar reddedilir); ömürleri Yönetim → Oturumlar'dan ayarlanır (varsayılan 60 dakika)
-  ([jwt.go#L23-L35](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/auth/jwt.go#L23-L35), [db.go#L344](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/db/db.go#L344)). Her
+- **Oturumlar** imzalı token'lardır (JWT, HS256; başka algoritmalar reddedilir); Yönetim → Oturumlar'da ayarlanan
+  hareketsizlik süresinden sonra (varsayılan 60 dakika), en geç de girişten 12 saat sonra biterler. Hareket bitişi
+  server tarafında ileri alır; bir ekranın otomatik yenilemesi ve kendiliğinden yeniden bağlanan bir WebSocket almaz
+  ([router.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/router.go),
+  [sessions.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/store/sessions.go)). Her
   token'ın server tarafında bir kaydı vardır ve bu kayıt her istekte kontrol edilir; böylece bir yönetici tek bir
   oturumu ya da bir kullanıcının bütün oturumlarını süreleri dolmadan iptal edebilir ([router.go#L95-L109](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L95-L109)).
   Bir kullanıcıyı deaktive etmek oturumlarını anında iptal eder; her yetki kontrolü de (shell'ler, loglar, reveal,

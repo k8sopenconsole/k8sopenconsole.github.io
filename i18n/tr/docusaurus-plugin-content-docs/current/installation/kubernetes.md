@@ -170,8 +170,10 @@ kubectl -n kubernetes-openconsole create secret tls openconsole-tls --cert=tls.c
 kubectl apply -f ingress.yaml
 ```
 
-**ingress-nginx boşta kalan WebSocket'leri 60 saniye sonra kapatır**; bu da girdi bekleyen bir pod shell'ini ve
-sessiz bir container'ın log akışını sonlandırır. Bu Ingress'te zaman aşımlarını artırın:
+OpenConsole her açık WebSocket'e (shell, canlı log, Canlı olaylar) 25 saniyede bir ping atar; bu yüzden
+ingress-nginx'in 60 saniyelik boşta kalma zaman aşımı girdi bekleyen bir shell'i ya da sessiz bir container'ın logunu
+kapatmaz. Ping'leri trafik saymayan bir proxy daha uzun bir zaman aşımı ister; ingress-nginx için bu şöyle olurdu
+(isteğe bağlı):
 
 ```yaml
 metadata:
@@ -180,9 +182,9 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
 ```
 
-Diğer proxy'lerde de aynı türden bir boşta kalma zaman aşımı vardır (ör. Ingress'in önündeki bir Azure Application
-Gateway ya da AWS load balancer); bunu shell'in boşta kalma zaman aşımının, `EXEC_IDLE_TIMEOUT` (5 dakika), üstüne
-ayarlayın.
+Başka bir proxy'nin arkasında (ör. Ingress'in önündeki bir Azure Application Gateway ya da AWS load balancer)
+shell'ler yine bir dakika kadar sonra kapanıyorsa, onun boşta kalma zaman aşımını shell'in boşta kalma zaman aşımının,
+`EXEC_IDLE_TIMEOUT` (5 dakika), üstüne ayarlayın.
 
 `/metrics`'i dışarıya açmayın: kimlik doğrulaması yoktur, cluster içindeki Prometheus'unuz içindir
 ([Metrikler](/operations/metrics)).

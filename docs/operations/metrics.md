@@ -143,7 +143,7 @@ The pod annotation changes the pod template, so applying it restarts OpenConsole
 | Metric | What it tells you |
 |---|---|
 | `up` of the OpenConsole target | the pod answers |
-| `openconsole_cluster_connected{cluster}` | `1` when OpenConsole has opened its connection to the cluster. Connections are opened at start and when a cluster is first used, so a cluster added since the last restart shows `0` until someone selects it. The value doesn't follow the cluster's credentials afterwards: a revoked token shows up as 5xx answers and `failed to list … Unauthorized` lines in the [log](/operations/troubleshooting#a-cluster-shows-empty-lists-or-503) |
+| `openconsole_cluster_connected{cluster}` | `1` while OpenConsole's cache of the cluster has listed objects and none of its watches is failing. A cluster is connected at start and as soon as it is added or its credentials are replaced. A refused token or an unreachable API server gives `0` (a running connection notices when its watches are next renewed); a single kind the ClusterRole doesn't allow does not, it only answers `403` `cluster_forbidden` on that tab ([Troubleshooting](/operations/troubleshooting#a-cluster-shows-empty-lists-or-503)) |
 | `openconsole_http_requests_status_total{status="5xx"}` | answers with an error: a cluster that refuses OpenConsole, a database problem |
 | `openconsole_http_request_duration_ms_sum` / `_count` | average request time |
 | `openconsole_pod_exec_active` | shells open right now |

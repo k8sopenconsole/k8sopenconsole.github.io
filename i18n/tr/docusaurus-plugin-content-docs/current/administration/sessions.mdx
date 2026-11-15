@@ -1,6 +1,6 @@
 ---
 title: "Oturumlar"
-description: "Kimin giriş yaptığını görün, birinin tüm oturumlarını kapatın ve bir girişin ne kadar geçerli kalacağını ayarlayın."
+description: "Kimin giriş yaptığını görün, birinin tüm oturumlarını kapatın ve boşta kalan bir oturumun ne zaman biteceğini ayarlayın."
 ---
 
 import Screenshot from '@site/src/components/Screenshot';
@@ -12,7 +12,7 @@ import Screenshot from '@site/src/components/Screenshot';
 **Yapmak istediğiniz:** kimin giriş yaptığını görmek ya da birinin oturumlarını hemen sonlandırmak.
 
 **Yönetim → Oturumlar** her giriş token'ını listeler: kullanıcı, durum, adres ve tarayıcı, ne zaman verildiği, en son ne
-zaman kullanıldığı ve ne zaman sona ereceği. *Sadece aktif oturumlar* süresi dolmuş ve iptal edilmiş olanları gizler.
+zaman kullanıldığı ve başka bir şey olmazsa ne zaman sona ereceği. *Sadece aktif oturumlar* süresi dolmuş ve iptal edilmiş olanları gizler.
 
 <Screenshot id="admin-sessions" alt="Yönetim → Oturumlar: ayse.yilmaz, bob, alice ve admin kullanıcılarının aktif oturumları; adres, tarayıcı, verilme, son kullanım ve bitiş zamanı, iptal düğmeleri" />
 
@@ -28,8 +28,12 @@ iptal edin ya da kullanıcıyı devre dışı bırakın.
 
 **Yönetim → Oturum**:
 
-<Screenshot id="admin-session-settings" alt="Yönetim → Oturum: 60 dakikalık oturum süresi ve API anahtarı süre politikası (en uzun süre, süresiz anahtarlara izin ver)" />
+<Screenshot id="admin-session-settings" alt="Yönetim → Oturum: 60 dakika hareketsizlikten sonra çıkış ve API anahtarı süre politikası (en uzun süre, süresiz anahtarlara izin ver)" />
 
-- **Oturum süresi**: bir girişin kaç dakika geçerli kalacağı (varsayılan 60). Yeni girişlere uygulanır.
+- **Hareketsizlikten sonra çıkış**: hiçbir hareket olmadan kaç dakika sonra oturumun biteceği (varsayılan 60).
+  Tıklamalar, tuşlar ve bunların gönderdiği istekler, hangi sekmede olursa olsun hareket sayılır; bir ekranın kendi
+  otomatik yenilemesi sayılmaz, yani açık bırakılan sekme de kapanır. Bir oturum en geç girişten **12 saat** sonra
+  (ya da süreyi daha uzun ayarladıysanız o süre sonunda) biter, kullanıcı yeniden giriş yapar. Değişiklik her oturuma
+  bir sonraki hareketinden itibaren uygulanır.
 - **API anahtarı süresi**: yeni ya da yeniden üretilen bir anahtarın alabileceği en uzun süre ve süresiz anahtarlara
   izin verilip verilmediği ([API erişim politikası](/administration/api-access-policy#expiry-policy)).

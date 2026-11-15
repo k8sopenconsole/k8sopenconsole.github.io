@@ -28,7 +28,10 @@ people. Permissions are per cluster entry.
 
 - **Set as default** marks the cluster everyone starts on until they pick another.
 - Each user picks **their own** cluster in the header (or with `c`); the choice is stored per user. The switcher
-  lists only the clusters their permissions cover; admins see all.
+  lists only the clusters their permissions cover; admins see all. Every browser tab sends the cluster it shows with
+  each request, so a pick in one tab never moves another tab's actions.
+- Picking a cluster, or setting it as default, asks the cluster once: one whose API server can't be reached or
+  refuses the token fails there with `cannot connect to cluster: …`.
 - If a user's cluster is deleted, or they lose every permission on it, they are moved to the default.
 - Every audit event records the cluster the action ran on.
 

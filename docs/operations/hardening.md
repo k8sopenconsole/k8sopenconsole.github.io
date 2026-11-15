@@ -95,7 +95,7 @@ the [Security model](/operations/security).
 - **Switch off what you don't use**, for everyone, with feature flags: `FEATURE_POD_EXEC=false`,
   `FEATURE_SECRET_REVEAL=false`, `FEATURE_API_KEYS=false`, …
   ([Feature flags](/administration/customization-and-flags#feature-flags)).
-- **A session lifetime** that fits your policy (60 minutes by default), and an **API key expiry policy**: the
+- **An inactivity timeout** that fits your policy (60 minutes by default; a session ends after 12 hours at the latest), and an **API key expiry policy**: the
   longest lifetime a key may have ([Session lifetime and API key expiry](/administration/sessions#session-lifetime-and-api-key-expiry)).
 - **Keep the API access policy at *Safe read-only*** for roles unless agents need more
   ([API access policy](/administration/api-access-policy)).

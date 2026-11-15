@@ -9,7 +9,7 @@ import Screenshot from '@site/src/components/Screenshot';
 
 **You want to:** read what a container is printing, or what it printed before it crashed.
 
-Open it from a pod row (**Logs**), from a pod's drawer, or from a Deployment / Job (all its pods together).
+Open it from a pod row (**Logs**), from a pod's drawer, or from a Deployment / Job (its pods together, up to 20).
 
 <Screenshot id="logs" alt="The log window of a storefront pod following its JSON log lines live, with Live / Before last restart, Find in log, Pause, Wrap, Copy and Download" />
 
@@ -44,6 +44,8 @@ first is not picked by mistake. The container menu switches; init containers are
 ## Limits {/* #limits */}
 
 - Ten log streams may be opened at once per user, then one more per second; past that, wait a moment.
+- A Deployment or Job log follows at most **20 pods**, ready ones first; the window then says *Limited: following 20
+  of 60 pods (ready ones first)*. Open a pod's own log for the others.
 - Every log you open is written to the audit log (`pod.logs`, `previous: true` for the log before a restart).
 
 :::info[Can't see it or can't do it?]
@@ -51,6 +53,6 @@ first is not picked by mistake. The container menu switches; init containers are
   `pods:logs`; reading the list (`pods:list`) is a separate permission.
 - **"unable to retrieve container logs"** before a restart: the container died too quickly for the runtime to keep
   its log.
-- **The stream stops after a minute of silence** behind your company proxy: ask your admin about the WebSocket idle
-  timeout ([Install on Kubernetes](/installation/kubernetes#ingress-with-tls)).
+- **The stream stops after a minute of silence** behind your company proxy: ask your admin about the proxy's
+  WebSocket idle timeout ([Install on Kubernetes](/installation/kubernetes#ingress-with-tls)).
 :::

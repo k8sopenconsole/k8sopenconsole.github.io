@@ -73,8 +73,7 @@ curl -sL https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/dev/d
 ```
 
 İkinci komutu her namespace için, o namespace'in adıyla bir kez çalıştırın. Diğer namespace'lerde Kubernetes
-reddeder: Secrets sekmesi `the OpenConsole ServiceAccount is not allowed to read secrets here (check the ClusterRole)`
-cevabını verir, bir shell ya da komut başarısız olur (`exec_failed`), restart, ölçekleme ve YAML apply API server'ın
+reddeder: Secrets sekmesi *OpenConsole'un bu cluster'daki hesabı bunu okuyamıyor (ClusterRole'ü kontrol edin).* der (`403` `cluster_forbidden`), bir shell ya da komut başarısız olur (`exec_failed`), restart, ölçekleme ve YAML apply API server'ın
 mesajıyla başarısız olur. OpenConsole rollerini buna uygun tutun ki kullanıcılar yalnızca hata veren butonlar
 görmesin. `deploy/` klasörüyle kuruyorsanız dosyaları tek tek listeleyin
 ([Kubernetes'e kurulum](/installation/kubernetes#2-apply-it)), yoksa her `kubectl apply -k` `rbac.yaml`'ı geri koyar.
@@ -86,7 +85,7 @@ Hiç vermeyeceğiniz izinlerin kurallarını silin (dosyanın bir kopyasında).
 | Kural (`rbac.yaml`) | Ne için gerekli | Olmazsa |
 |---|---|---|
 | `namespaces, pods, services, configmaps, events`: get / list / watch | Panel'in tüm sekmeleri, Canlı olaylar | OpenConsole hiçbir şeyi listeleyemez |
-| `secrets`: get / list | `secrets:list`, `secrets:get`, `secrets:reveal` | Secret'lar sekmesi *"ServiceAccount is not allowed to read secrets"* der |
+| `secrets`: get / list | `secrets:list`, `secrets:get`, `secrets:reveal` | Secret'lar sekmesi *"OpenConsole'un bu cluster'daki hesabı bunu okuyamıyor"* der |
 | `secrets`: update | `secrets:edit` | bir Secret'ın YAML'ını uygulamak 403 ile başarısız olur |
 | `pods/log`: get | pod / deployment / job logları (`pods:logs`) | loglar 403 ile başarısız olur |
 | `pods/exec`: create | pod shell'i ve tek komutluk exec (`pods:exec`) | shell 403 ile başarısız olur |
@@ -215,6 +214,7 @@ altında ayarlayın; bkz. [Prometheus](/administration/prometheus). "Cluster iç
   `127.0.0.1`) ya da CA eşleşmiyor.
 - **Bir kullanıcı için sekme boş ya da 403**: önce o kullanıcının rol izinlerine, sonra yukarıdaki ClusterRole
   kuralına bakın.
+  *OpenConsole'un bu cluster'daki hesabı bunu okuyamıyor* (`cluster_forbidden`) diyen bir sekmenin nedeni ClusterRole'dür.
 - **CPU / memory yok**: cluster'da metrics-server yok (`kubectl get apiservices v1beta1.metrics.k8s.io`) ya da
   ClusterRole'de `metrics.k8s.io` `pods` eksik. Hangisi olduğunu Pod'lar sekmesi söyler.
 - **Prometheus testi başarısız**: test, başarısız olan adımı söyler; bkz. [Prometheus](/administration/prometheus).

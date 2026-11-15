@@ -22,27 +22,29 @@ Mesajın sonu sebebi söyler:
 | `Unauthorized` | token yanlış, süresi dolmuş ya da ServiceAccount'u silinmiş | token'ı yeniden okuyun |
 | `namespaces is forbidden: User "system:serviceaccount:…" cannot list resource "namespaces" …` | kimliğin ClusterRole binding'i yok (ya da bu ClusterRole'e değil) | `deploy/rbac.yaml`'ı uygulayın ve o kimliğe bağlayın |
 
-## Bir cluster boş liste ya da 503 gösteriyor {#a-cluster-shows-empty-lists-or-503}
+## Bir cluster liste yerine hata gösteriyor {#a-cluster-shows-empty-lists-or-503}
 
-Cluster sorunsuz eklendi, ama şimdi iş yükü listeleri boş, diğer ekranlar hata veriyor ve log şunlarla dolu:
+Cluster sorunsuz eklendi, ama şimdi ekranları *Cluster'a ulaşılamıyor ya da OpenConsole'un kimlik bilgilerini
+reddetti.* ya da *OpenConsole'un bu cluster'daki hesabı bunu okuyamıyor (ClusterRole'ü kontrol edin).* diyor ve log şunlarla dolu:
 
 ```text
 …/reflector.go:229: Failed to watch *v1.Pod: failed to list *v1.Pod: Unauthorized
 …/reflector.go:229: Failed to watch *v1.Job: failed to list *v1.Job: jobs.batch is forbidden: User "system:serviceaccount:default:temp" cannot list resource "jobs" in API group "batch" at the cluster scope
 ```
 
-İstekler de `503`, `{"error":"Unauthorized"}` ya da
-`{"error":"the OpenConsole ServiceAccount is not allowed to read secrets here (check the ClusterRole)"}` dönüyor.
+Bir de kaynağı, cluster'ı ve request id'yi yazan `cluster read failed` satırları var. İstekler `502`
+`{"error":"cluster_unreachable"}` ya da `403` `{"error":"cluster_forbidden"}` dönüyor.
 
 OpenConsole'un o cluster için tuttuğu kimlik bilgileri artık çalışmıyor: token yenilendi ya da ServiceAccount'u
-silindi (`Unauthorized`), veya ClusterRole ya da binding'i değişti (`forbidden`). Cluster'ın bağlantı gauge'u yine de
-`1` gösterir ([Metrikler](/operations/metrics#what-to-watch)). Kimliği düzeltin, sonra **Yönetim → Cluster'lar →
+silindi (`Unauthorized`), veya ClusterRole ya da binding'i değişti (`forbidden`). `Unauthorized` durumunda cluster'ın
+bağlantı gauge'u `0` gösterir ([Metrikler](/operations/metrics#what-to-watch)) ve üst bardan cluster'ı seçmek
+`cannot connect to cluster: Unauthorized` ile başarısız olur. Kimliği düzeltin, sonra **Yönetim → Cluster'lar →
 Düzenle**'de **Credential'ları değiştir**'i işaretleyip token'ı ve CA'yı yapıştırın
 ([Token'ı yenileme](/installation/connect-cluster#rotate-the-token)). Cluster hemen yeniden çalışır; restart gerekmez.
 
-Tek bir kaynak türü için yalnızca
-`{"error":"the OpenConsole ServiceAccount is not allowed to read <resource> here (check the ClusterRole)"}` geliyorsa,
-eksik olan yalnızca o kuraldır ([Kubernetes izinleri](/reference/kubernetes-permissions)). ClusterRole'ün izin
+Tek bir sekmede (ör. Ingress'ler) yalnızca `403` `{"error":"cluster_forbidden"}` geliyorsa, eksik olan yalnızca o
+kuraldır ([Kubernetes izinleri](/reference/kubernetes-permissions)); diğer sekmeler ve gauge etkilenmez. Çok yavaş
+cevap veren bir cluster `504` `{"error":"cluster_timeout"}` verir. ClusterRole'ün izin
 vermediği bir yazma işlemi API server'ın mesajıyla 403 döner, ör.
 `restart failed: deployments.apps "web" is forbidden: …` (salt görüntüleme ClusterRole'ü, ya da `patch` / `update`
 verb'ü kaldırılmış).
@@ -84,7 +86,7 @@ Daha fazlası: [Prometheus](/administration/prometheus).
 | 5 denemeden sonra aynı mesaj ve `/api/auth/login`'den `Retry-After` ile `429` | o kullanıcı adı o adresten 5 dakika kilitli; `user.login` `locked` (`too_many_failures`) olarak audit'e yazılır; herhangi adreslerden 20 başarısız denemeden sonra ad her yerden 5 dakika kilitlenir. Bekleyin ya da başka bir makineden giriş yapın |
 | herkesin girişleri ve oturumları aynı adresi (Ingress pod'unun adresini) gösteriyor, bir kişinin yanlış denemeleri başkalarını kilitliyor | `TRUSTED_PROXIES` Ingress'inizi kapsamıyor, bu yüzden `X-Forwarded-For` okunmuyor: onu Ingress controller'ın pod ağına ayarlayın ([Ortam değişkenleri](/reference/environment-variables)) |
 | **Microsoft ile giriş yap** `this account can't sign in with this Microsoft account` cevabını veriyor | `user.login` `failed`, sebep `not_azure_account` (bu ada sahip local ya da LDAP hesabı var), `azure_oid_mismatch` (hesap başka bir Entra kullanıcısına ait, örn. silinip yeniden oluşturulmuş biri) ya da `azure_no_oid` ([Azure AD](/administration/azure-ad#how-the-account-is-found)) |
-| `Your session has ended. Please sign in again.` (Türkçe arayüzde: "Oturumun sona erdi. Lütfen tekrar giriş yap.") | oturumun süresi doldu (ömrü Yönetim → Oturumlar'dan ayarlanır) ya da bir yönetici iptal etti |
+| `Your session has ended. Please sign in again.` (Türkçe arayüzde: "Oturumun sona erdi. Lütfen tekrar giriş yap.") | hareketsizlik süresi boyunca hiçbir hareket olmadı (Yönetim → Oturumlar, varsayılan 60 dakika), girişin üstünden 12 saat geçti ya da bir yönetici iptal etti |
 
 Denetim sebebi, bir LDAP bind'inin neden başarısız olduğunu söylemez. Dizini **Yönetim → LDAP → Bağlantıyı test et**
 ile test edin; cevap dizin client'ının mesajıdır, örneğin:
@@ -102,7 +104,7 @@ sertifika hatası TLS ayarlarıdır.
 | Belirti | Sebep | Çözüm |
 |---|---|---|
 | shell hemen `Connection error.` (Türkçe arayüzde: "Bağlantı hatası.") ya da `Session closed (1006).` (Türkçe arayüzde: "Oturum kapandı (1006).") diyor; logda `GET /ws/namespaces/…/exec 400` var, cevap `{"error":"a WebSocket upgrade is required"}` | proxy `Upgrade` / `Connection` header'larını düşürüyor | WebSocket'leri geçirin (ingress-nginx, Traefik ve Gateway API varsayılan olarak geçirir; elle yazılmış bir nginx için `proxy_http_version 1.1` ve iki header da gerekir) |
-| sessiz bir shell yaklaşık bir dakika sonra `Session closed (1006).` ("Oturum kapandı (1006).") ile kapanıyor; sessiz bir log akışı `Connection dropped; reconnecting…` (Türkçe arayüzde: "Bağlantı koptu; yeniden bağlanıyor…") gösteriyor | proxy'nin idle timeout'u | `EXEC_IDLE_TIMEOUT`'un (5 dakika) üstüne çıkarın ([TLS'li Ingress](/installation/kubernetes#ingress-with-tls)) |
+| sessiz bir shell yaklaşık bir dakika sonra `Session closed (1006).` ("Oturum kapandı (1006).") ile kapanıyor; sessiz bir log akışı `Connection dropped; reconnecting…` (Türkçe arayüzde: "Bağlantı koptu; yeniden bağlanıyor…") gösteriyor | proxy'nin idle timeout'u, ve proxy WebSocket ping'lerini trafik saymıyor (OpenConsole her açık shell, log ve Canlı olaylar soketine 25 saniyede bir ping atar) | proxy'nin idle timeout'unu `EXEC_IDLE_TIMEOUT`'un (5 dakika) üstüne çıkarın ([TLS'li Ingress](/installation/kubernetes#ingress-with-tls)) |
 | `You already have 3 shells open, the most allowed. Close one and try again.` (Türkçe arayüzde: "Zaten 3 açık shell'in var, izin verilen en fazla bu. Birini kapatıp tekrar dene.") | `MAX_EXEC_SESSIONS_PER_USER` (3) kadar açık shell var; `pod.exec` `rate_limited` (`max_sessions`) olarak audit'e yazılır | birini kapatın ya da limiti yükseltin |
 | `Too many log streams; try again shortly.` (Türkçe arayüzde: "Çok fazla log akışı; birazdan tekrar deneyin.") | kullanıcı başına log akışı limiti | ihtiyacınız olmayan log görüntüleyicileri kapatın |
 | shell'ler, loglar ve canlı olaylar hemen başarısız oluyor; logda `"refused":true` ile `ws.origin_mismatch` var | `WS_ORIGIN_CHECK=enforce` ve tarayıcının adresi isteğin geldiği adres değil: proxy `Host`'u değiştiriyor ve ya `X-Forwarded-Host` göndermiyor ya da `TRUSTED_PROXIES`'te değil | proxy `Host`'u korusun ya da `X-Forwarded-Host` göndersin (ve ona güvenin), veya adresi `ALLOWED_ORIGINS`'e ekleyin |
@@ -144,7 +146,7 @@ eksik, süresi dolmuş ya da iptal edilmiş.
 | `only the owner can change this view` | başkasının paylaşılan görünümünü düzenlemek | [views.go#L161](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/views.go#L161) |
 | `user is disabled` | deaktive edilmiş bir hesap için Azure AD girişi | [router.go#L989-L991](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L989-L991) |
 | `this account can't sign in with this Microsoft account` | local ya da LDAP hesabı için, ya da başka bir Entra kullanıcısının ilk giriş yaptığı bir hesap için Azure AD girişi ([Giriş yapılamıyor](#sign-in-fails) bölümüne bakın) | [router.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/router.go) |
-| `the OpenConsole ServiceAccount is not allowed to read <resource> here (check the ClusterRole)` | Kubernetes sizi değil, OpenConsole'un kimliğini reddetti | [secrets.go#L227-L229](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/secrets.go#L227-L229) |
+| `cluster_forbidden` (*OpenConsole'un bu cluster'daki hesabı bunu okuyamıyor*) | Kubernetes sizi değil, OpenConsole'un kimliğini reddetti | [kube_errors.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/kube_errors.go) |
 | `restart failed: …` / `scale failed: …` / API server'ın mesajı | Kubernetes bir yazma işlemini reddetti (o verb'ü içermeyen ClusterRole) | [deployment_actions.go#L160-L164](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/deployment_actions.go#L160-L164), [yaml_apply.go#L111](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/yaml_apply.go#L111) |
 
 İlk altısı aynı zamanda `denied` denetim olayının `reason`'ıdır. API anahtarları ve agent'lar için ayrıca
@@ -154,10 +156,11 @@ eksik, süresi dolmuş ya da iptal edilmiş.
 
 | Cevap | Anlamı |
 |---|---|
-| `400` `cluster "<name>" is unknown or not reachable with this key` | `X-OpenConsole-Cluster` header'ı, var olmayan ya da anahtarın kapsamadığı bir cluster'ı gösteriyor |
+| `400` / `403` `cluster "<name>" is unknown or not yours to use` | `X-OpenConsole-Cluster` header'ı var olmayan (`400`) ya da anahtarın veya kullanıcının kapsamadığı (`403`, `cluster.use` ya da `api_key.use` `denied` olarak audit'e yazılır) bir cluster'ı gösteriyor. Tarayıcıda: bu sekmenin çalıştığı cluster silindi ya da üzerindeki izinleriniz kaldırıldı; sayfayı yenileyin |
+| `403` `cluster_forbidden`, `502` `cluster_unreachable`, `503` `not_connected`, `504` `cluster_timeout` | okumayı OpenConsole'un izinleri değil, cluster başarısız etti; bkz. [Bir cluster liste yerine hata gösteriyor](#a-cluster-shows-empty-lists-or-503) |
 | API anahtarıyla `429` (gövdesiz) | o anahtar için saniyede 10'dan fazla istek (30'luk patlamalar) |
 | `429` `too many open shells (limit 3 per user); close one first` | shell limiti; tarayıcı olmayan bir client'tan |
-| `400` `kubeconfig_unsupported: user "…" uses exec; …` | kubeconfig bir program çalıştırıyor ya da dosya okuyor (exec plugin, `auth-provider`, `tokenFile`, sertifika ya da anahtar yolu): satır içi kimlik bilgisi olan bir kubeconfig kullanın ([Cluster bağlama](/installation/connect-cluster)). Daha önce böyle bir kubeconfig ile kaydedilmiş cluster bağlanmaz: listeleri boş kalır (`503`), pod logunda bir kez `cluster not connected: its kubeconfig runs a program or reads a file` olur; **Yönetim → Cluster'lar → Düzenle**'den satır içi bir kubeconfig yükleyin |
+| `400` `kubeconfig_unsupported: user "…" uses exec; …` | kubeconfig bir program çalıştırıyor ya da dosya okuyor (exec plugin, `auth-provider`, `tokenFile`, sertifika ya da anahtar yolu): satır içi kimlik bilgisi olan bir kubeconfig kullanın ([Cluster bağlama](/installation/connect-cluster)). Daha önce böyle bir kubeconfig ile kaydedilmiş cluster bağlanmaz: listeleri *Cluster bağlı değil.* der (`503` `not_connected`), pod logunda bir kez `cluster not connected: its kubeconfig runs a program or reads a file` olur; **Yönetim → Cluster'lar → Düzenle**'den satır içi bir kubeconfig yükleyin |
 | `409` `a revoked key can't be regenerated; create a new one` | iptal edilmiş bir API anahtarını yeniden üretmek; yalnızca süresi dolmuş anahtar yeniden üretilebilir |
 | `413` `request body too large` | gövde 1 MiB'tan büyük (YAML apply için 4 MiB) |
 | `400` `username is required` | `username` olmadan `PUT /api/admin/users/{id}`: her güncellemede kullanıcının adını gönderin |
