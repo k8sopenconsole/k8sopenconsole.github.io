@@ -56,6 +56,8 @@ Do these in order; each step needs the one before.
      ([API and agents](/api/overview)).
    - Admin → Clusters → Prometheus: longer usage history ([Prometheus](/administration/prometheus)).
    - Admin → Customization: your logo.
+   - Admin → Backups: the database copies (downloading them needs `BACKUP_ALLOW_DOWNLOAD=true`)
+     ([Backup and restore](/installation/backup-restore)).
 8. **Ship the audit log.** It is in the database for `LOG_RETENTION_DAYS` (30) and on stdout as JSON; send stdout
    to your log platform to keep it longer ([Elastic](/operations/elastic)).
 9. **Plan backups** of the volume ([Backup and restore](/installation/backup-restore)).

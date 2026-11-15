@@ -58,6 +58,27 @@ Secret'lar salt okuma dosyasına bilerek konmadı: Kubernetes seviyesinde Secret
 demektir; tek koruma OpenConsole'daki `secrets:reveal` izni olurdu. Secret'lar sekmesine yalnızca metadata için
 ihtiyacınız varsa kuralın yorumunu kaldırın ve yalnızca `secrets:list` / `secrets:get` verin.
 
+### Yazma yalnızca bazı namespace'lerde {#writes-in-some-namespaces-only}
+
+`rbac.yaml`, OpenConsole'un `kube-system` dahil her namespace'te Secret okumasına, shell açmasına ve workload'ları
+değiştirmesine izin verir. Bunu yalnızca seçtiğiniz namespace'lerle sınırlamak için okumaları cluster genelinde
+bırakın (OpenConsole pod'ları, Deployment'ları, … cluster genelinde izler) ve yazma haklarını
+[`deploy/optional/rbac-namespaced-writes.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/deploy/optional/rbac-namespaced-writes.yaml) ile namespace
+başına bağlayın:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/dev/deploy/rbac-readonly.yaml
+curl -sL https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/dev/deploy/optional/rbac-namespaced-writes.yaml \
+  | sed 's/namespace: team-a/namespace: payments/' | kubectl apply -f -
+```
+
+İkinci komutu her namespace için, o namespace'in adıyla bir kez çalıştırın. Diğer namespace'lerde Kubernetes
+reddeder: Secrets sekmesi `the OpenConsole ServiceAccount is not allowed to read secrets here (check the ClusterRole)`
+cevabını verir, bir shell ya da komut başarısız olur (`exec_failed`), restart, ölçekleme ve YAML apply API server'ın
+mesajıyla başarısız olur. OpenConsole rollerini buna uygun tutun ki kullanıcılar yalnızca hata veren butonlar
+görmesin. `deploy/` klasörüyle kuruyorsanız dosyaları tek tek listeleyin
+([Kubernetes'e kurulum](/installation/kubernetes#2-apply-it)), yoksa her `kubectl apply -k` `rbac.yaml`'ı geri koyar.
+
 ### ClusterRole kuralları ne işe yarar {#what-each-clusterrole-rule-is-for}
 
 Hiç vermeyeceğiniz izinlerin kurallarını silin (dosyanın bir kopyasında).

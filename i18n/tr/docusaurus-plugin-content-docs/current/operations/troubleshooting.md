@@ -111,6 +111,18 @@ sertifika hatası TLS ayarlarıdır.
 Canlı bir log ya da shell, tarayıcıdan OpenConsole'a bir WebSocket ve OpenConsole pod'undan Kubernetes API
 server'ına bir akıştır; bu yüzden OpenConsole pod'unun API server'a da erişebilmesi gerekir.
 
+## Pod açılmıyor {#the-pod-doesnt-start}
+
+Pod yeniden başlıyor (`CrashLoopBackOff`) ve logu bir `ERROR` satırıyla bitiyor:
+
+| Log satırı | Sebep | Çözüm |
+|---|---|---|
+| `db error` … `migrate …` | yeni bir sürümün veritabanı migration'ı başarısız oldu (dolu volume, bozuk dosya); veritabanı değişmedi | volume'de yer açın ya da `…-pre-upgrade.db` kopyasını [geri yükleyip](/installation/backup-restore) önceki sürümü başlatın |
+| `ENCRYPTION_KEY` … `the key must be base64 of 32 bytes (openssl rand -base64 32)` | anahtar dosyası ya da değeri bir anahtar değil | `openssl rand -base64 32` ile oluşturun |
+| `store error` … `the stored credentials are encrypted with an external key: set ENCRYPTION_KEY_FILE (or ENCRYPTION_KEY)` | anahtar veritabanının dışına taşındı ve Deployment onu artık mount etmiyor | `ENCRYPTION_KEY_FILE`'ı ve Secret'ı geri koyun |
+| `store error` … `value is encrypted with key <id>, which is neither ENCRYPTION_KEY nor ENCRYPTION_KEY_PREVIOUS` | Secret'ta başka bir anahtar var | doğru anahtarı kullanın; anahtar değiştirirken `ENCRYPTION_KEY_PREVIOUS_FILE`'ı da ayarlayın; tamamen kaybolmuş bir anahtar: [Anahtar kaybolursa](/installation/backup-restore) |
+| `store error` … `ENCRYPTION_KEY_PREVIOUS / ENCRYPTION_KEY_LOST need ENCRYPTION_KEY (or ENCRYPTION_KEY_FILE)` | önceki anahtar ya da kayıp anahtar anahtarı, geçerli anahtar olmadan verilmiş | `ENCRYPTION_KEY_FILE`'ı da ayarlayın |
+
 ## Hata cevapları {#error-answers}
 
 Her hata cevabı JSON'dır: `{"error": "<reason or message>"}`. `401`'in gövdesi yoktur: oturum ya da API anahtarı
@@ -127,6 +139,7 @@ eksik, süresi dolmuş ya da iptal edilmiş.
 | `feature_disabled` | operatör bu yeteneği kapattı (`FEATURE_*=false`) | [audit_events.go#L92](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L92), [router.go#L2637-L2640](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L2637-L2640) |
 | `admin_only` | bir yönetim ekranı ya da ucu; API anahtarıyla: Admin API kapsamı olmayan bir anahtar | [audit_events.go#L93](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L93), [router.go#L598-L605](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L598-L605) |
 | `change your password first` | ilk şifresini hâlâ değiştirmesi gereken bir hesabın API anahtarı ya da API anahtarları sayfası (böyle bir hesap diğer ekranlarda `forbidden` alır) | [apikeys.go#L196-L199](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L196-L199), [apikeys.go#L431-L432](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L431-L432) |
+| `backup_download_disabled` | yedek indirme kapalı (`BACKUP_ALLOW_DOWNLOAD` `true` değil) | [backups.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/backups.go) |
 | `you have no permissions on this cluster` | hiçbir izninizin kapsamadığı bir cluster'ı seçmek | [cluster_ctx.go#L172](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/cluster_ctx.go#L172) |
 | `only the owner can change this view` | başkasının paylaşılan görünümünü düzenlemek | [views.go#L161](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/views.go#L161) |
 | `user is disabled` | deaktive edilmiş bir hesap için Azure AD girişi | [router.go#L989-L991](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L989-L991) |
@@ -149,4 +162,5 @@ eksik, süresi dolmuş ya da iptal edilmiş.
 | `413` `request body too large` | gövde 1 MiB'tan büyük (YAML apply için 4 MiB) |
 | `400` `username is required` | `username` olmadan `PUT /api/admin/users/{id}`: her güncellemede kullanıcının adını gönderin |
 | restart, ölçekleme, YAML apply ya da bir Secret isteğinden `404`, `409`, `400` ya da `504` | Kubernetes NotFound, Conflict (ör. eskimiş bir `resourceVersion`), Invalid ya da Timeout cevabı verdi; OpenConsole aynı status'u iletir, böylece bir proxy 4xx'i 5xx ile sarmaz. `failed` denetim olayında neden (`not_found`, `conflict`, `invalid`) ve `error` yer alır |
+| `400` `unknown group or role id` / `unknown user or group id`, `404` `role not found` | istekteki bir grup, rol ya da kullanıcı id'si yok (bu arada silinmiş); hiçbir şey değişmedi |
 | `/readyz`'den `503`: `db not reachable` | veritabanı dosyası açılamıyor: volume'u kontrol edin ([Sağlık probe'ları](/operations/health-probes)) |

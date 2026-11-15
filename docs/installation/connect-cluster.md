@@ -58,6 +58,26 @@ Secrets are left out of the read-only file on purpose: at the Kubernetes level `
 values, so the OpenConsole permission `secrets:reveal` would be the only protection. If you need the Secrets tab with
 metadata only, uncomment the rule and grant `secrets:list` / `secrets:get` only.
 
+### Writes in some namespaces only {#writes-in-some-namespaces-only}
+
+`rbac.yaml` lets OpenConsole read Secrets, open shells and change workloads in every namespace, `kube-system`
+included. To allow that only in the namespaces you choose, keep the reads cluster-wide (OpenConsole watches pods,
+Deployments, … across the cluster) and bind the write rights per namespace with
+[`deploy/optional/rbac-namespaced-writes.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/deploy/optional/rbac-namespaced-writes.yaml):
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/dev/deploy/rbac-readonly.yaml
+curl -sL https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/dev/deploy/optional/rbac-namespaced-writes.yaml \
+  | sed 's/namespace: team-a/namespace: payments/' | kubectl apply -f -
+```
+
+Run the second command once per namespace, with its name. Elsewhere Kubernetes refuses: the Secrets tab answers
+`the OpenConsole ServiceAccount is not allowed to read secrets here (check the ClusterRole)`, a shell or a command
+fails (`exec_failed`), and restart, scale and YAML apply fail with the API server's message. Keep the OpenConsole
+roles in line, so users don't get buttons that only fail. If you install with the `deploy/` folder, list the files
+instead ([Install on Kubernetes](/installation/kubernetes#2-apply-it)), or every `kubectl apply -k` puts `rbac.yaml`
+back.
+
 ### What each ClusterRole rule is for {#what-each-clusterrole-rule-is-for}
 
 Delete the rules for permissions you will never grant (from a copy of the file).

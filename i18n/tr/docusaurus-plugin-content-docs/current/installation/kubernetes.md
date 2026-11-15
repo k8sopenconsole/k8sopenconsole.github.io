@@ -53,7 +53,8 @@ patches:
 - **`Recreate`** önemlidir. Varsayılan rolling update'te yeni pod, eskisi veritabanını hâlâ tutarken başlar;
   2.23.0'da bu durum, iki pod'un çakıştığı andan sonra bir sonraki restart'a kadar yapılan yazmaların kaybolmasına
   yol açabilir. Bunun bedeli, sürüm yükseltmelerinde ve `rollout restart`'ta yeni pod başlarken birkaç saniyelik
-  kesintidir.
+  kesintidir. 2.23.1'den itibaren
+  manifest'in kendisi `Recreate` kullanır; yama o zaman bir şey değiştirmez.
 - Diğer değişkenleri aynı `env:` listesine ekleyin (bkz. [aşağısı](#settings-you-may-want-to-change)).
 
 ## 2. Uygulayın {#2-apply-it}
@@ -101,12 +102,15 @@ bellekteki önbellekten gelir.
 
 Manifest `300m` CPU ve `384Mi` bellek request eder; limitler `1` CPU ve `1Gi`'dir. OpenConsole bağlı
 cluster'lardaki pod'ları, Deployment'ları, Service'leri, … bellekte tuttuğu için bellek kullanımı bunların sayısıyla
-artar; buna 24 saatlik kullanım örnekleri için pod başına yaklaşık 10 KB eklenir. Pod OOMKilled olursa önce bellek
-limitini artırın.
+artar; buna 24 saatlik kullanım örnekleri için pod başına yaklaşık 10 KB eklenir. Cache, OpenConsole'un ondan hiç
+okumadığı şeyleri tutmaz (`managedFields` ve `last-applied-configuration` annotation'ı; çoğu zaman bir nesnenin
+yarısı), ama ConfigMap'ler verileriyle birlikte tutulur. Birkaç büyük cluster bağladıktan sonra pod'un belleğini
+izleyin (`kubectl top pod`); pod OOMKilled olursa önce bellek limitini artırın.
 
-Volume; veritabanını (küçüktür: kullanıcılar, roller, `LOG_RETENTION_DAYS` süresince audit log) ve shell
-kayıtlarını tutar. Kayıtlar varsayılan olarak 2 GiB ile sınırlıdır (Yönetim → Kayıtlar). Çoğu kurulum için 5 GiB
-yeterlidir.
+Volume; veritabanını (küçüktür: kullanıcılar, roller, `LOG_RETENTION_DAYS` süresince audit log), `/data/backups`
+içinde onun en fazla 7 kopyasını ([Yedekleme ve geri yükleme](/installation/backup-restore)) ve shell kayıtlarını
+tutar. Kayıtlar varsayılan olarak 2 GiB ile sınırlıdır (Yönetim → Kayıtlar). Çoğu kurulum için 5 GiB yeterlidir;
+audit log büyükse veritabanı boyutunun 8 katını hesaba katın.
 
 ## Değiştirmek isteyebileceğiniz ayarlar {#settings-you-may-want-to-change}
 
@@ -116,7 +120,10 @@ okunur:
 | Değişken | Varsayılan | Anlamı |
 |---|---|---|
 | `TIMEZONE` | `UTC` (manifest `Europe/Istanbul` ayarlar) | arayüzdeki audit zaman damgalarının saat dilimi; saklanan zamanlar UTC'dir |
-| `LOG_RETENTION_DAYS` | `30` | audit olaylarının veritabanında tutulduğu gün sayısı (`0` ya da geçersiz bir değer varsayılan, yani 30 demektir) |
+| `LOG_RETENTION_DAYS` | `30` | audit olaylarının veritabanında tutulduğu gün sayısı; `0` hiç silmez (2.23.1'den önce 30 demekti) |
+| `BACKUP_ALLOW_DOWNLOAD` | `false` | `true`, adminlerin Yönetim → Yedekler'deki yedekleri indirmesine izin verir |
+| `BACKUP_INTERVAL` / `BACKUP_KEEP` | `24h` / `7` | veritabanının ne sıklıkla `/data/backups`'a kopyalandığı (`0` = zamanlanmış kopya yok) ve kaç kopyanın tutulduğu ([Yedekleme ve geri yükleme](/installation/backup-restore)) |
+| `ENCRYPTION_KEY_FILE` | boş (anahtar veritabanında) | saklanan kimlik bilgilerini şifreleyen anahtarın dosyası, bir Secret'tan ([Şifreleme anahtarını veritabanının dışında tutun](/installation/backup-restore)) |
 | `RESTART_HISTORY_RETENTION_DAYS` | `30` | restart geçmişi için tutulan container çıkışları |
 | `API_KEY_READ_RETENTION_DAYS` | `7` | bir API anahtarıyla yapılan başarılı okumalar |
 | `APP_ENV` | (manifest `prod` ayarlar) | her log satırında ve trace'te yer alan ortam etiketi |

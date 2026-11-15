@@ -11,7 +11,8 @@ description: "Yeni bir sürüme nasıl geçilir, veritabanına ne olur ve nasıl
    Sürüme özel adımlar [aşağıda](#version-notes) da var. Sürümünüzü öğrenmek için sol menünün altındaki GitHub
    ikonunun üzerine gelin ya da pod'un ilk log satırına bakın (`"version":"…"`).
 2. **Volume'ün yedeğini alın** ([Yedekleme ve geri yükleme](/installation/backup-restore)). Yükseltmeden önceki
-   duruma birebir dönmenin tek yolu bu.
+   duruma birebir dönmenin tek yolu bu. 2.23.1'den itibaren OpenConsole, yeni bir sürüm veritabanını değiştirmeden
+   önce onu `/data/backups/app-<zaman>-pre-upgrade.db`'ye de kopyalar, ama bu kopya aynı volume'dadır.
 3. Deployment'ın `strategy: Recreate` kullandığından emin olun ([Kubernetes'e kurulum](/installation/kubernetes)).
    Varsayılan rolling update'te yeni pod, eskisi hâlâ çalışırken veritabanını açar; 2.23.0'da bu, bir sonraki
    restart'a kadar yazılanların kaybolmasına yol açabilir.
@@ -54,6 +55,8 @@ cluster'da `deploy/` ile birlikte gelir; bağlı diğer her cluster'da yeni `rba
 - Migration'lar yeni sürümün ilk açılışında otomatik çalışır: tablo ve sütun eklerler; bazı sürümler mevcut
   satırları bir kez yeniden yazar (2.17, eski audit satırlarına yeni aksiyon / sonuç alanlarını ekledi). Elle
   çalıştırılacak bir adım yok.
+- 2.23.1'den itibaren migration tek bir transaction içinde çalışır: başarısız olursa (dolu disk, bozuk dosya) pod
+  hatayı loguna yazarak durur ve veritabanı olduğu gibi kalır.
 - Geri migration yok. Eski bir sürüme dönmek desteklenmez. Pratikte değişiklikler yalnızca ekleme yaptığı için eski
   sürüm yeni veritabanıyla genellikle açılır (denendi: 2.22.0 veritabanında 2.21.0), ama yeni sürümün yazdığı
   veriler yok sayılabilir ya da yanlış okunabilir.
@@ -78,6 +81,18 @@ cluster'da `deploy/` ile birlikte gelir; bağlı diğer her cluster'da yeni `rba
   varsa onları `ALLOWED_ORIGINS`'e yazın. Başka bir siteden gelen WebSocket'ler `ws.origin_mismatch` olarak loglanır
   (varsayılan `WS_ORIGIN_CHECK=warn` ile hâlâ kabul edilir).
 - **YAML editörü** imajla gelir; tarayıcı onu artık `cdn.jsdelivr.net`'ten yüklemez.
+- **Kendi manifest'iniz**: `deploy/` gibi `strategy: Recreate` ve `terminationGracePeriodSeconds: 30` kullanın.
+  Kapanışta açık shell'ler 1012 koduyla (*server restarting*) kapanır; bitişleri ve kayıtları audit'e yazılır.
+- **Veritabanı**: ilk açılış onu `/data/backups/app-<zaman>-pre-upgrade.db`'ye kopyalar. Grup üyelikleri ve rol
+  izinleri foreign key alır: daha önce silinmiş kullanıcı, grup ve rollerden kalan satırlar atılır; olmayan bir id
+  saklanmak yerine reddedilir (`400` / `404`).
+- **Yedekler**: her gün veritabanının bir kopyası; en yeni 7 tanesi `/data/backups`'ta tutulur (Yönetim → Yedekler).
+  Volume'daki boş alana bakın: veritabanı boyutunun yaklaşık 7 katı.
+- **`LOG_RETENTION_DAYS=0`** artık audit olaylarını hiç silmez (eskiden 30 demekti); temizlik açılışta da çalışır.
+- **Denetim Logları**: bir sayfada en fazla 500 satır olur; **CSV olarak dışa aktar** artık filtreye uyan bütün
+  satırları, en fazla 50 000, içerir (eskiden 1 000'de duruyordu).
+- **İsteğe bağlı**: şifreleme anahtarını bir Secret'ta tutun
+  ([Şifreleme anahtarını veritabanının dışında tutun](/installation/backup-restore)).
 
 ### 2.22'ye yükseltme {#upgrading-to-222}
 
