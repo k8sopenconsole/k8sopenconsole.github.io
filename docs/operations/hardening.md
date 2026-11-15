@@ -30,8 +30,10 @@ the [Security model](/operations/security).
 - **Pin the release and use `Recreate`** ([Install on Kubernetes](/installation/kubernetes#1-write-a-kustomization)),
   one replica, and verify the image you run ([Verify the image](/installation/verify-image)).
 - **TLS at the Ingress, and nothing else in front of the Service.** OpenConsole speaks plain HTTP. It takes the
-  client address for the audit log and the sign-in lock from `X-Forwarded-For`, so the only way in should be a proxy
-  that sets that header ([Ingress with TLS](/installation/kubernetes#ingress-with-tls)).
+  client address for the audit log and the sign-in lock from `X-Forwarded-For` only when the connection comes from a
+  proxy in `TRUSTED_PROXIES` (the manifest lists the private networks); set it to your ingress controller's pod
+  network, so the only way in is that proxy ([Ingress with TLS](/installation/kubernetes#ingress-with-tls),
+  [Environment variables](/reference/environment-variables)).
 - **A NetworkPolicy** that lets in only your Ingress controller and your Prometheus. `/metrics` has no sign-in;
   don't route it through the Ingress either. Change the two namespace names to yours:
 

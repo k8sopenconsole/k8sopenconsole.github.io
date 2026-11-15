@@ -17,8 +17,9 @@ import Screenshot from '@site/src/components/Screenshot';
 
 Name (it appears in the switcher and in every audit event), an optional description, and the credentials:
 **ServiceAccount Token** (API server + token + CA) or **Kubeconfig** (the form opens on Kubeconfig). **Save Cluster**
-checks the connection with a real namespace list and only then stores it, encrypted. How to create the ServiceAccount
-and read its token: [Connect a cluster](/installation/connect-cluster).
+checks the connection with a real namespace list and only then stores it, encrypted. A kubeconfig must carry its
+credentials inline; one with an exec plugin, `auth-provider` or a file path is refused (`kubeconfig_unsupported`). How
+to create the ServiceAccount and read its token: [Connect a cluster](/installation/connect-cluster).
 
 The same cluster can be added twice under two names with two different identities, e.g. a read-only one for most
 people. Permissions are per cluster entry.

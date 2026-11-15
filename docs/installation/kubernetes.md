@@ -118,6 +118,7 @@ Everything else is configured in the UI and stored in the database. These are re
 | `APP_ENV` | (the manifest sets `prod`) | environment label on every log line and trace |
 | `LOG_FORMAT` | `text` (the manifest sets `ecs`) | `ecs` for Elastic, `json`, or `text` |
 | `DATA_PATH` | `/data/app.db` | the database file; must be on the volume |
+| `TRUSTED_PROXIES` | empty (the manifest sets `10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7`) | proxies whose `X-Forwarded-For` gives the client address in the audit, sessions and sign-in lock; narrow it to your ingress controller's pod network |
 
 The full list, including feature flags and limits: [Environment variables](/reference/environment-variables).
 

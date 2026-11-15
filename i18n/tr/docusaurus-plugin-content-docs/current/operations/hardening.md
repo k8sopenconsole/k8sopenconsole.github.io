@@ -31,8 +31,10 @@ listeyi baştan sona geçin. Her maddenin neden önemli olduğu [Güvenlik model
 - **Release'i sabitleyin ve `Recreate` kullanın** ([Kubernetes'e kurulum](/installation/kubernetes#1-write-a-kustomization)),
   tek replica çalıştırın ve çalıştırdığınız imajı doğrulayın ([İmajı doğrulama](/installation/verify-image)).
 - **TLS Ingress'te olsun, Service'in önünde başka hiçbir şey olmasın.** OpenConsole düz HTTP konuşur. Denetim logu ve
-  giriş kilidi için istemci adresini `X-Forwarded-For`'dan alır; bu yüzden içeri tek giriş yolu o header'ı set eden
-  bir proxy olmalı ([TLS'li Ingress](/installation/kubernetes#ingress-with-tls)).
+  giriş kilidi için istemci adresini `X-Forwarded-For`'dan yalnızca bağlantı `TRUSTED_PROXIES`'teki bir proxy'den
+  geliyorsa alır (manifest özel ağları listeler); bunu Ingress controller'ınızın pod ağına ayarlayın, böylece içeri tek
+  giriş yolu o proxy olur ([TLS'li Ingress](/installation/kubernetes#ingress-with-tls),
+  [Ortam değişkenleri](/reference/environment-variables)).
 - **Yalnızca Ingress controller'ınızı ve Prometheus'unuzu içeri alan bir NetworkPolicy.** `/metrics` giriş istemez;
   onu Ingress üzerinden de yönlendirmeyin. İki namespace adını kendinizinkilerle değiştirin:
 

@@ -79,8 +79,10 @@ More: [Prometheus](/administration/prometheus).
 
 | Symptom | Where to look |
 |---|---|
-| `Login failed. Please check your credentials.` | Admin → Audit Logs, action `user.login`, outcome `failed`. The reason says which: `bad_password` (wrong password; also an LDAP account whose directory bind failed), `unknown_user` (no such account, or deactivated), `azure_account` (an Azure AD account typed a password: use **Sign in with Microsoft**) |
-| the same message after 5 tries, and `429` with `Retry-After` from `/api/auth/login` | that user name is locked for 5 minutes from that address, audited as `user.login` `locked` (`too_many_failures`). Wait, or sign in from another machine |
+| `Login failed. Please check your credentials.` | Admin → Audit Logs, action `user.login`, outcome `failed`. The reason says which: `bad_password` (wrong password; also an LDAP account whose directory bind failed), `unknown_user` (no such account, or deactivated), `azure_account` (an Azure AD account typed a password: use **Sign in with Microsoft**). A local account never signs in with a directory password: an LDAP user whose account shows source *Local* gets `bad_password` ([LDAP](/administration/ldap#signing-in)) |
+| the same message after 5 tries, and `429` with `Retry-After` from `/api/auth/login` | that user name is locked for 5 minutes from that address, audited as `user.login` `locked` (`too_many_failures`); after 20 failures from any addresses, the name is locked everywhere for 5 minutes. Wait, or sign in from another machine |
+| everyone's sign-ins and sessions show the same address (the ingress pod's), and one person's typos lock others out | `TRUSTED_PROXIES` doesn't cover your ingress, so `X-Forwarded-For` isn't read: set it to the ingress controller's pod network ([Environment variables](/reference/environment-variables)) |
+| **Sign in with Microsoft** answers `this account can't sign in with this Microsoft account` | `user.login` `failed` with reason `not_azure_account` (a local or LDAP account has that name), `azure_oid_mismatch` (the account belongs to another Entra user, e.g. one deleted and re-created) or `azure_no_oid` ([Azure AD](/administration/azure-ad#how-the-account-is-found)) |
 | `Your session has ended. Please sign in again.` | the session expired (Admin → Sessions sets the lifetime) or an admin revoked it |
 
 The audit reason doesn't say why an LDAP bind failed. Test the directory from **Admin → LDAP → Test connection**,
@@ -126,6 +128,7 @@ missing, expired or revoked.
 | `you have no permissions on this cluster` | picking a cluster none of your grants cover | [cluster_ctx.go#L172](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/cluster_ctx.go#L172) |
 | `only the owner can change this view` | editing someone else's shared view | [views.go#L161](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/views.go#L161) |
 | `user is disabled` | an Azure AD sign-in for a deactivated account | [router.go#L989-L991](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L989-L991) |
+| `this account can't sign in with this Microsoft account` | an Azure AD sign-in for a local or LDAP account, or for an account another Entra user signed in to first (see [Sign-in fails](#sign-in-fails)) | [router.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/router.go) |
 | `the OpenConsole ServiceAccount is not allowed to read <resource> here (check the ClusterRole)` | Kubernetes refused OpenConsole's identity, not you | [secrets.go#L227-L229](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/secrets.go#L227-L229) |
 | `restart failed: …` / `scale failed: …` / the API server's message | Kubernetes refused a write (ClusterRole without that verb) | [deployment_actions.go#L160-L164](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/deployment_actions.go#L160-L164), [yaml_apply.go#L111](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/yaml_apply.go#L111) |
 
@@ -139,5 +142,9 @@ The first six are also the `reason` of the `denied` audit event. For API keys an
 | `400` `cluster "<name>" is unknown or not reachable with this key` | the `X-OpenConsole-Cluster` header names a cluster that doesn't exist or the key doesn't cover |
 | `429` (no body) with an API key | more than 10 requests per second (bursts of 30) for that key |
 | `429` `too many open shells (limit 3 per user); close one first` | the shell limit, from a client that isn't a browser |
+| `400` `kubeconfig_unsupported: user "…" uses exec; …` | the kubeconfig runs a program or reads a file (exec plugin, `auth-provider`, `tokenFile`, a certificate or key path): use one with inline credentials ([Connect a cluster](/installation/connect-cluster)). A cluster saved with such a kubeconfig before doesn't connect: its lists stay empty (`503`), and the pod log has `cluster not connected: its kubeconfig runs a program or reads a file` once; upload an inline kubeconfig under **Admin → Clusters → Edit** |
+| `409` `a revoked key can't be regenerated; create a new one` | regenerating a revoked API key; only an expired key can be regenerated |
+| `413` `request body too large` | the body is over 1 MiB (4 MiB for a YAML apply) |
+| `400` `username is required` | `PUT /api/admin/users/{id}` without `username`: send the user's name with every update |
 | `404`, `409`, `400` or `504` from restart, scale, YAML apply or a Secret request | Kubernetes answered NotFound, Conflict (e.g. a stale `resourceVersion`), Invalid or Timeout; OpenConsole passes that status on, so a proxy doesn't wrap a 5xx around a 4xx. The `failed` audit event has the reason (`not_found`, `conflict`, `invalid`) and the `error` |
 | `503` from `/readyz`: `db not reachable` | the database file can't be opened: check the volume ([Health probes](/operations/health-probes)) |

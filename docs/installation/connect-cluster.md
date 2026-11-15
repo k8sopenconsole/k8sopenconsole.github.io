@@ -141,9 +141,12 @@ EOF
 ```
 
 :::warning Not your personal kubeconfig
-Kubeconfigs that sign in through an exec plugin (`kubelogin`, `aws eks get-token`, `gke-gcloud-auth-plugin`) don't
-work: the container has none of those programs. They would also make OpenConsole act as you instead of as a
-dedicated identity.
+A kubeconfig may only carry its credentials **inline**: `token`, `client-certificate-data` / `client-key-data`,
+`certificate-authority-data`. One that signs in through an exec plugin (`kubelogin`, `aws eks get-token`,
+`gke-gcloud-auth-plugin`), an `auth-provider`, or reads a file (`tokenFile`, `client-certificate`, `client-key`,
+`certificate-authority`) is refused with `kubeconfig_unsupported: …`: it would run a program or read a file inside
+the OpenConsole pod. A personal kubeconfig would also make OpenConsole act as you instead of as a dedicated
+identity.
 :::
 
 ## Rotate the token {#rotate-the-token}
@@ -162,8 +165,8 @@ kubectl --context $CTX apply -f \
 
 Deleting and re-creating only the Secret gives you **the same token again**: Kubernetes derives a ServiceAccount
 token from the ServiceAccount and the Secret's name, so the "new" token is identical and the old one keeps working.
-A new ServiceAccount gets a new identity, and the old token is refused at once. (The comment in `rbac.yaml` 2.23.0
-still describes the Secret-only way; it is wrong.)
+A new ServiceAccount gets a new identity, and the old token is refused at once. (The comment in `rbac.yaml` up to
+2.23.0 described the Secret-only way; it was wrong.)
 
 Then read the new token and CA (step 2), click **Edit** on the cluster in **Admin → Clusters**, tick **Replace
 credentials** and paste the new token **and the CA again**: with *Replace credentials* both fields start empty, and
