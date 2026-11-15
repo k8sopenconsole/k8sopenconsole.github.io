@@ -17,8 +17,10 @@ import Screenshot from '@site/src/components/Screenshot';
 
 Ad (cluster seçicide ve her audit olayında görünür), isteğe bağlı bir açıklama ve kimlik bilgileri:
 **ServiceAccount Token** (API server + token + CA) ya da **Kubeconfig** (form Kubeconfig seçili açılır). **Cluster'ı
-kaydet**, bağlantıyı gerçek bir namespace listesiyle dener ve ancak bu başarılı olursa şifreleyerek saklar.
-ServiceAccount'u oluşturma ve token'ını okuma: [Cluster bağlama](/installation/connect-cluster).
+kaydet**, bağlantıyı gerçek bir namespace listesiyle dener ve ancak bu başarılı olursa şifreleyerek saklar. Bir
+kubeconfig kimlik bilgilerini satır içi taşımalıdır; exec plugin, `auth-provider` ya da dosya yolu içeren kubeconfig
+reddedilir (`kubeconfig_unsupported`). ServiceAccount'u oluşturma ve token'ını okuma:
+[Cluster bağlama](/installation/connect-cluster).
 
 Aynı cluster, iki farklı kimlikle iki ayrı adla iki kez eklenebilir; örneğin çoğu kişi için salt okuma bir bağlantı.
 İzinler her cluster kaydı için ayrı tanımlanır.

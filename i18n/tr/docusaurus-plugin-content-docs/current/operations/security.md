@@ -27,6 +27,9 @@ flowchart LR
   Yönetim → Cluster'lar altında eklediği kimlik bilgileriyle konuşur (bir ServiceAccount token'ı ya da bir kubeconfig).
   Kendi başına cluster bulmaz ve pod'un kendi kimliğini kullanmaz: manifest pod'a hiçbir ServiceAccount token'ı
   mount etmez ([deployment.yaml#L24](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/deploy/deployment.yaml#L24)).
+  Bir kubeconfig yalnızca satır içi kimlik bilgisi taşıyabilir: exec plugin, `auth-provider` ya da dosya yolu içeren
+  kubeconfig reddedilir (`kubeconfig_unsupported`); böylece bir cluster bağlamak pod'da program çalıştıramaz ya da
+  dosya okuyamaz ([manager.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/kube/manager.go)).
 - **O kimlik bilgisine verdiğiniz ClusterRole herkes için üst sınırdır**, yöneticiler dahil. Manifest'teki
   ClusterRole ([rbac.yaml#L34-L122](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/deploy/rbac.yaml#L34-L122)) iş yüklerini, pod'ları, service'leri, ConfigMap'leri,
   event'leri, node'ları ve metrikleri okur; Secret'ları okur ve günceller; pod loglarını okur; `pods/exec` oluşturur;
@@ -77,17 +80,22 @@ flowchart LR
 - **Yerel şifreler** bcrypt hash'i olarak saklanır ([password.go#L12](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/auth/password.go#L12));
   en az `PASSWORD_MIN_LENGTH` (8) karakter, en fazla 72 bayt olabilir ([password.go#L23-L35](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/auth/password.go#L23-L35)).
   LDAP hesapları dizine bind ile kontrol edilir; Azure AD hesapları Microsoft üzerinden giriş yapar ve hiçbir zaman
-  yerel şifre kabul etmez ([router.go#L656-L681](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L656-L681)).
-- **Tahmin denemeleri yavaşlatılır:** bir istemci adresinden bir kullanıcı adı için 5 başarısız girişten sonra bu ikili
-  5 dakika kilitlenir (`429`, `user.login` `locked` olarak audit'e yazılır)
+  yerel şifre kabul etmez. Bir hesap yalnızca kendi kaynağıyla giriş yapar: local hesap asla dizin şifresi kabul etmez,
+  Microsoft girişi de asla local ya da LDAP hesabını devralmaz; bir Azure AD hesabı ona ilk giriş yapan Entra nesnesine
+  (`oid`) bağlanır ([router.go#L656-L681](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L656-L681)).
+- **Tahmin denemeleri yavaşlatılır:** bir istemci adresinden bir kullanıcı adı için 5 başarısız girişten sonra bu ikili,
+  herhangi adreslerden bir kullanıcı adı için 20 başarısız girişten sonra da o ad 5 dakika kilitlenir (`429`,
+  `user.login` `locked` olarak audit'e yazılır; 5 dakikadan eski başarısız girişler unutulur)
   ([observability.go#L62-L67](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/observability.go#L62-L67),
   [router.go#L632-L638](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L632-L638)). Her başarısız giriş aynı `401`'i alır;
   cevap, hesabın var olup olmadığını belli etmez ([router.go#L684-L690](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L684-L690)).
-- **Oturumlar** imzalı token'lardır (JWT, HS256); ömürleri Yönetim → Oturumlar'dan ayarlanır (varsayılan 60 dakika)
+- **Oturumlar** imzalı token'lardır (JWT, HS256; başka algoritmalar reddedilir); ömürleri Yönetim → Oturumlar'dan ayarlanır (varsayılan 60 dakika)
   ([jwt.go#L23-L35](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/auth/jwt.go#L23-L35), [db.go#L344](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/db/db.go#L344)). Her
   token'ın server tarafında bir kaydı vardır ve bu kayıt her istekte kontrol edilir; böylece bir yönetici tek bir
   oturumu ya da bir kullanıcının bütün oturumlarını süreleri dolmadan iptal edebilir ([router.go#L95-L109](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L95-L109)).
-  Deaktive edilen bir kullanıcı bir sonraki isteğinde reddedilir ([router.go#L2668-L2678](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L2668-L2678)).
+  Bir kullanıcıyı deaktive etmek oturumlarını anında iptal eder; her yetki kontrolü de (shell'ler, loglar, reveal,
+  apply ve API anahtarları dahil) deaktive edilmiş bir kullanıcıyı ya da yöneticinin belirlediği şifreyi hâlâ
+  değiştirmemiş bir kullanıcıyı reddeder.
 - **Tarayıcı oturum token'ını local storage'da tutar** ve `Authorization: Bearer` header'ı olarak gönderir
   ([api.ts#L78](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/frontend/src/services/api.ts#L78), [api.ts#L112](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/frontend/src/services/api.ts#L112));
   oturum cookie'si yoktur.
@@ -154,9 +162,17 @@ ayarları, Prometheus ayarları, oturumlar, API anahtarı özetleri ve denetim l
 - **Giriş olmadan** yalnızca şunlar cevap verir: `/livez`, `/readyz`, `/healthz`, `/metrics`, giriş uçları, logo ve
   `/api/openapi.json` (host adı ya da secret içermeyen API tanımı)
   ([router.go#L174-L210](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L174-L210)).
-- **Denetim logundaki ve giriş kilidindeki istemci adresi** sırasıyla `X-Forwarded-For`'daki ilk adres, sonra
-  `X-Real-Ip`, sonra bağlantının adresidir ([router.go#L484-L499](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L484-L499)).
-  OpenConsole'u `X-Forwarded-For`'u set eden bir proxy'nin arkasına koyun ve Service'i başka bir yoldan açmayın.
+- **Denetim logundaki, Yönetim → Oturumlar'daki ve giriş kilidindeki istemci adresi** bağlantının adresidir.
+  `X-Forwarded-For` yalnızca bağlantı `TRUSTED_PROXIES`'te listelenen bir proxy'den geliyorsa ve sağdan okunur: proxy
+  olmayan ilk adres kazanır, yani istemcinin kendi yazdığı bir adres asla kullanılmaz; header yoksa `X-Real-Ip`
+  ([clientip.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/clientip.go)). Manifest özel ağlara güvenir; yapabiliyorsanız
+  `TRUSTED_PROXIES`'i Ingress'inize daraltın ve Service'i başka bir yoldan açmayın
+  ([Ortam değişkenleri](/reference/environment-variables)).
+- **İstek gövdeleri sınırlıdır**: 1 MiB, YAML apply için 4 MiB, logo yükleme için 6 MiB; daha büyüğü, giriş dahil,
+  okunmadan `413` ile reddedilir. Kullanıcı adları en fazla 256 karakterdir.
+- **CSV dışa aktarımları** (audit, kullanıcılar, gruplar, API anahtarları) `=`, `+`, `-`, `@`, tab ya da satır başı
+  ile başlayan bir hücrenin önüne `'` koyar; böylece bir kullanıcı adı ya da tarayıcının User-Agent'ı bir tabloda
+  formüle dönüşemez.
 
 ## Container {#the-container}
 

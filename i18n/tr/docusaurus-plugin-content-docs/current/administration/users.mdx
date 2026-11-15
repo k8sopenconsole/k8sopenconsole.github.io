@@ -44,8 +44,8 @@ değiştirmesini siz söyleyin.
 - **Düzenle** (kalem): aktiflik, admin, gruplar ve kullanıcının [API erişimi](/administration/api-access-policy).
 - **Parola sıfırla** (anahtar simgesi, yalnızca local hesaplar): yeni bir şifre belirler; varsayılan olarak bir sonraki
   girişte değiştirilmesi gerekir. Kullanıcının her yerdeki oturumu kapatılır (`user.reset_password`).
-- **Devre dışı bırakma** (*Aktif* işaretini kaldırın): bir sonraki istekte, mevcut oturumlar dahil reddedilir. Silmeye
-  tercih edin.
+- **Devre dışı bırakma** (*Aktif* işaretini kaldırın): oturumları anında iptal edilir ve her isteği, API anahtarları dahil,
+  reddedilir; yeni shell ya da log akışı açılmaz (açık olan kapanana kadar sürer). Silmeye tercih edin.
 - **Silme** (çöp kutusu): hesabı ve üyeliklerini kaldırır; hesabın yaptıkları audit log'da kalır.
 - Son aktif admin devre dışı bırakılamaz, adminliği alınamaz ve silinemez.
 

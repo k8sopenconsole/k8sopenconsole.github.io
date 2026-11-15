@@ -23,8 +23,9 @@ LDAP works next to local accounts. By default a person must have an OpenConsole 
 | Enabled | turns LDAP sign-in on or off at once |
 | Host + Port, or URL | `dc01.example.corp` and `389`, or `ldaps://dc01.example.corp:636` |
 | Use SSL (ldaps) | TLS from the start (port 636) |
-| StartTLS | upgrade a plain connection on 389 to TLS (see the note below) |
+| StartTLS | upgrade a plain connection on 389 to TLS |
 | Skip TLS certificate verification | testing only |
+| CA certificate (PEM) | your own CA, when the directory's certificate isn't signed by a public one (see the note below) |
 | Timeout | seconds per LDAP operation (default 10) |
 | Bind DN / Bind password | the service account that searches the directory, e.g. `CN=svc-openconsole,OU=ServiceAccounts,DC=example,DC=corp`. The password is stored encrypted; tick **Update Bind Password** only when you change it |
 | User base DN (single) | where people are searched, e.g. `OU=Users,DC=example,DC=corp`. For people in several OUs, use their common parent (in 2.23.0 the *User base DNs (comma separated)* field splits a DN at its own commas, so it can't hold a full DN) |
@@ -43,10 +44,12 @@ An example Active Directory setup (fictitious values):
 
 **Save LDAP settings**, then **Test connection**: it binds with the service account and searches each base DN.
 
-:::warning[TLS in 2.23.0]
-**StartTLS only connects with *Skip TLS certificate verification* ticked** in 2.23.0: the server certificate can't be
-checked (filed as a bug). For an encrypted **and** verified connection use **Use SSL (ldaps)** on port 636; the
-certificate must then be trusted by a public CA, since there is no field for your own CA yet.
+:::note[TLS]
+With **Use SSL (ldaps)** or **StartTLS** the directory's certificate is checked: it must be valid for the host name
+(or IP address) in *Host* / *URL* and signed by a CA OpenConsole trusts, the public ones of the image or the one in
+**CA certificate (PEM)**. Paste your CA there (`-----BEGIN CERTIFICATE-----` …; several certificates may follow each
+other). A pasted text that holds no certificate is refused when you save. Up to 2.23.0, StartTLS only connected with
+*Skip TLS certificate verification* ticked and there was no CA field.
 :::
 
 ## 2. Import people (or create them on first sign-in) {/* #2-import-people-or-create-them-on-first-sign-in */}
@@ -83,13 +86,19 @@ and binds as them, so the directory checks the password every time; a disabled o
 sign in. A wildcard filter is safe: at sign-in OpenConsole also requires an **exact match** on the username attribute,
 so `jo` never signs in as `john`. Turning **Enabled** off stops every LDAP sign-in at once.
 
+Only an account whose source is **LDAP** (imported, or created on first sign-in) signs in with the directory. A
+**local** account never does, even if the directory has someone with the same name, so a directory entry can't take
+over a local account (the built-in `admin` included). Up to 2.23.0 a local account whose password didn't match fell
+back to the directory and was switched to LDAP; people imported before 2.13 who still show source *Local* in Admin →
+Users must be deleted and imported again.
+
 ## When it doesn't work {/* #when-it-doesnt-work */}
 
 | Symptom | Usually |
 |---|---|
 | Test: connection refused / timeout | host or port wrong, or a firewall between the OpenConsole pod and the directory |
-| Test: `x509: certificate signed by unknown authority` | ldaps with a certificate from your own CA; see the TLS note above |
-| Test: StartTLS fails without *Skip verification* | the 2.23.0 limitation above |
+| Test: `x509: certificate signed by unknown authority` | the certificate comes from your own CA: paste it into **CA certificate (PEM)** |
+| Test: `x509: certificate is valid for …, not …` | *Host* / *URL* isn't a name on the certificate: use the name the certificate was issued for |
 | Test: `Invalid Credentials (49)` | bind DN or bind password wrong (an AD bind DN is the full `CN=…`, or `user@domain`) |
 | Test works, a person can't sign in | the user filter doesn't find them under the base DNs, or the username attribute differs from what they type; or (without first-sign-in) they were never imported |
 | Signed in, sees nothing | they are in no OpenConsole group with a role |

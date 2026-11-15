@@ -27,6 +27,9 @@ flowchart LR
   Admin → Clusters (a ServiceAccount token or a kubeconfig). It finds no cluster on its own and doesn't use the
   pod's own identity: the manifest mounts no ServiceAccount token into the pod
   ([deployment.yaml#L24](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/deploy/deployment.yaml#L24)).
+  A kubeconfig may carry only inline credentials: one with an exec plugin, an `auth-provider` or a file path is
+  refused (`kubeconfig_unsupported`), so connecting a cluster can't run a program or read a file in the pod
+  ([manager.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/kube/manager.go)).
 - **The ClusterRole you give that credential is the upper bound** for everyone, admins included. The manifest's
   ClusterRole ([rbac.yaml#L34-L122](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/deploy/rbac.yaml#L34-L122)) reads workloads, pods, services, config maps,
   events, nodes and metrics; reads and updates Secrets; reads pod logs; creates `pods/exec`; updates and patches
@@ -75,17 +78,21 @@ flowchart LR
 - **Local passwords** are stored as bcrypt hashes ([password.go#L12](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/auth/password.go#L12)), at least
   `PASSWORD_MIN_LENGTH` (8) characters and at most 72 bytes ([password.go#L23-L35](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/auth/password.go#L23-L35)).
   LDAP accounts are checked by a bind against the directory; Azure AD accounts sign in through Microsoft and never
-  accept a local password ([router.go#L656-L681](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L656-L681)).
+  accept a local password. An account signs in only through its own source: a local account never accepts a
+  directory password, and Microsoft sign-in never takes over a local or LDAP account; an Azure AD account is bound to
+  the Entra object (`oid`) that first signed in to it ([router.go#L656-L681](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L656-L681)).
 - **Guessing is slowed down:** after 5 failed sign-ins for one user name from one client address, that pair is locked
-  for 5 minutes (`429`, audited as `user.login` `locked`)
+  for 5 minutes, and after 20 for one user name from any addresses, the name is (`429`, audited as `user.login`
+  `locked`; failures older than 5 minutes are forgotten)
   ([observability.go#L62-L67](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/observability.go#L62-L67),
   [router.go#L632-L638](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L632-L638)). Every failed sign-in gets the same `401`, so
   the answer doesn't tell whether the account exists ([router.go#L684-L690](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L684-L690)).
-- **Sessions** are signed tokens (JWT, HS256) with a lifetime from Admin → Sessions (60 minutes by default)
+- **Sessions** are signed tokens (JWT, HS256; other algorithms are refused) with a lifetime from Admin → Sessions (60 minutes by default)
   ([jwt.go#L23-L35](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/auth/jwt.go#L23-L35), [db.go#L344](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/db/db.go#L344)). Each
   token has a server-side record that is checked on every request, so an admin can revoke one session or all of a
-  user's sessions before they expire ([router.go#L95-L109](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L95-L109)). A
-  deactivated user is refused on the next request ([router.go#L2668-L2678](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L2668-L2678)).
+  user's sessions before they expire ([router.go#L95-L109](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L95-L109)).
+  Deactivating a user revokes their sessions at once, and every permission check (shells, logs, reveal, apply, API
+  keys included) refuses a deactivated user, or one who still has to change a password an admin set.
 - **The browser keeps the session token in local storage** and sends it as an `Authorization: Bearer` header
   ([api.ts#L78](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/frontend/src/services/api.ts#L78), [api.ts#L112](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/frontend/src/services/api.ts#L112)); there are
   no session cookies.
@@ -150,9 +157,16 @@ Prometheus settings, sessions, API key digests and the audit log.
 - **Without sign-in** answer only: `/livez`, `/readyz`, `/healthz`, `/metrics`, the sign-in endpoints, the logo, and
   `/api/openapi.json` (the API description, which holds no host names or secrets)
   ([router.go#L174-L210](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L174-L210)).
-- **The client address** in the audit log and in the sign-in lock is the first address in `X-Forwarded-For`, then
-  `X-Real-Ip`, then the connection's address ([router.go#L484-L499](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L484-L499)). Put
-  OpenConsole behind a proxy that sets `X-Forwarded-For`, and don't expose the Service any other way.
+- **The client address** in the audit log, Admin → Sessions and the sign-in lock is the connection's address. Only
+  when the connection comes from a proxy listed in `TRUSTED_PROXIES` is `X-Forwarded-For` read, from the right: the
+  first address that isn't a trusted proxy wins, so an address the client wrote itself is never used; without the
+  header, `X-Real-Ip` ([clientip.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/clientip.go)). The manifest trusts the private
+  networks; narrow `TRUSTED_PROXIES` to your ingress if you can, and don't expose the Service any other way
+  ([Environment variables](/reference/environment-variables)).
+- **Request bodies are capped**: 1 MiB, 4 MiB for a YAML apply, 6 MiB for the logo upload; a larger one is refused
+  with `413` before it is read, sign-in included. User names are at most 256 characters.
+- **CSV exports** (audit, users, groups, API keys) put a `'` in front of a cell that starts with `=`, `+`, `-`, `@`, a
+  tab or a carriage return, so a user name or a browser's User-Agent can't become a formula in a spreadsheet.
 
 ## The container {#the-container}
 

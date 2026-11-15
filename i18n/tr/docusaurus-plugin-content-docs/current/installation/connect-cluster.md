@@ -141,9 +141,12 @@ EOF
 ```
 
 :::warning Kişisel kubeconfig'iniz değil
-Exec plugin ile giriş yapan kubeconfig'ler (`kubelogin`, `aws eks get-token`, `gke-gcloud-auth-plugin`) çalışmaz:
-container'da bu programların hiçbiri yok. Üstelik OpenConsole'un ayrı bir kimlikle değil, sizin adınıza işlem
-yapmasına yol açarlar.
+Bir kubeconfig kimlik bilgilerini yalnızca **satır içi** taşıyabilir: `token`, `client-certificate-data` /
+`client-key-data`, `certificate-authority-data`. Exec plugin ile giriş yapan (`kubelogin`, `aws eks get-token`,
+`gke-gcloud-auth-plugin`), `auth-provider` kullanan ya da bir dosya okuyan (`tokenFile`, `client-certificate`,
+`client-key`, `certificate-authority`) kubeconfig `kubeconfig_unsupported: …` ile reddedilir: OpenConsole pod'unun
+içinde bir program çalıştırır ya da dosya okurdu. Kişisel bir kubeconfig ayrıca OpenConsole'un ayrı bir kimlikle değil,
+sizin adınıza işlem yapmasına yol açar.
 :::
 
 ## Token'ı yenileme {#rotate-the-token}
@@ -162,8 +165,8 @@ kubectl --context $CTX apply -f \
 
 Yalnızca Secret'ı silip yeniden oluşturursanız **aynı token'ı yeniden alırsınız**: Kubernetes ServiceAccount
 token'ını ServiceAccount'tan ve Secret'ın adından türetir; "yeni" token aynısıdır ve eskisi çalışmaya devam eder.
-Yeni bir ServiceAccount ise yeni bir kimlik alır ve eski token hemen reddedilir. (`rbac.yaml` 2.23.0'daki yorum hâlâ
-yalnızca Secret'ı silme yolunu anlatıyor; bu yanlış.)
+Yeni bir ServiceAccount ise yeni bir kimlik alır ve eski token hemen reddedilir. (`rbac.yaml`'daki yorum 2.23.0'a
+kadar yalnızca Secret'ı silme yolunu anlatıyordu; bu yanlıştı.)
 
 Ardından yeni token'ı ve CA'yı okuyun (2. adım), **Yönetim → Cluster'lar** ekranında cluster'ın **Düzenle**
 butonuna tıklayın, **Credential'ları değiştir** kutusunu işaretleyin ve yeni token'ı **ve CA'yı da yeniden**
