@@ -119,6 +119,7 @@ Everything else is configured in the UI and stored in the database. These are re
 |---|---|---|
 | `TIMEZONE` | `UTC` (the manifest sets `Europe/Istanbul`) | time zone of audit timestamps in the UI; stored times are UTC |
 | `LOG_RETENTION_DAYS` | `30` | days audit events are kept in the database; `0` keeps them forever (before 2.23.1 it meant 30) |
+| `BACKUP_ALLOW_DOWNLOAD` | `false` | `true` lets admins download the backups in Admin → Backups |
 | `BACKUP_INTERVAL` / `BACKUP_KEEP` | `24h` / `7` | how often the database is copied to `/data/backups` (`0` = no scheduled copy) and how many copies are kept ([Backup and restore](/installation/backup-restore)) |
 | `ENCRYPTION_KEY_FILE` | empty (the key is in the database) | file with the key that encrypts the stored credentials, from a Secret ([Keep the encryption key out of the database](/installation/backup-restore)) |
 | `RESTART_HISTORY_RETENTION_DAYS` | `30` | container exits kept for the restart history |

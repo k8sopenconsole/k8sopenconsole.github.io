@@ -119,6 +119,6 @@ listeyi baştan sona geçin. Her maddenin neden önemli olduğu [Güvenlik model
   kopyasını başka bir yerde saklayın ([Yedekleme ve geri yükleme](/installation/backup-restore)).
 - **Yedekleri volume'un dışına kopyalayın ve cluster kimlik bilgileri gibi koruyun.** OpenConsole her gün
   `/data/backups`'a, yani aynı volume'a bir yedek yazar; volume kaybolursa onlar da kaybolur. Kullanmıyorsanız
-  Yönetim → Yedekler'de indirmeyi kapalı bırakın ([Yedekleme ve geri yükleme](/installation/backup-restore)).
+  `BACKUP_ALLOW_DOWNLOAD`'ı kapalı bırakın ([Yedekleme ve geri yükleme](/installation/backup-restore)).
 - **Volume'u şifreleyin:** platformunuz destekliyorsa depolama katmanında (şifreli StorageClass, şifreli
   snapshot'lar).

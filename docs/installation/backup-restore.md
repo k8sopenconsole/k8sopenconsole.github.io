@@ -39,14 +39,20 @@ them somewhere else.
 
 ### Downloading backups {#downloading-backups}
 
-Downloading is off by default. An admin turns it on with **Allow downloading backups** (after a confirmation); from
-then every admin can download every copy, older ones included, until it is turned off. Each download is a
-`backup.download` audit event, and so is a refused one (`denied`, `backup_download_disabled`). An API key can neither
-download a backup nor change the setting.
+Downloading is off by default. It is turned on with `BACKUP_ALLOW_DOWNLOAD=true` on the Deployment, not in the UI,
+so an admin account alone (or a stolen admin session) can't turn it on: whoever may change the Deployment can read
+the volume anyway. Setting it restarts the pod:
+
+```bash
+kubectl -n kubernetes-openconsole set env deploy/kubernetes-openconsole BACKUP_ALLOW_DOWNLOAD=true   # off again: BACKUP_ALLOW_DOWNLOAD-
+```
+
+While it is on, every admin can download every copy, older ones included. Each download is a `backup.download`
+audit event, and so is a refused one (`denied`, `backup_download_disabled`). An API key never downloads a backup.
 
 ## Copy a backup off the volume {#copy-a-backup-off-the-volume}
 
-- **In the browser**: Admin → Backups → the download icon, once downloading is allowed.
+- **In the browser**: Admin → Backups → the download icon, when `BACKUP_ALLOW_DOWNLOAD=true`.
 - **With kubectl, without stopping the console.** The image has no shell, so attach a short-lived debug container
   that shares the pod's processes, and read the file through the app's own filesystem (`/proc/1/root`):
 

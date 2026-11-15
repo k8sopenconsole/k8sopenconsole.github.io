@@ -116,7 +116,7 @@ the [Security model](/operations/security).
 - **Keep the encryption key outside the database** (`ENCRYPTION_KEY_FILE` from a Secret), and keep a copy of the key
   somewhere else ([Backup and restore](/installation/backup-restore)).
 - **Copy the backups off the volume, and protect them like the cluster credentials.** OpenConsole writes one a day to
-  `/data/backups`, on the same volume, so they don't survive losing it. Leave downloading in Admin → Backups off
-  unless you use it ([Backup and restore](/installation/backup-restore)).
+  `/data/backups`, on the same volume, so they don't survive losing it. Leave `BACKUP_ALLOW_DOWNLOAD` off unless
+  you use it ([Backup and restore](/installation/backup-restore)).
 - **Encrypt the volume** at the storage layer if your platform offers it (encrypted StorageClass, encrypted
   snapshots).

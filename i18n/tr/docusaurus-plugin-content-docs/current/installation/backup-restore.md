@@ -40,14 +40,20 @@ değil. Onları başka bir yere de kopyalayın.
 
 ### Yedekleri indirme {#downloading-backups}
 
-İndirme varsayılan olarak kapalıdır. Bir admin onu **Yedeklerin indirilmesine izin ver** ile (bir onaydan sonra)
-açar; o andan kapatılana kadar her admin, eskiler dahil her kopyayı indirebilir. Her indirme bir `backup.download`
-audit olayıdır; reddedilen de öyle (`denied`, `backup_download_disabled`). Bir API anahtarı ne yedek indirebilir ne
-de bu ayarı değiştirebilir.
+İndirme varsayılan olarak kapalıdır. Arayüzden değil, Deployment'ta `BACKUP_ALLOW_DOWNLOAD=true` ile açılır; böylece
+bir admin hesabı tek başına (ya da çalınmış bir admin oturumu) onu açamaz: Deployment'ı değiştirebilen biri volume'ü
+zaten okuyabilir. Ayarlamak pod'u yeniden başlatır:
+
+```bash
+kubectl -n kubernetes-openconsole set env deploy/kubernetes-openconsole BACKUP_ALLOW_DOWNLOAD=true   # off again: BACKUP_ALLOW_DOWNLOAD-
+```
+
+Açıkken her admin, eskiler dahil her kopyayı indirebilir. Her indirme bir `backup.download` audit olayıdır;
+reddedilen de öyle (`denied`, `backup_download_disabled`). Bir API anahtarı hiçbir zaman yedek indiremez.
 
 ## Bir yedeği volume'un dışına kopyalama {#copy-a-backup-off-the-volume}
 
-- **Tarayıcıda**: indirme açıksa Yönetim → Yedekler → indirme ikonu.
+- **Tarayıcıda**: `BACKUP_ALLOW_DOWNLOAD=true` iken Yönetim → Yedekler → indirme ikonu.
 - **kubectl ile, konsolu durdurmadan.** İmajda shell yoktur; bu yüzden pod'un process'lerini paylaşan kısa ömürlü bir
   debug container bağlayın ve dosyayı uygulamanın kendi dosya sistemi (`/proc/1/root`) üzerinden okuyun:
 

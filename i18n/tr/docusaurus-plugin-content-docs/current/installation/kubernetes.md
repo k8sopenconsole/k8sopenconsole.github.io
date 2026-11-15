@@ -121,6 +121,7 @@ okunur:
 |---|---|---|
 | `TIMEZONE` | `UTC` (manifest `Europe/Istanbul` ayarlar) | arayüzdeki audit zaman damgalarının saat dilimi; saklanan zamanlar UTC'dir |
 | `LOG_RETENTION_DAYS` | `30` | audit olaylarının veritabanında tutulduğu gün sayısı; `0` hiç silmez (2.23.1'den önce 30 demekti) |
+| `BACKUP_ALLOW_DOWNLOAD` | `false` | `true`, adminlerin Yönetim → Yedekler'deki yedekleri indirmesine izin verir |
 | `BACKUP_INTERVAL` / `BACKUP_KEEP` | `24h` / `7` | veritabanının ne sıklıkla `/data/backups`'a kopyalandığı (`0` = zamanlanmış kopya yok) ve kaç kopyanın tutulduğu ([Yedekleme ve geri yükleme](/installation/backup-restore)) |
 | `ENCRYPTION_KEY_FILE` | boş (anahtar veritabanında) | saklanan kimlik bilgilerini şifreleyen anahtarın dosyası, bir Secret'tan ([Şifreleme anahtarını veritabanının dışında tutun](/installation/backup-restore)) |
 | `RESTART_HISTORY_RETENTION_DAYS` | `30` | restart geçmişi için tutulan container çıkışları |

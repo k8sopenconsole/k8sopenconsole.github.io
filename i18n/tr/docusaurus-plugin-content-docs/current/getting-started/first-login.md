@@ -60,7 +60,7 @@ Bunları sırayla yapın; her adım bir öncekine dayanır.
      kullanabileceği (varsayılan *Güvenli salt okuma*) ([API ve agent'lar](/api/overview)).
    - Yönetim → Cluster'lar → Prometheus: daha uzun kullanım geçmişi ([Prometheus](/administration/prometheus)).
    - Yönetim → Özelleştirme: logonuz.
-   - Yönetim → Yedekler: veritabanı kopyaları ve adminlerin onları indirip indiremeyeceği
+   - Yönetim → Yedekler: veritabanı kopyaları (indirmek için `BACKUP_ALLOW_DOWNLOAD=true` gerekir)
      ([Yedekleme ve geri yükleme](/installation/backup-restore)).
 8. **Audit log'u dışarı aktarın.** Veritabanında `LOG_RETENTION_DAYS` (30) gün kalır ve stdout'a JSON olarak
    yazılır; daha uzun saklamak için stdout'u log platformunuza gönderin ([Elastic](/operations/elastic)).
