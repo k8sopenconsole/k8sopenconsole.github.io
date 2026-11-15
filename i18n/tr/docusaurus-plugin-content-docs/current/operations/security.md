@@ -60,7 +60,7 @@ flowchart LR
   Arayüz kullanamayacağınız şeyleri gizler, ama asıl kontrol gizlemek değildir. Reddedilen istek bir sebep koduyla
   `403` döner ve `denied` olarak audit'e yazılır. Yönetim ekranları tek bir yönetici kontrolü kullanır
   ([`isAdminRequest`, router.go#L611-L620](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L611-L620)).
-- **İlk şifresini değiştirmemiş bir kullanıcının** hiçbir izni olmaz
+- **İlk parolasını değiştirmemiş bir kullanıcının** hiçbir izni olmaz
   ([router.go#L2563-L2570](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L2563-L2570)); bu durumdaki bir yönetici de yönetici sayılmaz
   ([router.go#L613](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L613)).
 - **Özellik bayrakları bir yeteneği herkes için kapatır**, yöneticiler dahil, aynı kontrolde: `FEATURE_POD_EXEC`,
@@ -72,15 +72,15 @@ flowchart LR
   [`WithKey`, engine.go#L67](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/rbac/engine.go#L67),
   [`KeyCeiling`, policy.go#L57](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/rbac/policy.go#L57)). Roller için varsayılan politika *güvenli
   salt okuma*dır: list, get ve loglar; ConfigMap'ler ve Secret'lar hariç ([`SafeRead`, policy.go#L24](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/rbac/policy.go#L24)).
-  Bir anahtar hiçbir zaman anahtar yönetemez, şifre değiştiremez, kullanıcının cluster'ını seçemez, görünüm
+  Bir anahtar hiçbir zaman anahtar yönetemez, parola değiştiremez, kullanıcının cluster'ını seçemez, görünüm
   kaydedemez ([`denyAPIKey`, apikeys.go#L244](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L244)).
 
 ## Giriş ve oturumlar {#sign-in-and-sessions}
 
-- **Yerel şifreler** bcrypt hash'i olarak saklanır ([password.go#L12](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/auth/password.go#L12));
+- **Yerel parolalar** bcrypt hash'i olarak saklanır ([password.go#L12](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/auth/password.go#L12));
   en az `PASSWORD_MIN_LENGTH` (8) karakter, en fazla 72 bayt olabilir ([password.go#L23-L35](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/auth/password.go#L23-L35)).
   LDAP hesapları dizine bind ile kontrol edilir; Azure AD hesapları Microsoft üzerinden giriş yapar ve hiçbir zaman
-  yerel şifre kabul etmez. Bir hesap yalnızca kendi kaynağıyla giriş yapar: local hesap asla dizin şifresi kabul etmez,
+  yerel parola kabul etmez. Bir hesap yalnızca kendi kaynağıyla giriş yapar: local hesap asla dizin parolası kabul etmez,
   Microsoft girişi de asla local ya da LDAP hesabını devralmaz; bir Azure AD hesabı ona ilk giriş yapan Entra nesnesine
   (`oid`) bağlanır ([router.go#L656-L681](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L656-L681)).
 - **Tahmin denemeleri yavaşlatılır:** bir istemci adresinden bir kullanıcı adı için 5 başarısız girişten sonra bu ikili,
@@ -97,7 +97,7 @@ flowchart LR
   token'ın server tarafında bir kaydı vardır ve bu kayıt her istekte kontrol edilir; böylece bir yönetici tek bir
   oturumu ya da bir kullanıcının bütün oturumlarını süreleri dolmadan iptal edebilir ([router.go#L95-L109](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L95-L109)).
   Bir kullanıcıyı deaktive etmek oturumlarını anında iptal eder; her yetki kontrolü de (shell'ler, loglar, reveal,
-  apply ve API anahtarları dahil) deaktive edilmiş bir kullanıcıyı ya da yöneticinin belirlediği şifreyi hâlâ
+  apply ve API anahtarları dahil) deaktive edilmiş bir kullanıcıyı ya da yöneticinin belirlediği parolayı hâlâ
   değiştirmemiş bir kullanıcıyı reddeder.
 - **Tarayıcı oturum token'ını local storage'da tutar** ve `Authorization: Bearer` header'ı olarak gönderir
   ([api.ts#L78](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/frontend/src/services/api.ts#L78), [api.ts#L112](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/frontend/src/services/api.ts#L112));
@@ -114,11 +114,11 @@ flowchart LR
 ## Veriler nerede saklanır {#where-data-is-kept}
 
 OpenConsole'un sakladığı her şey, volume'undaki tek bir SQLite veritabanındadır (`/data/app.db`); shell kayıtları da
-`/data/recordings`'tedir: kullanıcılar ve şifre hash'leri, gruplar, roller, cluster kimlik bilgileri, LDAP ve Azure AD
+`/data/recordings`'tedir: kullanıcılar ve parola hash'leri, gruplar, roller, cluster kimlik bilgileri, LDAP ve Azure AD
 ayarları, Prometheus ayarları, oturumlar, API anahtarı özetleri ve denetim logu.
 
 - **Kimlik bilgileri yazılmadan önce şifrelenir:** cluster token'ları, kubeconfig'ler ve CA sertifikaları
-  ([clusters.go#L100-L111](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/store/clusters.go#L100-L111)), LDAP bind şifresi
+  ([clusters.go#L100-L111](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/store/clusters.go#L100-L111)), LDAP bind parolası
   ([store.go#L489](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/store/store.go#L489)), Azure AD client secret'ı
   ([store.go#L571](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/store/store.go#L571)) ve Prometheus ayarları
   ([clusters.go#L235-L245](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/store/clusters.go#L235-L245)); her değer için rastgele bir nonce ile,
@@ -142,7 +142,7 @@ ayarları, Prometheus ayarları, oturumlar, API anahtarı özetleri ve denetim l
   adresten, hangi API anahtarıyla, hangi cluster'da, namespace'te ve nesnede, sonuç ne. Olaylar veritabanında
   `LOG_RETENTION_DAYS` (30) gün tutulur ve log platformunuz için stdout'a yazılır ([Loglama](/operations/logging)).
   Olay türleri: [Denetim olayları](/reference/audit-events).
-- **Denetim ayrıntıları hiçbir zaman secret değeri, YAML gövdesi, şifre ya da token içermez.** Ayrıntılar sabit,
+- **Denetim ayrıntıları hiçbir zaman secret değeri, YAML gövdesi, parola ya da token içermez.** Ayrıntılar sabit,
   tipli bir anahtar kümesidir; dışındaki her şey atılır ([event.go#L131-L136](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/audit/event.go#L131-L136)).
   Bir secret reveal, anahtarın adını kaydeder ([secrets.go#L24-L25](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/secrets.go#L24-L25));
   bir YAML apply, YAML'ı değil, nesnenin önceki ve sonraki hâlinin kısa SHA-256 hash'lerini (8 hex karakter) kaydeder

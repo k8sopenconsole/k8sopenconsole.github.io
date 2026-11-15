@@ -28,7 +28,8 @@ LDAP works next to local accounts. By default a person must have an OpenConsole 
 | CA certificate (PEM) | your own CA, when the directory's certificate isn't signed by a public one (see the note below) |
 | Timeout | seconds per LDAP operation (default 10) |
 | Bind DN / Bind password | the service account that searches the directory, e.g. `CN=svc-openconsole,OU=ServiceAccounts,DC=example,DC=corp`. The password is stored encrypted; tick **Update Bind Password** only when you change it |
-| User base DN (single) | where people are searched, e.g. `OU=Users,DC=example,DC=corp`. For people in several OUs, use their common parent (in 2.23.0 the *User base DNs (comma separated)* field splits a DN at its own commas, so it can't hold a full DN) |
+| User base DN (single) | where people are searched, e.g. `OU=Users,DC=example,DC=corp` |
+| User base DNs (one per line) | more places to search, one full DN per line, e.g. `OU=Users,DC=example,DC=corp` and `OU=Contractors,DC=example,DC=corp` on two lines. Up to 2.23.0 this field was split at commas; a value saved then is read back as one DN, so check it after the upgrade |
 | User filter | `%s` is what the person typed. Active Directory `(sAMAccountName=%s)`, OpenLDAP `(uid=%s)` |
 | Username attribute | the attribute that becomes the OpenConsole username: `sAMAccountName` or `uid` |
 

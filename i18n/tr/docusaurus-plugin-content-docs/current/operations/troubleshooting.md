@@ -68,7 +68,7 @@ Yönetim → Cluster'lar → Prometheus → **Bağlantıyı test et**, başarıs
 | `The settings are incomplete or invalid.` (Türkçe arayüzde: "Ayarlar eksik ya da geçersiz.") | namespace, Service ve port'u ya da `http(s)://` ile başlayan bir URL'i doldurun |
 | `The OpenConsole ServiceAccount may not use services/proxy on this Service; add the rule from deploy/rbac.yaml.` (Türkçe arayüzde: "OpenConsole ServiceAccount'ı bu servis üzerinde services/proxy kullanamıyor; deploy/rbac.yaml'daki kuralı ekleyin.") | `services/proxy` kuralının yorumunu kaldırın; `resourceNames`'e Prometheus Service'inizi yazın |
 | `The Service or its port was not found, or it has no ready endpoints.` (Türkçe arayüzde: "Servis ya da portu bulunamadı, veya hazır endpoint'i yok.") | namespace'i, Service adını ve port'u kontrol edin (**Cluster'da bul** adayları listeler) |
-| `Prometheus refused the credentials (401 / 403).` (Türkçe arayüzde: "Prometheus kimlik bilgilerini reddetti (401 / 403).") | kullanıcı / şifreyi, token'ı ya da client sertifikasını kontrol edin |
+| `Prometheus refused the credentials (401 / 403).` (Türkçe arayüzde: "Prometheus kimlik bilgilerini reddetti (401 / 403).") | kullanıcı / parolayı, token'ı ya da client sertifikasını kontrol edin |
 | `The address answered, but not with the Prometheus API. Check the URL / port and the path prefix.` (Türkçe arayüzde: "Adres yanıt verdi ama Prometheus API'si değil. URL / port ve path önekini kontrol edin.") | Prometheus HTTP API'sini gösterin; varsa path prefix'i de ekleyin |
 | `The host name could not be resolved.` (Türkçe arayüzde: "Host adı çözülemedi.") | URL'deki host OpenConsole pod'undan çözülmüyor |
 | `TLS failed: check the CA certificate, or skip verification for a test.` (Türkçe arayüzde: "TLS başarısız: CA sertifikasını kontrol edin ya da test için doğrulamayı atlayın.") | CA sertifikasını ekleyin |
@@ -82,7 +82,7 @@ Daha fazlası: [Prometheus](/administration/prometheus).
 
 | Belirti | Nereye bakmalı |
 |---|---|
-| `Login failed. Please check your credentials.` (Türkçe arayüzde: "Giriş başarısız. Lütfen bilgilerini kontrol et.") | Yönetim → Denetim Logları, aksiyon `user.login`, sonuç `failed`. Sebep hangisi olduğunu söyler: `bad_password` (yanlış şifre; dizin bind'i başarısız olan bir LDAP hesabı da), `unknown_user` (böyle bir hesap yok ya da deaktive), `azure_account` (bir Azure AD hesabı şifre girdi: **Microsoft ile giriş yap**'ı kullanın). Local bir hesap asla dizin şifresiyle giriş yapmaz: hesabının kaynağı *Local* görünen bir LDAP kullanıcısı `bad_password` alır ([LDAP](/administration/ldap#signing-in)) |
+| `Login failed. Please check your credentials.` (Türkçe arayüzde: "Giriş başarısız. Lütfen bilgilerini kontrol et.") | Yönetim → Denetim Logları, aksiyon `user.login`, sonuç `failed`. Sebep hangisi olduğunu söyler: `bad_password` (yanlış parola; dizin bind'i başarısız olan bir LDAP hesabı da), `unknown_user` (böyle bir hesap yok ya da deaktive), `azure_account` (bir Azure AD hesabı parola girdi: **Microsoft ile giriş yap**'ı kullanın). Local bir hesap asla dizin parolasıyla giriş yapmaz: hesabının kaynağı *Local* görünen bir LDAP kullanıcısı `bad_password` alır ([LDAP](/administration/ldap#signing-in)) |
 | 5 denemeden sonra aynı mesaj ve `/api/auth/login`'den `Retry-After` ile `429` | o kullanıcı adı o adresten 5 dakika kilitli; `user.login` `locked` (`too_many_failures`) olarak audit'e yazılır; herhangi adreslerden 20 başarısız denemeden sonra ad her yerden 5 dakika kilitlenir. Bekleyin ya da başka bir makineden giriş yapın |
 | herkesin girişleri ve oturumları aynı adresi (Ingress pod'unun adresini) gösteriyor, bir kişinin yanlış denemeleri başkalarını kilitliyor | `TRUSTED_PROXIES` Ingress'inizi kapsamıyor, bu yüzden `X-Forwarded-For` okunmuyor: onu Ingress controller'ın pod ağına ayarlayın ([Ortam değişkenleri](/reference/environment-variables)) |
 | **Microsoft ile giriş yap** `this account can't sign in with this Microsoft account` cevabını veriyor | `user.login` `failed`, sebep `not_azure_account` (bu ada sahip local ya da LDAP hesabı var), `azure_oid_mismatch` (hesap başka bir Entra kullanıcısına ait, örn. silinip yeniden oluşturulmuş biri) ya da `azure_no_oid` ([Azure AD](/administration/azure-ad#how-the-account-is-found)) |
@@ -96,7 +96,7 @@ LDAP Result Code 200 "Network Error": dial tcp 127.0.0.1:389: connect: connectio
 LDAP Result Code 200 "Network Error": dial tcp: lookup ldap.example.invalid on 10.43.0.10:53: no such host
 ```
 
-`connection refused` / `no such host` host ve port demektir; `Invalid Credentials` bind DN ya da şifredir; bir
+`connection refused` / `no such host` host ve port demektir; `Invalid Credentials` bind DN ya da paroladır; bir
 sertifika hatası TLS ayarlarıdır.
 
 ## Proxy arkasında shell'ler ya da canlı loglar kopuyor {#shells-or-live-logs-break-behind-a-proxy}
@@ -128,7 +128,9 @@ Pod yeniden başlıyor (`CrashLoopBackOff`) ve logu bir `ERROR` satırıyla biti
 ## Hata cevapları {#error-answers}
 
 Her hata cevabı JSON'dır: `{"error": "<reason or message>"}`. `401`'in gövdesi yoktur: oturum ya da API anahtarı
-eksik, süresi dolmuş ya da iptal edilmiş.
+eksik, süresi dolmuş ya da iptal edilmiş. Web arayüzü aşağıdaki sebep kodlarını
+kendi dilinizde bir cümle olarak gösterir (örneğin `admin_only` için *Bunu yalnız yöneticiler yapabilir.*); diğer
+mesajları sunucunun yazdığı gibi gösterir.
 
 ### 403 sebepleri {#403-reasons}
 
@@ -137,10 +139,10 @@ eksik, süresi dolmuş ya da iptal edilmiş.
 | `forbidden` | burada (namespace, cluster) bu aksiyon için izin yok | [audit_events.go#L91](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L91), [router.go#L2642-L2651](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L2642-L2651) |
 | `api_access_policy` | API anahtarıyla: sahibinin izni var ve anahtar onu listeliyor, ama yöneticinin API erişim politikası anahtarlara bunu vermiyor | [audit_events.go#L95-L97](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L95-L97), [router.go#L2612-L2629](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L2612-L2629) |
 | `api_access_off` | API anahtarıyla: politika bu kullanıcı için API erişimini kapatıyor | [audit_events.go#L98-L99](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L98-L99), [apikeys.go#L205-L208](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L205-L208) |
-| `api_key_not_allowed` | bir API anahtarı bunu hiçbir zaman yapamaz (anahtar yönetmek, şifre değiştirmek, cluster seçmek, görünüm kaydetmek) | [apikeys.go#L51](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L51), [apikeys.go#L244-L252](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L244-L252) |
+| `api_key_not_allowed` | bir API anahtarı bunu hiçbir zaman yapamaz (anahtar yönetmek, parola değiştirmek, cluster seçmek, görünüm kaydetmek) | [apikeys.go#L51](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L51), [apikeys.go#L244-L252](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L244-L252) |
 | `feature_disabled` | operatör bu yeteneği kapattı (`FEATURE_*=false`) | [audit_events.go#L92](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L92), [router.go#L2637-L2640](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L2637-L2640) |
 | `admin_only` | bir yönetim ekranı ya da ucu; API anahtarıyla: Admin API kapsamı olmayan bir anahtar | [audit_events.go#L93](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L93), [router.go#L598-L605](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L598-L605) |
-| `change your password first` | ilk şifresini hâlâ değiştirmesi gereken bir hesabın API anahtarı ya da API anahtarları sayfası (böyle bir hesap diğer ekranlarda `forbidden` alır) | [apikeys.go#L196-L199](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L196-L199), [apikeys.go#L431-L432](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L431-L432) |
+| `change your password first` | ilk parolasını hâlâ değiştirmesi gereken bir hesabın API anahtarı ya da API anahtarları sayfası (böyle bir hesap diğer ekranlarda `forbidden` alır) | [apikeys.go#L196-L199](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L196-L199), [apikeys.go#L431-L432](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L431-L432) |
 | `backup_download_disabled` | yedek indirme kapalı (`BACKUP_ALLOW_DOWNLOAD` `true` değil) | [backups.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/backups.go) |
 | `you have no permissions on this cluster` | hiçbir izninizin kapsamadığı bir cluster'ı seçmek | [cluster_ctx.go#L172](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/cluster_ctx.go#L172) |
 | `only the owner can change this view` | başkasının paylaşılan görünümünü düzenlemek | [views.go#L161](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/views.go#L161) |

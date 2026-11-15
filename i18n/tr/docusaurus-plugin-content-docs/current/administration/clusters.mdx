@@ -38,9 +38,11 @@ Aynı cluster, iki farklı kimlikle iki ayrı adla iki kez eklenebilir; örneği
 
 ## Düzenleme, kimlik bilgilerini değiştirme, silme {/* #edit-replace-credentials-delete */}
 
-- **Düzenle**: ad ve açıklama. Yeni bir token **ve CA** yapıştırmak (iki alan da boş gelir) ya da yeni bir kubeconfig
-  yüklemek için **Credential'ları değiştir**'i işaretleyin. [Token rotasyonundan](/installation/connect-cluster#rotate-the-token)
-  sonra gereklidir.
+- **Düzenle**: ad ve açıklama. Yeni bir token yapıştırmak ya da yeni bir kubeconfig yüklemek için **Credential'ları
+  değiştir**'i işaretleyin. [Token rotasyonundan](/installation/connect-cluster#rotate-the-token) sonra gereklidir.
+  Kayıtlı CA'yı korumak için **CA Sertifikası** alanını boş bırakın; **Kayıtlı CA'yı kaldır**'ı yalnız API sunucusunun
+  sertifikası artık herkesçe güvenilen bir CA'dan geliyorsa işaretleyin. Yeni kimlik bilgileri çalışmazsa hata açık
+  kalan dialog'un içinde görünür.
 - **Sil** bağlantıyı kaldırır. Bu cluster'ı seçmiş kullanıcılar varsayılan cluster'a geçer.
 
 ## Prometheus {/* #prometheus */}

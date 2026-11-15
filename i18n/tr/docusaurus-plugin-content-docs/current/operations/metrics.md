@@ -209,7 +209,7 @@ rule'u olarak:
 
 | Alert | Sorgu (`logs-openconsole.audit-*`) |
 |---|---|
-| 5 yanlış şifreden sonra bir giriş kilitlendi | `openconsole.outcome : "locked"` |
+| 5 yanlış paroladan sonra bir giriş kilitlendi | `openconsole.outcome : "locked"` |
 | Biri shell limitine takıldı | `event.action : "pod.exec" and openconsole.outcome : "rate_limited"` |
 | Bir Secret gösterildi | `event.action : "secret.reveal" and event.outcome : "success"` |
 | Bir kullanıcı için tekrarlanan retler | `openconsole.outcome : "denied"`, `user.name`'e göre gruplanmış |

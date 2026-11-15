@@ -37,8 +37,10 @@ people. Permissions are per cluster entry.
 
 ## Edit, replace credentials, delete {/* #edit-replace-credentials-delete */}
 
-- **Edit**: name and description; tick **Replace credentials** to paste a new token **and the CA** (both fields start
-  empty) or upload a new kubeconfig. Needed after a [token rotation](/installation/connect-cluster#rotate-the-token).
+- **Edit**: name and description; tick **Replace credentials** to paste a new token or upload a new kubeconfig.
+  Needed after a [token rotation](/installation/connect-cluster#rotate-the-token). Leave **CA Cert** empty to keep the
+  stored CA; tick **Remove the stored CA** only when the API server now has a publicly trusted certificate. When the
+  new credentials don't work, the error shows in the dialog, which stays open.
 - **Delete** removes the connection. Users who had it selected move to the default cluster.
 
 ## Prometheus {/* #prometheus */}

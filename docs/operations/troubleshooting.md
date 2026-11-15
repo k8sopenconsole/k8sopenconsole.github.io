@@ -128,7 +128,8 @@ The pod restarts (`CrashLoopBackOff`) and its log ends with an `ERROR` line:
 ## Error answers {#error-answers}
 
 Every error answer is JSON, `{"error": "<reason or message>"}`. `401` has no body: the session or API key is
-missing, expired or revoked.
+missing, expired or revoked. The web UI shows the reason codes below as a sentence in your language (for example
+`admin_only` as *Only administrators can do this.*); other messages as the server wrote them.
 
 ### 403 reasons {#403-reasons}
 

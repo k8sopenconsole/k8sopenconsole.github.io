@@ -24,11 +24,11 @@ Uygulamanın overview sayfasındaki **Directory (tenant) ID** ve **Application (
 
 **Yönetim → Azure AD** (örnek değerler):
 
-<Screenshot id="admin-azure" alt="Yönetim → Azure AD: tenant ID, client ID, redirect URL https://openconsole.example.com/api/auth/azure/callback, client secret, Azure AD ayarlarını kaydet ve Test Connection" />
+<Screenshot id="admin-azure" alt="Yönetim → Azure AD: tenant ID, client ID, redirect URL https://openconsole.example.com/api/auth/azure/callback, client secret, Azure AD ayarlarını kaydet ve Yapılandırmayı test et" />
 
 **Etkin**, **Tenant ID**, **Client ID**, **Client secret** (şifrelenerek saklanır; değiştirmek için **Client secret'ı
-güncelle**'yi işaretleyin), **Redirect URL** (yukarıda kaydettiğiniz URI'nin birebir aynısı). Kaydedin, ardından **Test
-Connection**. Giriş sayfasında artık **Microsoft ile giriş yap** görünür.
+güncelle**'yi işaretleyin), **Redirect URL** (yukarıda kaydettiğiniz URI'nin birebir aynısı). Kaydedin, ardından
+**Yapılandırmayı test et**. Giriş sayfasında artık **Microsoft ile giriş yap** görünür.
 
 US Government ya da China bulutları için `AZURE_AD_AUTHORITY` değişkenini ayarlayın
 ([Ortam değişkenleri](/reference/environment-variables)).
@@ -53,7 +53,7 @@ Microsoft ile yalnızca **Azure AD** hesapları giriş yapar. Aynı adlı local 
 `this account can't sign in with this Microsoft account` ile reddedilir (audit `user.login`, sonuç `failed`, neden
 `not_azure_account`). 2.23.0'a kadar böyle bir hesap Azure AD'ye çevriliyordu; birini local hesaptan Azure AD'ye
 taşımak için hesabı silin ve bir Azure AD hesabı önceden oluşturun. Bir hesap sahiplenildiğinde `user.login` olayı bunu
-kaydeder (`linked_by`, `signed_in_as`). Azure AD hesapları asla şifre kabul etmez.
+kaydeder (`linked_by`, `signed_in_as`). Azure AD hesapları asla parola kabul etmez.
 
 Bir hesap, ona **ilk** giriş yapan Microsoft hesabına aittir; bu, adına göre değil Entra nesne kimliğine (token'daki
 `oid`) göre belirlenir. Sonradan aynı ada sahip olan başka biri (silinip yeniden oluşturulmuş ya da adı değişmiş bir

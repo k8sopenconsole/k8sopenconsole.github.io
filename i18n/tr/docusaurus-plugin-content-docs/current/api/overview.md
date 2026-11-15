@@ -38,7 +38,7 @@ Bunlardan herhangi birinin dışında kalan bir çağrı 403 ile reddedilir ve g
 `api_access_off` (politika bu kullanıcının anahtarlarına hiçbir şey vermiyor), `feature_disabled` (operatör bu
 özelliği kapattı). Tam liste [Hızlı başlangıç](/api/quick-start#errors) sayfasında.
 
-**Bir anahtar hiçbir zaman** anahtar oluşturamaz ya da değiştiremez, şifre değiştiremez, seçili cluster'ınızı
+**Bir anahtar hiçbir zaman** anahtar oluşturamaz ya da değiştiremez, parola değiştiremez, seçili cluster'ınızı
 değiştiremez ya da görünüm kaydedemez (403 `api_key_not_allowed`); admin uçları (`/api/admin/*`) için, bir admin'in
 **Admin API** kutusu işaretlenerek oluşturulmuş anahtarı gerekir.
 

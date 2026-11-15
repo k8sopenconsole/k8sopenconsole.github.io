@@ -1,6 +1,6 @@
 ---
 title: "Kullanıcılar ve gruplar"
-description: "Local, LDAP ve Azure AD hesapları, gruplar, şifre sıfırlama, devre dışı bırakma ve erişim gözden geçirmeleri için CSV dışa aktarma."
+description: "Local, LDAP ve Azure AD hesapları, gruplar, parola sıfırlama, devre dışı bırakma ve erişim gözden geçirmeleri için CSV dışa aktarma."
 ---
 
 import Screenshot from '@site/src/components/Screenshot';
@@ -13,19 +13,19 @@ import Screenshot from '@site/src/components/Screenshot';
 
 <Screenshot id="admin-users" alt="Yönetim → Kullanıcılar: kaynağı Local, API erişimi Rollere göre olan beş hesap; admin işaretleri, Aktif durumu ve grupları; CSV olarak dışa aktar ve Yeni kullanıcı" />
 
-| Kaynak | Giriş yöntemi | Şifrenin tutulduğu yer |
+| Kaynak | Giriş yöntemi | Parolanın tutulduğu yer |
 |---|---|---|
-| **Local** | kullanıcı adı + şifre | OpenConsole (bcrypt) |
-| **LDAP** | dizindeki kullanıcı adı + şifre | dizin |
+| **Local** | kullanıcı adı + parola | OpenConsole (bcrypt) |
+| **LDAP** | dizindeki kullanıcı adı + parola | dizin |
 | **Azure AD** | **Microsoft ile giriş yap** | Entra ID |
 
-Şifrenin nasıl kontrol edileceğini kaynak belirler: LDAP hesapları yalnızca dizine karşı, Azure AD hesapları hiçbir
-zaman şifreyle. Başarısız bir giriş her zaman aynı yanıtı alır; böylece form bir hesabın var olup olmadığını ele
+Parolanın nasıl kontrol edileceğini kaynak belirler: LDAP hesapları yalnızca dizine karşı, Azure AD hesapları hiçbir
+zaman parolayla. Başarısız bir giriş her zaman aynı yanıtı alır; böylece form bir hesabın var olup olmadığını ele
 vermez. Gerçek nedeni `user.login` audit olayı kaydeder.
 
 ### Oluşturma {/* #create */}
 
-**Yeni kullanıcı** local bir hesap oluşturur: kullanıcı adı, ilk şifre, gruplar ve admin için **Admin yetkisi ver**.
+**Yeni kullanıcı** local bir hesap oluşturur: kullanıcı adı, ilk parola, gruplar ve admin için **Admin yetkisi ver**.
 LDAP ya da Azure AD açıksa yanındaki ok bir menü açar:
 
 - **Yerel kullanıcı**: yukarıdaki gibi.
@@ -34,7 +34,7 @@ LDAP ya da Azure AD açıksa yanındaki ok bir menü açar:
   Microsoft girişinde bir şeyler görsün ([Azure AD](/administration/azure-ad)).
 
 Oluşturulan ya da içe aktarılan yeni hesaplar bir süre listenin başında, **Yeni** etiketiyle görünür. Hiçbir grupta
-olmayan kullanıcı hiç namespace görmez. Local bir kullanıcı belirlediğiniz şifreyi değiştirmeye zorlanmaz;
+olmayan kullanıcı hiç namespace görmez. Local bir kullanıcı belirlediğiniz parolayı değiştirmeye zorlanmaz;
 değiştirmesini siz söyleyin.
 
 ### Düzenleme, sıfırlama, devre dışı bırakma, silme {/* #edit-reset-disable-delete */}
@@ -42,7 +42,7 @@ değiştirmesini siz söyleyin.
 <Screenshot id="admin-user-edit" alt="alice'i düzenle: kullanıcı adı, Aktif ve Admin onay kutuları, gruplar, önizlemeli API erişimi (Rollere göre / Kapalı / Güvenli salt okuma / Tüm yetkileri) ve Tüm anahtarlarını iptal et" />
 
 - **Düzenle** (kalem): aktiflik, admin, gruplar ve kullanıcının [API erişimi](/administration/api-access-policy).
-- **Parola sıfırla** (anahtar simgesi, yalnızca local hesaplar): yeni bir şifre belirler; varsayılan olarak bir sonraki
+- **Parola sıfırla** (anahtar simgesi, yalnızca local hesaplar): yeni bir parola belirler; varsayılan olarak bir sonraki
   girişte değiştirilmesi gerekir. Kullanıcının her yerdeki oturumu kapatılır (`user.reset_password`).
 - **Devre dışı bırakma** (*Aktif* işaretini kaldırın): oturumları anında iptal edilir ve her isteği, API anahtarları dahil,
   reddedilir; yeni shell ya da log akışı açılmaz (açık olan kapanana kadar sürer). Silmeye tercih edin.
@@ -55,7 +55,7 @@ değiştirmesini siz söyleyin.
 
 <Screenshot id="admin-groups" alt="Yönetim → Gruplar: üye sayıları ve rolleriyle finance-readers, shop-team ve sre" />
 
-**Yeni grup** bir ad ister; sonra **Düzenle** (kalem) → *Assign roles…* ve üyeler. Bir kullanıcının gruplarını
+**Yeni grup** bir ad ister; sonra **Düzenle** (kalem) → *Rol atayın…* ve üyeler. Bir kullanıcının gruplarını
 Yönetim → Kullanıcılar → Düzenle'den de belirleyebilir ya da LDAP'tan içe aktarırken grupları seçebilirsiniz.
 
 ## Erişim gözden geçirmeleri {/* #access-reviews */}
