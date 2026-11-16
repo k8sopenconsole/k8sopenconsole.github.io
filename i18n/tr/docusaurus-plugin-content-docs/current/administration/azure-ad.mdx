@@ -50,7 +50,7 @@ hesabı kullanır ve namespace'lerini hemen görürler.
 3. Hiç hesap yoksa bir hesap oluşturulur (yukarıya bakın).
 
 Microsoft ile yalnızca **Azure AD** hesapları giriş yapar. Aynı adlı local ya da LDAP hesabı asla devralınmaz: giriş
-`this account can't sign in with this Microsoft account` ile reddedilir (audit `user.login`, sonuç `failed`, neden
+reddedilir (`403` `sign_in_failed`, detail `this account can't sign in with this Microsoft account`; audit `user.login`, sonuç `failed`, neden
 `not_azure_account`). 2.23.0'a kadar böyle bir hesap Azure AD'ye çevriliyordu; birini local hesaptan Azure AD'ye
 taşımak için hesabı silin ve bir Azure AD hesabı önceden oluşturun. Bir hesap sahiplenildiğinde `user.login` olayı bunu
 kaydeder (`linked_by`, `signed_in_as`). Azure AD hesapları asla parola kabul etmez.

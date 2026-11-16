@@ -49,7 +49,7 @@ at once.
 3. No account at all: one is created (see above).
 
 Only **Azure AD** accounts sign in with Microsoft. A local or LDAP account with the same name is never taken over: the
-sign-in is refused with `this account can't sign in with this Microsoft account` (audit `user.login`, outcome
+sign-in is refused (`403` `sign_in_failed`, detail `this account can't sign in with this Microsoft account`; audit `user.login`, outcome
 `failed`, reason `not_azure_account`). Up to 2.23.0 such an account was switched to Azure AD; to move someone from a
 local account to Azure AD, delete it and pre-create an Azure AD account. The `user.login` event notes when an account
 was claimed (`linked_by`, `signed_in_as`). Azure AD accounts never accept a password.

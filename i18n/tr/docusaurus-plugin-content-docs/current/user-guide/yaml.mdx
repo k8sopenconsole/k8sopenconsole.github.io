@@ -30,7 +30,8 @@ da, ama yalnızca `secrets:edit` ile ([Secret'lar](/user-guide/secrets)).
 
 4. **Uygula** değişikliği saklar. **Sıfırla** değişikliklerinizi atar.
 
-Her uygulama audit log'a yazılır (`<kind>.apply`, `dry_run` ile ve YAML'ın önceki ve sonraki halinin kısa hash'leriyle;
+YAML'ı açmak bir okuma olarak audit'e yazılır (`<kind>.get`, ör. `deployment.get`). Her uygulama audit log'a
+yazılır (`<kind>.apply`, `dry_run` ile ve YAML'ın önceki ve sonraki halinin kısa hash'leriyle;
 YAML'ın kendisi asla yazılmaz).
 
 ## "Conflict": biri sizden önce değiştirdi {/* #conflict-someone-changed-it-first */}

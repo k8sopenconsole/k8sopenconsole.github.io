@@ -43,7 +43,8 @@ An example Active Directory setup (fictitious values):
 | User filter | `(sAMAccountName=%s)` |
 | Username attribute | `sAMAccountName` |
 
-**Save LDAP settings**, then **Test connection**: it binds with the service account and searches each base DN.
+**Save LDAP settings**, then **Test connection**: it binds with the service account and searches each base DN. If
+saving fails, the screen says why (for example a CA certificate that isn't PEM).
 
 :::note[TLS]
 With **Use SSL (ldaps)** or **StartTLS** the directory's certificate is checked: it must be valid for the host name
@@ -104,4 +105,5 @@ Users must be deleted and imported again.
 | Test works, a person can't sign in | the user filter doesn't find them under the base DNs, or the username attribute differs from what they type; or (without first-sign-in) they were never imported |
 | Signed in, sees nothing | they are in no OpenConsole group with a role |
 
-The failed `user.login` event in the audit log has the reason (`login_method: ldap`).
+The failed `user.login` event in the audit log has the reason (`login_method: ldap`); the pod log line
+`ldap sign-in failed` has the directory's message ([Sign-in fails](/operations/troubleshooting#sign-in-fails)).

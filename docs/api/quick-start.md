@@ -106,39 +106,63 @@ The command is recorded like a shell session; the audit event keeps only the pro
 
 ## Errors {#errors}
 
-Every refusal is audited. The body names the reason:
+Every refusal is audited. An error answer is JSON in the problem details format of
+[RFC 9457](https://www.rfc-editor.org/rfc/rfc9457), with `Content-Type: application/problem+json`:
 
-| Status | Body | Means |
+```json
+{"type":"about:blank","title":"Bad Request","status":400,"error":"invalid_input","detail":"cluster \"nope\" is unknown or not yours to use"}
+```
+
+- `error` is always a reason code (`snake_case`): switch on it.
+- `detail` (not always there) is English text for a person: which field, which name. Show or log it; don't parse it.
+- `title` is the HTTP status text, `type` is always `about:blank`.
+
+The API has no version in its path. It only grows (new fields, new codes, new endpoints), so ignore what you don't
+know; `info.version` in `/api/openapi.json` is the server's version. An unknown `/api/…` path answers `404`
+`not_found`, a known path with the wrong method `405` `method_not_allowed` with an `Allow` header.
+
+| Status | `error` | Means |
 |---|---|---|
-| 401 | empty | The key is unknown, expired or revoked, or its owner is disabled. |
-| 403 | `{"error":"change your password first"}` | The owner must change their password (first sign-in or an admin reset). |
-| 403 | `{"error":"forbidden"}` | The key doesn't list it, or you don't hold it in that namespace. |
-| 403 | `{"error":"api_access_policy"}` | You hold it on the web, but the admin's API access policy keeps it from keys. |
-| 403 | `{"error":"api_access_off"}` | The policy gives your keys nothing; every call is refused, `/api/auth/me` too. |
-| 403 | `{"error":"api_key_not_allowed"}` | Web session only (managing keys, password, saved views). |
-| 403 | `{"error":"feature_disabled"}` | The operator switched the feature off (`FEATURE_*=false`). |
-| 403 | `{"error":"admin_only"}` | An admin endpoint, and the key isn't an Admin API key of an admin. |
-| 400 | `{"error":"cluster \"nope\" is unknown or not yours to use"}` | `X-OpenConsole-Cluster` names a cluster that doesn't exist (`403` for one the key doesn't cover). |
-| 403 | `{"error":"cluster_forbidden"}` | The cluster refused the read: OpenConsole's ClusterRole there doesn't allow it. |
-| 502 / 503 / 504 | `{"error":"cluster_unreachable"}` / `not_connected` / `cluster_timeout` | The cluster can't be reached or refused OpenConsole's credentials / isn't connected / didn't answer in time. |
-| 429 | empty | More than 10 requests a second for this key; see [Limits](/api/limits). |
+| 401 | `unauthorized` | No key, an unknown key, or its owner is disabled. |
+| 401 | `api_key_expired` / `api_key_revoked` | The key has expired / was revoked. |
+| 403 | `password_change_required` | The owner must change their password (first sign-in or an admin reset). |
+| 403 | `forbidden` | The key doesn't list it, or you don't hold it in that namespace. |
+| 403 | `api_access_policy` | You hold it on the web, but the admin's API access policy keeps it from keys. |
+| 403 | `api_access_off` | The policy gives your keys nothing; every call is refused, `/api/auth/me` too. |
+| 403 | `api_key_not_allowed` | Web session only (managing keys, password, saved views). |
+| 403 | `feature_disabled` | The operator switched the feature off (`FEATURE_*=false`). |
+| 403 | `admin_only` | An admin endpoint, and the key isn't an Admin API key of an admin. |
+| 400 | `invalid_input` | A value isn't accepted; `detail` says which. For example `X-OpenConsole-Cluster` names a cluster that doesn't exist (`403` `forbidden` for one the key doesn't cover). |
+| 404 | `not_found` / `pod_not_found` | The object or the path doesn't exist. |
+| 403 | `cluster_forbidden` | The cluster refused the read: OpenConsole's ClusterRole there doesn't allow it. |
+| 502 / 503 / 504 | `cluster_unreachable` / `not_connected` / `cluster_timeout` | The cluster can't be reached or refused OpenConsole's credentials / isn't connected / didn't answer in time. |
+| 429 | `rate_limited` | More than 10 requests a second for this key; wait for `Retry-After` (1 second). See [Limits](/api/limits). |
+
+Every code: [Troubleshooting → Error answers](/operations/troubleshooting#error-answers).
 
 Seen on the test cluster with:
 
 ```bash
 curl -s -w ' %{http_code}\n' -H "Authorization: Bearer $OPENCONSOLE_API_KEY" "$OC_URL/api/namespaces/kube-system/pods"
-# {"error":"forbidden"}
+# {"type":"about:blank","title":"Forbidden","status":403,"error":"forbidden"}
 #  403
 curl -s -w ' %{http_code}\n' -H "Authorization: Bearer $OPENCONSOLE_API_KEY" "$OC_URL/api/me/api-keys"
-# {"error":"api_key_not_allowed"}
+# {"type":"about:blank","title":"Forbidden","status":403,"error":"api_key_not_allowed"}
 #  403
 curl -s -w ' %{http_code}\n' -H "Authorization: Bearer $OPENCONSOLE_API_KEY" -H "X-OpenConsole-Cluster: nope" \
   "$OC_URL/api/namespaces/crashlab/pods"
-# {"error":"cluster \"nope\" is unknown or not yours to use"}
+# {"type":"about:blank","title":"Bad Request","status":400,"error":"invalid_input","detail":"cluster \"nope\" is unknown or not yours to use"}
 #  400
 curl -s -w ' %{http_code}\n' -H "Authorization: Bearer $OPENCONSOLE_API_KEY" "$OC_URL/api/admin/users"
-# {"error":"admin_only"}
+# {"type":"about:blank","title":"Forbidden","status":403,"error":"admin_only"}
 #  403
+curl -s -w ' %{http_code}\n' -H "Authorization: Bearer oc_notarealkey" "$OC_URL/api/auth/me"
+# {"type":"about:blank","title":"Unauthorized","status":401,"error":"unauthorized"}
+#  401
+curl -s -i -X DELETE -H "Authorization: Bearer $OPENCONSOLE_API_KEY" "$OC_URL/api/namespaces/crashlab/pods" | grep -E '^(HTTP|Allow)|"error"'
+# HTTP/1.1 405 Method Not Allowed
+# Allow: GET
+# {"type":"about:blank","title":"Method Not Allowed","status":405,"error":"method_not_allowed"}
 ```
 
 **Next:** give it to an agent: [Agent recipes](/api/agent-recipes). Every endpoint:

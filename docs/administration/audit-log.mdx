@@ -38,6 +38,12 @@ API keys for `API_KEY_READ_RETENTION_DAYS`, 7) and on stdout as one JSON line ea
 
 **Details** on a row shows them. Every field and every detail key: [Audit events](/reference/audit-events).
 
+Admin changes to users, groups, roles, role permissions and the LDAP, Azure AD, session and logo settings write one
+event for every answer: `success`, `denied` (a non-admin, reason `admin_only`) or `failed`, with the answer's code
+as the reason (`not_found`, `invalid_id`, `weak_password`, …), so a refused or broken change is in the log too.
+Opening an object's YAML is a read (`pod.get`, `deployment.get`, `configmap.get`, …). A request refused because the
+account must still change its password is `denied`.
+
 What is not audited: lists the UI fetches on its own (the Dashboard's 10-second refresh, and the namespace list behind
 the command palette and the role editor; they send `X-OpenConsole-Refresh: auto`, which is ignored with an API key, so
 every read with a key is audited); calls that read no cluster resource (`/api/auth/me`, `/api/features`, …). The request log on stdout still has every request.

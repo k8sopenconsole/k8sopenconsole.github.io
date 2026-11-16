@@ -11,8 +11,10 @@ döndüğü ya da logladığı metindir. Log satırları `kubectl -n kubernetes-
 
 ## Cluster eklenemiyor {#adding-a-cluster-fails}
 
-**Cluster'ı kaydet** şu cevabı veriyor: `cluster validation failed: cannot list namespaces with these credentials: …`.
-Mesajın sonu sebebi söyler:
+**Cluster'ı kaydet** *The cluster refused the credentials or could not be reached.* (Türkçe arayüzde: "Cluster kimlik
+bilgilerini reddetti ya da cluster'a ulaşılamadı.") cevabını, sebebi parantez içinde vererek döner:
+`(cannot list namespaces with these credentials: …)` (API bu `detail` ile `400` `cluster_invalid` döner). Mesajın
+sonu sebebi söyler:
 
 | Mesajın sonu | Sebep | Çözüm |
 |---|---|---|
@@ -33,19 +35,20 @@ reddetti.* ya da *OpenConsole'un bu cluster'daki hesabı bunu okuyamıyor (Clust
 ```
 
 Bir de kaynağı, cluster'ı ve request id'yi yazan `cluster read failed` satırları var. İstekler `502`
-`{"error":"cluster_unreachable"}` ya da `403` `{"error":"cluster_forbidden"}` dönüyor.
+`cluster_unreachable` ya da `403` `cluster_forbidden` dönüyor (gövdenin `error` alanı).
 
 OpenConsole'un o cluster için tuttuğu kimlik bilgileri artık çalışmıyor: token yenilendi ya da ServiceAccount'u
 silindi (`Unauthorized`), veya ClusterRole ya da binding'i değişti (`forbidden`). `Unauthorized` durumunda cluster'ın
 bağlantı gauge'u `0` gösterir ([Metrikler](/operations/metrics#what-to-watch)) ve üst bardan cluster'ı seçmek
-`cannot connect to cluster: Unauthorized` ile başarısız olur. Kimliği düzeltin, sonra **Yönetim → Cluster'lar →
+*The cluster cannot be reached, or it refused OpenConsole's credentials. (cannot connect to cluster: Unauthorized)*
+(Türkçe arayüzde: "Cluster'a ulaşılamıyor ya da OpenConsole'un kimlik bilgilerini reddetti.") ile başarısız olur. Kimliği düzeltin, sonra **Yönetim → Cluster'lar →
 Düzenle**'de **Credential'ları değiştir**'i işaretleyip token'ı ve CA'yı yapıştırın
 ([Token'ı yenileme](/installation/connect-cluster#rotate-the-token)). Cluster hemen yeniden çalışır; restart gerekmez.
 
-Tek bir sekmede (ör. Ingress'ler) yalnızca `403` `{"error":"cluster_forbidden"}` geliyorsa, eksik olan yalnızca o
+Tek bir sekmede (ör. Ingress'ler) yalnızca `403` `cluster_forbidden` geliyorsa, eksik olan yalnızca o
 kuraldır ([Kubernetes izinleri](/reference/kubernetes-permissions)); diğer sekmeler ve gauge etkilenmez. Çok yavaş
-cevap veren bir cluster `504` `{"error":"cluster_timeout"}` verir. ClusterRole'ün izin
-vermediği bir yazma işlemi API server'ın mesajıyla 403 döner, ör.
+cevap veren bir cluster `504` `cluster_timeout` verir. ClusterRole'ün izin
+vermediği bir yazma işlemi, API server'ın mesajını `detail` olarak taşıyan `403` `cluster_forbidden` döner, ör.
 `restart failed: deployments.apps "web" is forbidden: …` (salt görüntüleme ClusterRole'ü, ya da `patch` / `update`
 verb'ü kaldırılmış).
 
@@ -83,13 +86,22 @@ Daha fazlası: [Prometheus](/administration/prometheus).
 | Belirti | Nereye bakmalı |
 |---|---|
 | `Login failed. Please check your credentials.` (Türkçe arayüzde: "Giriş başarısız. Lütfen bilgilerini kontrol et.") | Yönetim → Denetim Logları, aksiyon `user.login`, sonuç `failed`. Sebep hangisi olduğunu söyler: `bad_password` (yanlış parola; dizin bind'i başarısız olan bir LDAP hesabı da), `unknown_user` (böyle bir hesap yok ya da deaktive), `azure_account` (bir Azure AD hesabı parola girdi: **Microsoft ile giriş yap**'ı kullanın). Local bir hesap asla dizin parolasıyla giriş yapmaz: hesabının kaynağı *Local* görünen bir LDAP kullanıcısı `bad_password` alır ([LDAP](/administration/ldap#signing-in)) |
-| 5 denemeden sonra aynı mesaj ve `/api/auth/login`'den `Retry-After` ile `429` | o kullanıcı adı o adresten 5 dakika kilitli; `user.login` `locked` (`too_many_failures`) olarak audit'e yazılır; herhangi adreslerden 20 başarısız denemeden sonra ad her yerden 5 dakika kilitlenir. Bekleyin ya da başka bir makineden giriş yapın |
+| 5 denemeden sonra aynı mesaj ve `/api/auth/login`'den `Retry-After` ile `429` `rate_limited` | o kullanıcı adı o adresten 5 dakika kilitli; `user.login` `locked` (`too_many_failures`) olarak audit'e yazılır; herhangi adreslerden 20 başarısız denemeden sonra ad her yerden 5 dakika kilitlenir. Bekleyin ya da başka bir makineden giriş yapın |
 | herkesin girişleri ve oturumları aynı adresi (Ingress pod'unun adresini) gösteriyor, bir kişinin yanlış denemeleri başkalarını kilitliyor | `TRUSTED_PROXIES` Ingress'inizi kapsamıyor, bu yüzden `X-Forwarded-For` okunmuyor: onu Ingress controller'ın pod ağına ayarlayın ([Ortam değişkenleri](/reference/environment-variables)) |
-| **Microsoft ile giriş yap** `this account can't sign in with this Microsoft account` cevabını veriyor | `user.login` `failed`, sebep `not_azure_account` (bu ada sahip local ya da LDAP hesabı var), `azure_oid_mismatch` (hesap başka bir Entra kullanıcısına ait, örn. silinip yeniden oluşturulmuş biri) ya da `azure_no_oid` ([Azure AD](/administration/azure-ad#how-the-account-is-found)) |
+| **Microsoft ile giriş yap** `this account can't sign in with this Microsoft account` detail'iyle `403` `sign_in_failed` cevabını veriyor | `user.login` `failed`, sebep `not_azure_account` (bu ada sahip local ya da LDAP hesabı var), `azure_oid_mismatch` (hesap başka bir Entra kullanıcısına ait, örn. silinip yeniden oluşturulmuş biri) ya da `azure_no_oid` ([Azure AD](/administration/azure-ad#how-the-account-is-found)) |
 | `Your session has ended. Please sign in again.` (Türkçe arayüzde: "Oturumun sona erdi. Lütfen tekrar giriş yap.") | hareketsizlik süresi boyunca hiçbir hareket olmadı (Yönetim → Oturumlar, varsayılan 60 dakika), girişin üstünden 12 saat geçti ya da bir yönetici iptal etti |
 
-Denetim sebebi, bir LDAP bind'inin neden başarısız olduğunu söylemez. Dizini **Yönetim → LDAP → Bağlantıyı test et**
-ile test edin; cevap dizin client'ının mesajıdır, örneğin:
+Denetim sebebi, bir LDAP bind'inin neden başarısız olduğunu söylemez; pod logu söyler. Başarısız her LDAP girişi
+(hesabı oluşturacak olan ilk giriş de) kullanıcı adını, dizinin mesajını (`error`) ve girişin request id'sini içeren bir
+`ldap sign-in failed` satırı yazar: yanlış parola için (`LDAP Result Code 49 "Invalid Credentials"`) seviye `INFO`,
+diğer her şey için `WARN`:
+
+```text
+level=WARN msg="ldap sign-in failed" service=openconsole version=dev user=ghost error="LDAP Result Code 200 \"Network Error\": dial tcp 127.0.0.1:1: connect: connection refused" request_id=_Ehr0EXS3V9EnInT
+```
+
+Kimse giriş yapmadan dizini denemek için **Yönetim → LDAP → Bağlantıyı test et**'i kullanın; başarısız olursa
+*Bağlantı testi başarısız oldu.* der ve aynı client mesajını parantez içinde gösterir, örneğin:
 
 ```text
 LDAP Result Code 200 "Network Error": dial tcp 127.0.0.1:389: connect: connection refused
@@ -103,7 +115,7 @@ sertifika hatası TLS ayarlarıdır.
 
 | Belirti | Sebep | Çözüm |
 |---|---|---|
-| shell hemen `Connection error.` (Türkçe arayüzde: "Bağlantı hatası.") ya da `Session closed (1006).` (Türkçe arayüzde: "Oturum kapandı (1006).") diyor; logda `GET /ws/namespaces/…/exec 400` var, cevap `{"error":"a WebSocket upgrade is required"}` | proxy `Upgrade` / `Connection` header'larını düşürüyor | WebSocket'leri geçirin (ingress-nginx, Traefik ve Gateway API varsayılan olarak geçirir; elle yazılmış bir nginx için `proxy_http_version 1.1` ve iki header da gerekir) |
+| shell hemen `Connection error.` (Türkçe arayüzde: "Bağlantı hatası.") ya da `Session closed (1006).` (Türkçe arayüzde: "Oturum kapandı (1006).") diyor; logda `GET /ws/namespaces/…/exec 400` var, cevap `a WebSocket upgrade is required` detail'iyle `400` `invalid_input` | proxy `Upgrade` / `Connection` header'larını düşürüyor | WebSocket'leri geçirin (ingress-nginx, Traefik ve Gateway API varsayılan olarak geçirir; elle yazılmış bir nginx için `proxy_http_version 1.1` ve iki header da gerekir) |
 | sessiz bir shell yaklaşık bir dakika sonra `Session closed (1006).` ("Oturum kapandı (1006).") ile kapanıyor; sessiz bir log akışı `Connection dropped; reconnecting…` (Türkçe arayüzde: "Bağlantı koptu; yeniden bağlanıyor…") gösteriyor | proxy'nin idle timeout'u, ve proxy WebSocket ping'lerini trafik saymıyor (OpenConsole her açık shell, log ve Canlı olaylar soketine 25 saniyede bir ping atar) | proxy'nin idle timeout'unu `EXEC_IDLE_TIMEOUT`'un (5 dakika) üstüne çıkarın ([TLS'li Ingress](/installation/kubernetes#ingress-with-tls)) |
 | `You already have 3 shells open, the most allowed. Close one and try again.` (Türkçe arayüzde: "Zaten 3 açık shell'in var, izin verilen en fazla bu. Birini kapatıp tekrar dene.") | `MAX_EXEC_SESSIONS_PER_USER` (3) kadar açık shell var; `pod.exec` `rate_limited` (`max_sessions`) olarak audit'e yazılır | birini kapatın ya da limiti yükseltin |
 | `Too many log streams; try again shortly.` (Türkçe arayüzde: "Çok fazla log akışı; birazdan tekrar deneyin.") | kullanıcı başına log akışı limiti | ihtiyacınız olmayan log görüntüleyicileri kapatın |
@@ -127,29 +139,68 @@ Pod yeniden başlıyor (`CrashLoopBackOff`) ve logu bir `ERROR` satırıyla biti
 
 ## Hata cevapları {#error-answers}
 
-Her hata cevabı JSON'dır: `{"error": "<reason or message>"}`. `401`'in gövdesi yoktur: oturum ya da API anahtarı
-eksik, süresi dolmuş ya da iptal edilmiş. Web arayüzü aşağıdaki sebep kodlarını
-kendi dilinizde bir cümle olarak gösterir (örneğin `admin_only` için *Bunu yalnız yöneticiler yapabilir.*); diğer
-mesajları sunucunun yazdığı gibi gösterir.
+API'nin her hata cevabı, `401` ve `429` dahil, problem details biçiminde (RFC 9457) JSON'dır; `Content-Type:
+application/problem+json`:
+
+```json
+{"type":"about:blank","title":"Forbidden","status":403,"error":"admin_only"}
+```
+
+`error` her zaman aşağıdaki sebep kodlarından biridir; `detail` varsa alanı, nesneyi ya da cluster'ın veya dizinin
+mesajını söyleyen İngilizce bir metindir. Web arayüzü kodu kendi dilinizde bir cümle olarak, detail'i parantez içinde
+gösterir; örneğin *Yeni parola, parola politikasına uymuyor. (password must be at least 8 characters)*. Bu sayfada
+kodu ya da detail'i arayın. Bilinmeyen bir `/api/…` ya da `/ws/…` yolu `404` `not_found`, bilinen bir yola yanlış
+metotla gelen istek `Allow` header'ıyla `405` `method_not_allowed` cevabı alır.
+
+| `error` | Durum | Anlamı |
+|---|---|---|
+| `unauthorized` | 401 | giriş yapılmamış, ya da oturum veya API anahtarı artık geçerli değil (bilinmiyor, çıkış yapılmış, sahibi deaktive) |
+| `api_key_expired` / `api_key_revoked` | 401 | API anahtarının süresi doldu / anahtar iptal edildi |
+| `password_change_required` | 403 | hesabın önce parolasını değiştirmesi gerekiyor |
+| `forbidden`, `admin_only`, `feature_disabled`, `api_key_not_allowed`, `api_access_policy`, `api_access_off`, `backup_download_disabled` | 403 | OpenConsole reddetti; bkz. [403 sebepleri](#403-reasons) |
+| `rate_limited` | 429 | çok fazla istek; `Retry-After` kadar bekleyin ([Limitler](/api/limits)) |
+| `too_many_sessions` | 429 | bu kullanıcı için aynı anda çok fazla açık shell |
+| `not_found` | 404 | nesne ya da yol yok |
+| `method_not_allowed` | 405 | yol var, bu metotla değil (`Allow` metotları listeler) |
+| `invalid_id` | 400 | yoldaki bir id sayı değil |
+| `invalid_body` | 400 | gövde yok ya da beklenen biçimde JSON değil |
+| `invalid_input` | 400 | bir değer kabul edilmedi; hangisi olduğunu `detail` söyler |
+| `body_too_large` | 413 | gövde 1 MiB'tan büyük (YAML apply için 4 MiB) |
+| `conflict` | 409 | değişiklik mevcut durumla çakışıyor (var olan bir ad, iptal edilmiş bir anahtar, hâlâ süren bir kayıt, eskimiş bir `resourceVersion`) |
+| `wrong_password` / `weak_password` / `password_unchanged` | 400 | mevcut parola yanlış / yeni parola politikaya uymuyor (nedenini `detail` söyler) / yeni parola mevcut parolayla aynı |
+| `cannot_delete_self` | 409 | kendi hesabınızı silmek |
+| `kubeconfig_unsupported` | 400 | kubeconfig bir program çalıştırıyor ya da dosya okuyor; bkz. [Diğer cevaplar](#other-answers) |
+| `cluster_invalid` | 400, 502 | cluster kaydedilirken ya da aktive edilirken kimlik bilgileri reddedildi ya da API server'ına ulaşılamadı; bkz. [Cluster eklenemiyor](#adding-a-cluster-fails) |
+| `cluster_forbidden`, `cluster_unreachable`, `cluster_timeout`, `not_connected` | 403, 502, 504, 503 | isteği OpenConsole'un izinleri değil, cluster başarısız etti; bkz. [Bir cluster liste yerine hata gösteriyor](#a-cluster-shows-empty-lists-or-503) |
+| `cluster_error` | API server'ın durumu | cluster başka bir hatayla cevap verdi (bir değişikliği reddetti, sunucu hatası); mesajı `detail`'dedir |
+| `pod_not_found` / `container_not_found` | 404 / 400 | (artık) var olmayan bir pod için log ya da komut / pod'da olmayan bir container |
+| `not_ready` / `previous_unavailable` | 400 | container henüz çalışmıyor / önceki logu yok (restart olmadı ya da hiç çalışmadı) |
+| `unavailable` | 502 | cluster logu ya da komutu sunamadı; tekrar deneyin |
+| `exec_failed` | 502 | komut container'da başlatılamadı (böyle bir program yok) |
+| `connection_failed` | 400 | bir LDAP / Azure AD **Bağlantıyı test et** ya da LDAP araması başarısız oldu; dizinin mesajı `detail`'dedir |
+| `not_configured` | 400, 503 | bu sunucuda ayarlanmamış (Azure AD, yedekler) |
+| `sign_in_failed` | 400, 401, 403, 502 | Microsoft girişi başarısız oldu ya da bu hesaba uymuyor; bkz. [Giriş yapılamıyor](#sign-in-fails) |
+| `recording_unavailable` | 503 | kaydedilmesi gereken bir shell (API anahtarı) şu an kaydedilemiyor ([Kayıtlar](/administration/recordings)) |
+| `internal_error` | 500 | OpenConsole hata verdi; sebep, cevabın `X-Request-Id`'siyle pod logundadır |
 
 ### 403 sebepleri {#403-reasons}
 
-| `error` | Anlamı | Kaynak (v2.23.0) |
+| `error` | Anlamı | Kaynak |
 |---|---|---|
-| `forbidden` | burada (namespace, cluster) bu aksiyon için izin yok | [audit_events.go#L91](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L91), [router.go#L2642-L2651](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L2642-L2651) |
-| `api_access_policy` | API anahtarıyla: sahibinin izni var ve anahtar onu listeliyor, ama yöneticinin API erişim politikası anahtarlara bunu vermiyor | [audit_events.go#L95-L97](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L95-L97), [router.go#L2612-L2629](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L2612-L2629) |
-| `api_access_off` | API anahtarıyla: politika bu kullanıcı için API erişimini kapatıyor | [audit_events.go#L98-L99](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L98-L99), [apikeys.go#L205-L208](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L205-L208) |
-| `api_key_not_allowed` | bir API anahtarı bunu hiçbir zaman yapamaz (anahtar yönetmek, parola değiştirmek, cluster seçmek, görünüm kaydetmek) | [apikeys.go#L51](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L51), [apikeys.go#L244-L252](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L244-L252) |
-| `feature_disabled` | operatör bu yeteneği kapattı (`FEATURE_*=false`) | [audit_events.go#L92](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L92), [router.go#L2637-L2640](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L2637-L2640) |
-| `admin_only` | bir yönetim ekranı ya da ucu; API anahtarıyla: Admin API kapsamı olmayan bir anahtar | [audit_events.go#L93](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L93), [router.go#L598-L605](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L598-L605) |
-| `change your password first` | ilk parolasını hâlâ değiştirmesi gereken bir hesabın API anahtarı ya da API anahtarları sayfası (böyle bir hesap diğer ekranlarda `forbidden` alır) | [apikeys.go#L196-L199](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L196-L199), [apikeys.go#L431-L432](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L431-L432) |
-| `backup_download_disabled` | yedek indirme kapalı (`BACKUP_ALLOW_DOWNLOAD` `true` değil) | [backups.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/backups.go) |
-| `you have no permissions on this cluster` | hiçbir izninizin kapsamadığı bir cluster'ı seçmek | [cluster_ctx.go#L172](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/cluster_ctx.go#L172) |
-| `only the owner can change this view` | başkasının paylaşılan görünümünü düzenlemek | [views.go#L161](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/views.go#L161) |
-| `user is disabled` | deaktive edilmiş bir hesap için Azure AD girişi | [router.go#L989-L991](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L989-L991) |
-| `this account can't sign in with this Microsoft account` | local ya da LDAP hesabı için, ya da başka bir Entra kullanıcısının ilk giriş yaptığı bir hesap için Azure AD girişi ([Giriş yapılamıyor](#sign-in-fails) bölümüne bakın) | [router.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/router.go) |
-| `cluster_forbidden` (*OpenConsole'un bu cluster'daki hesabı bunu okuyamıyor*) | Kubernetes sizi değil, OpenConsole'un kimliğini reddetti | [kube_errors.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/kube_errors.go) |
-| `restart failed: …` / `scale failed: …` / API server'ın mesajı | Kubernetes bir yazma işlemini reddetti (o verb'ü içermeyen ClusterRole) | [deployment_actions.go#L160-L164](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/deployment_actions.go#L160-L164), [yaml_apply.go#L111](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/yaml_apply.go#L111) |
+| `forbidden` | burada (namespace, cluster) bu aksiyon için izin yok | [audit_events.go#L93](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/audit_events.go#L93), [access.go#L116-L140](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/access.go#L116-L140) |
+| `api_access_policy` | API anahtarıyla: sahibinin izni var ve anahtar onu listeliyor, ama yöneticinin API erişim politikası anahtarlara bunu vermiyor | [audit_events.go#L97-L99](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/audit_events.go#L97-L99), [access.go#L97-L114](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/access.go#L97-L114) |
+| `api_access_off` | API anahtarıyla: politika bu kullanıcı için API erişimini kapatıyor | [audit_events.go#L100-L101](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/audit_events.go#L100-L101), [apikeys.go#L207-L209](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/apikeys.go#L207-L209) |
+| `api_key_not_allowed` | bir API anahtarı bunu hiçbir zaman yapamaz (anahtar yönetmek, parola değiştirmek, cluster seçmek, görünüm kaydetmek) | [apikeys.go#L52](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/apikeys.go#L52), [apikeys.go#L243-L253](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/apikeys.go#L243-L253) |
+| `feature_disabled` | operatör bu yeteneği kapattı (`FEATURE_*=false`) | [audit_events.go#L94](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/audit_events.go#L94), [access.go#L122-L126](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/access.go#L122-L126) |
+| `admin_only` | bir yönetim ekranı ya da ucu; API anahtarıyla: Admin API kapsamı olmayan bir anahtar | [audit_events.go#L95](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/audit_events.go#L95), [access.go#L21-L43](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/access.go#L21-L43) |
+| `password_change_required` | ilk parolasını hâlâ değiştirmesi gereken bir hesabın API anahtarı ya da API anahtarları sayfası (böyle bir hesap diğer ekranlarda `forbidden` alır) | [apikeys.go#L197-L200](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/apikeys.go#L197-L200), [apikeys.go#L422-L423](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/apikeys.go#L422-L423) |
+| `backup_download_disabled` | yedek indirme kapalı (`BACKUP_ALLOW_DOWNLOAD` `true` değil) | [backups.go#L86-L88](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/backups.go#L86-L88) |
+| `forbidden`, detail `you have no permissions on this cluster` | hiçbir izninizin kapsamadığı bir cluster'ı seçmek | [cluster_ctx.go#L191](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/cluster_ctx.go#L191) |
+| `forbidden`, detail `only the owner can change this view` | başkasının paylaşılan görünümünü düzenlemek | [views.go#L162](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/views.go#L162) |
+| `sign_in_failed`, detail `user is disabled` | deaktive edilmiş bir hesap için Azure AD girişi | [auth_handlers.go#L469](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/auth_handlers.go#L469) |
+| `sign_in_failed`, detail `this account can't sign in with this Microsoft account` | local ya da LDAP hesabı için, ya da başka bir Entra kullanıcısının ilk giriş yaptığı bir hesap için Azure AD girişi ([Giriş yapılamıyor](#sign-in-fails) bölümüne bakın) | [auth_handlers.go#L424](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/auth_handlers.go#L424), [auth_handlers.go#L479](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/auth_handlers.go#L479) |
+| `cluster_forbidden` (*OpenConsole'un bu cluster'daki hesabı bunu okuyamıyor*) | Kubernetes sizi değil, OpenConsole'un kimliğini reddetti | [kube_errors.go#L28-L48](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/kube_errors.go#L28-L48) |
+| `cluster_forbidden`, detail `restart failed: …` / `scale failed: …` / API server'ın mesajı | Kubernetes bir yazma işlemini reddetti (o verb'ü içermeyen ClusterRole) | [deployment_actions.go#L155-L163](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/deployment_actions.go#L155-L163), [yaml_apply.go#L113](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/yaml_apply.go#L113), [kube_errors.go#L74-L90](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/kube_errors.go#L74-L90) |
 
 İlk altısı aynı zamanda `denied` denetim olayının `reason`'ıdır. API anahtarları ve agent'lar için ayrıca
 [API'ye genel bakış](/api/overview) sayfasına bakın.
@@ -158,14 +209,15 @@ mesajları sunucunun yazdığı gibi gösterir.
 
 | Cevap | Anlamı |
 |---|---|
-| `400` / `403` `cluster "<name>" is unknown or not yours to use` | `X-OpenConsole-Cluster` header'ı var olmayan (`400`) ya da anahtarın veya kullanıcının kapsamadığı (`403`, `cluster.use` ya da `api_key.use` `denied` olarak audit'e yazılır) bir cluster'ı gösteriyor. Tarayıcıda: bu sekmenin çalıştığı cluster silindi ya da üzerindeki izinleriniz kaldırıldı; sayfayı yenileyin |
+| `400` `invalid_input` / `403` `forbidden`, detail `cluster "<name>" is unknown or not yours to use` | `X-OpenConsole-Cluster` header'ı var olmayan (`400`) ya da anahtarın veya kullanıcının kapsamadığı (`403`, `cluster.use` ya da `api_key.use` `denied` olarak audit'e yazılır) bir cluster'ı gösteriyor. Tarayıcıda: bu sekmenin çalıştığı cluster silindi ya da üzerindeki izinleriniz kaldırıldı; sayfayı yenileyin |
 | `403` `cluster_forbidden`, `502` `cluster_unreachable`, `503` `not_connected`, `504` `cluster_timeout` | okumayı OpenConsole'un izinleri değil, cluster başarısız etti; bkz. [Bir cluster liste yerine hata gösteriyor](#a-cluster-shows-empty-lists-or-503) |
-| API anahtarıyla `429` (gövdesiz) | o anahtar için saniyede 10'dan fazla istek (30'luk patlamalar) |
-| `429` `too many open shells (limit 3 per user); close one first` | shell limiti; tarayıcı olmayan bir client'tan |
-| `400` `kubeconfig_unsupported: user "…" uses exec; …` | kubeconfig bir program çalıştırıyor ya da dosya okuyor (exec plugin, `auth-provider`, `tokenFile`, sertifika ya da anahtar yolu): satır içi kimlik bilgisi olan bir kubeconfig kullanın ([Cluster bağlama](/installation/connect-cluster)). Daha önce böyle bir kubeconfig ile kaydedilmiş cluster bağlanmaz: listeleri *Cluster bağlı değil.* der (`503` `not_connected`), pod logunda bir kez `cluster not connected: its kubeconfig runs a program or reads a file` olur; **Yönetim → Cluster'lar → Düzenle**'den satır içi bir kubeconfig yükleyin |
-| `409` `a revoked key can't be regenerated; create a new one` | iptal edilmiş bir API anahtarını yeniden üretmek; yalnızca süresi dolmuş anahtar yeniden üretilebilir |
-| `413` `request body too large` | gövde 1 MiB'tan büyük (YAML apply için 4 MiB) |
-| `400` `username is required` | `username` olmadan `PUT /api/admin/users/{id}`: her güncellemede kullanıcının adını gönderin |
-| restart, ölçekleme, YAML apply ya da bir Secret isteğinden `404`, `409`, `400` ya da `504` | Kubernetes NotFound, Conflict (ör. eskimiş bir `resourceVersion`), Invalid ya da Timeout cevabı verdi; OpenConsole aynı status'u iletir, böylece bir proxy 4xx'i 5xx ile sarmaz. `failed` denetim olayında neden (`not_found`, `conflict`, `invalid`) ve `error` yer alır |
-| `400` `unknown group or role id` / `unknown user or group id`, `404` `role not found` | istekteki bir grup, rol ya da kullanıcı id'si yok (bu arada silinmiş); hiçbir şey değişmedi |
+| API anahtarıyla `429` `rate_limited` | o anahtar için saniyede 10'dan fazla istek (30'luk patlamalar); cevapta `Retry-After: 1` vardır |
+| `429` `too_many_sessions`, detail `too many open shells (limit 3 per user); close one first` | shell limiti; tarayıcı olmayan bir client'tan |
+| `400` `kubeconfig_unsupported`, detail `user "…" uses exec; …` | kubeconfig bir program çalıştırıyor ya da dosya okuyor (exec plugin, `auth-provider`, `tokenFile`, sertifika ya da anahtar yolu): satır içi kimlik bilgisi olan bir kubeconfig kullanın ([Cluster bağlama](/installation/connect-cluster)). Daha önce böyle bir kubeconfig ile kaydedilmiş cluster bağlanmaz: listeleri *Cluster bağlı değil.* der (`503` `not_connected`), pod logunda bir kez `cluster not connected: its kubeconfig runs a program or reads a file` olur; **Yönetim → Cluster'lar → Düzenle**'den satır içi bir kubeconfig yükleyin |
+| `409` `conflict`, detail `a revoked key can't be regenerated; create a new one` | iptal edilmiş bir API anahtarını yeniden üretmek; yalnızca süresi dolmuş anahtar yeniden üretilebilir |
+| `413` `body_too_large` | gövde 1 MiB'tan büyük (YAML apply için 4 MiB) |
+| `400` `invalid_input`, detail `username is required` | `username` olmadan `PUT /api/admin/users/{id}`: her güncellemede kullanıcının adını gönderin |
+| restart, ölçekleme, YAML apply ya da bir Secret isteğinden `404` `not_found`, `409` `conflict`, `400` `invalid_input` ya da `504` `cluster_timeout` | Kubernetes NotFound, Conflict (ör. eskimiş bir `resourceVersion`), Invalid ya da Timeout cevabı verdi; OpenConsole aynı status'u iletir, böylece bir proxy 4xx'i 5xx ile sarmaz, ve API server'ın mesajını `detail`'e koyar. `failed` denetim olayında neden (`not_found`, `conflict`, `invalid`) ve `error` yer alır |
+| `400` `invalid_input`, detail `unknown group or role id` / `unknown user or group id`; `404` `not_found`, detail `role not found` | istekteki bir grup, rol ya da kullanıcı id'si yok (bu arada silinmiş); hiçbir şey değişmedi |
+| var olmasını beklediğiniz bir yol için `404` `not_found` | yol yanlış, sunucu okuduğunuz sayfadan eski, ya da uç kaldırıldı: `GET` / `POST` / `PUT /api/admin/cluster` ve `POST /api/admin/cluster/validate` (tek cluster dönemi) artık yok, `/api/admin/clusters`'ı kullanın |
 | `/readyz`'den `503`: `db not reachable` | veritabanı dosyası açılamıyor: volume'u kontrol edin ([Sağlık probe'ları](/operations/health-probes)) |
