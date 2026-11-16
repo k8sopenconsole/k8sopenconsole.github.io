@@ -25,6 +25,8 @@ node screenshots/record.mjs logs && node screenshots/shoot.mjs logs
 - A scene's `run()` clicks in English; `shoot.mjs` switches the language at the end. Wait only for things that are in
   the recording.
 - `shoot.mjs` warns about API requests without a recording: record that scene again.
+- A change that touches every screen by a few pixels only (the product name in the header, 2.23.1) stays under the
+  0.5 % threshold: shoot with `MIN_CHANGE=0` so every image is rewritten, then check one header.
 - Same fixtures → same files. Each scene gets a fresh Chrome (text rendering depends on what the browser drew
   before), and an image is rewritten only when more than 0.5 % of its pixels changed: a few screens draw a handful
   of pixels differently from run to run (asynchronous UI timing). `MIN_CHANGE=0` rewrites everything; a scene whose
