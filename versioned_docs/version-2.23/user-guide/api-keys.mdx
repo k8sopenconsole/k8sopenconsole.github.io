@@ -47,8 +47,8 @@ Shells and commands run with a key are always recorded. Every call is audited wi
 From the **⋯** menu of a key:
 
 - **Edit**: name, note, scope, permissions (the secret and expiry stay).
-- **Regenerate**: a new secret and a new expiry; the old secret stops working at once. It also revives a revoked or
-  expired key.
+- **Regenerate**: a new secret and a new expiry; the old secret stops working at once. It also revives an expired
+  key. A revoked key stays revoked (the menu doesn't offer it): create a new one.
 - **Revoke**: stops it for good. **Delete** removes it from the list.
 
 How to use a key from `curl` or an agent: **Documentation** tab on the same page, and [API and agents](/api/overview).

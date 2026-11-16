@@ -26,7 +26,7 @@ k3s, metrics-server ile birlikte gelir; CPU ve bellek bir dakika sonra görünü
 
 ```bash
 kubectl --context k3d-openconsole-demo apply -k \
-  'https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.0'
+  'https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.1'
 kubectl --context k3d-openconsole-demo -n kubernetes-openconsole \
   rollout status deploy/kubernetes-openconsole --timeout=5m
 ```
@@ -41,7 +41,7 @@ dışındaki her kurulumda sürümü sabitlemelisiniz.
 
 ```bash
 kubectl --context k3d-openconsole-demo apply -f \
-  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/hack/k3d/crashlab.yaml
+  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/hack/k3d/crashlab.yaml
 ```
 
 `crashlab` namespace'i: sağlıklı Deployment'lar, StatefulSet'ler ve bir DaemonSet; yanlarında OOMKilled olan, crash
@@ -55,7 +55,7 @@ kubectl --context k3d-openconsole-demo -n kubernetes-openconsole \
   port-forward svc/kubernetes-openconsole 8080:80
 ```
 
-http://localhost:8080 adresini açın, `admin` / `admin` ile giriş yapın ve yeni bir şifre seçin.
+http://localhost:8080 adresini açın, `admin` / `admin` ile giriş yapın ve yeni bir parola seçin.
 
 ## 5. Cluster'ı bağlayın {#5-connect-the-cluster}
 

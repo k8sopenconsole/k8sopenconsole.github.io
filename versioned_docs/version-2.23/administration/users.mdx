@@ -43,7 +43,8 @@ namespaces. A local user is not forced to change the password you set; tell them
 - **Edit** (pencil): active, admin, groups, and the user's [API access](/administration/api-access-policy).
 - **Reset password** (key icon, local accounts only): sets a new password, by default to be changed at the next sign-in,
   and signs the user out everywhere (`user.reset_password`).
-- **Disable** (untick *Active*): refused on the next request, sessions included. Prefer it to deleting.
+- **Disable** (untick *Active*): their sessions are revoked at once, and every request is refused, API keys
+  included; no new shell or log stream opens (one already open runs until it closes). Prefer it to deleting.
 - **Delete** (bin): removes the account and its memberships; the audit log keeps what it did.
 - The last active admin can't be disabled, demoted or deleted.
 

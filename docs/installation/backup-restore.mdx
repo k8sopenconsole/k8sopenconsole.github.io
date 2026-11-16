@@ -3,6 +3,8 @@ title: "Backup and restore"
 description: "Back up the SQLite volume, keep the backup safe, and restore it in place or into a new namespace."
 ---
 
+import Screenshot from '@site/src/components/Screenshot';
+
 # Backup and restore
 
 Everything OpenConsole stores is on one volume, mounted at `/data`:
@@ -20,10 +22,10 @@ the key is in the same file, so anyone with a copy can read them. Recordings may
 shell. Store backups encrypted, with access as tight as the clusters themselves.
 :::
 
-## Automatic backups {#automatic-backups}
+## Automatic backups {/* #automatic-backups */}
 
 OpenConsole copies its database into `/data/backups` with SQLite's `VACUUM INTO`, a consistent copy made while it
-keeps running ([backup.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/backup/backup.go)):
+keeps running ([backup.go](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.1/backend/internal/backup/backup.go)):
 
 - every `BACKUP_INTERVAL` (default `24h`; `0` turns the schedule off), counted from the newest copy, so a restart
   neither skips nor repeats one;
@@ -34,10 +36,12 @@ The newest `BACKUP_KEEP` copies (default `7`, all kinds together) are kept; the 
 readable by the server's user only. Recordings are not in them. Each copy, scheduled ones too, is a `backup.create`
 audit event. **Admin → Backups** lists them with size and time and warns while the key is in the database.
 
+<Screenshot id="admin-backups" alt="Admin → Backups: the schedule (a backup every 24 hours, the newest 7 kept in /data/backups), the warning that the encryption key is in the database, Back up now, and the copies with their time and size" />
+
 These copies are on the same volume: they help after a bad upgrade or a mistake, not when the volume is lost. Copy
 them somewhere else.
 
-### Downloading backups {#downloading-backups}
+### Downloading backups {/* #downloading-backups */}
 
 Downloading is off by default. It is turned on with `BACKUP_ALLOW_DOWNLOAD=true` on the Deployment, not in the UI,
 so an admin account alone (or a stolen admin session) can't turn it on: whoever may change the Deployment can read
@@ -50,7 +54,7 @@ kubectl -n kubernetes-openconsole set env deploy/kubernetes-openconsole BACKUP_A
 While it is on, every admin can download every copy, older ones included. Each download is a `backup.download`
 audit event, and so is a refused one (`denied`, `backup_download_disabled`). An API key never downloads a backup.
 
-## Copy a backup off the volume {#copy-a-backup-off-the-volume}
+## Copy a backup off the volume {/* #copy-a-backup-off-the-volume */}
 
 - **In the browser**: Admin → Backups → the download icon, when `BACKUP_ALLOW_DOWNLOAD=true`.
 - **With kubectl, without stopping the console.** The image has no shell, so attach a short-lived debug container
@@ -70,7 +74,7 @@ sqlite3 app-20261115-020000.db 'PRAGMA integrity_check'   # ok
   copy works anyway. `sqlite3` runs on your machine, not in the pod.
 - **A volume snapshot** (CSI `VolumeSnapshot`) of the PVC, if your storage supports it.
 
-## Back up the whole volume {#back-up}
+## Back up the whole volume {/* #back-up */}
 
 To copy everything, recordings included, stop the app for a moment and read the volume from a short-lived helper
 pod. The console is unavailable for about a minute.
@@ -98,7 +102,7 @@ kubectl -n $NS scale deploy/kubernetes-openconsole --replicas=1
 A volume snapshot (CSI `VolumeSnapshot`) of the PVC is an alternative if your storage supports it; take it while the
 Deployment is scaled to 0, as above.
 
-## Restore {#restore}
+## Restore {/* #restore */}
 
 Restoring replaces everything on the volume with the backup. It works into the same installation (lost or broken
 volume) or into a new one (another namespace or cluster).
@@ -138,7 +142,7 @@ A backup from an older release can be restored into a newer one: the newer versi
 If the restored installation reaches the clusters with tokens that were [rotated](/installation/connect-cluster#rotate-the-token)
 after the backup, replace them in Admin → Clusters.
 
-### Restore one database copy {#restore-one-database-copy}
+### Restore one database copy {/* #restore-one-database-copy */}
 
 A copy from `/data/backups` (for example the pre-upgrade one) or one you copied off replaces only the database;
 recordings stay as they are:
@@ -167,11 +171,11 @@ kubectl -n $NS rollout status deploy/kubernetes-openconsole --timeout=5m
 
 A copy made after the key was moved out of the database needs the same `ENCRYPTION_KEY_FILE`.
 
-## Keep the encryption key out of the database {#keep-the-encryption-key-out-of-the-database}
+## Keep the encryption key out of the database {/* #keep-the-encryption-key-out-of-the-database */}
 
 By default the key that encrypts the stored credentials is in the database itself. Keep it in a Kubernetes Secret
 instead, so that a copy of the database (a backup, a snapshot) doesn't reveal the credentials on its own
-([keys.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/store/keys.go)).
+([keys.go](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.1/backend/internal/store/keys.go)).
 
 1. **Create the key and the Secret.** Keep `openconsole.key` somewhere safe outside the cluster too: without it
    the stored credentials are lost.
@@ -209,9 +213,9 @@ kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | grep 'mov
 
 Copies made before, including the pre-upgrade one, still hold the old key and open the credentials; they are
 replaced after `BACKUP_KEEP` new ones. If a value can't be decrypted, the start stops with the error in the log
-and nothing changes ([Troubleshooting](/operations/troubleshooting)).
+and nothing changes ([Troubleshooting](/operations/troubleshooting#the-pod-doesnt-start)).
 
-### Rotate the key {#rotate-the-key}
+### Rotate the key {/* #rotate-the-key */}
 
 Put the new key and the old one in the Secret, start once with `ENCRYPTION_KEY_PREVIOUS_FILE`, then remove it.
 Everyone signs in again.
@@ -225,7 +229,7 @@ kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole -
 kubectl -n kubernetes-openconsole set env deploy/kubernetes-openconsole ENCRYPTION_KEY_PREVIOUS_FILE-
 ```
 
-### If the key is lost {#if-the-key-is-lost}
+### If the key is lost {/* #if-the-key-is-lost */}
 
 The values encrypted with it can't be recovered. Create a new key and Secret as above and start once with
 `ENCRYPTION_KEY_LOST=true` (`kubectl -n kubernetes-openconsole set env deploy/kubernetes-openconsole

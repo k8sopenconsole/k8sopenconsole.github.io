@@ -143,11 +143,12 @@ The pod annotation changes the pod template, so applying it restarts OpenConsole
 | Metric | What it tells you |
 |---|---|
 | `up` of the OpenConsole target | the pod answers |
-| `openconsole_cluster_connected{cluster}` | `1` when OpenConsole has opened its connection to the cluster. Connections are opened at start and when a cluster is first used, so a cluster added since the last restart shows `0` until someone selects it. The value doesn't follow the cluster's credentials afterwards: a revoked token shows up as 5xx answers and `failed to list … Unauthorized` lines in the [log](/operations/troubleshooting#a-cluster-shows-empty-lists-or-503) |
+| `openconsole_cluster_connected{cluster}` | `1` while OpenConsole's cache of the cluster has listed objects and none of its watches is failing. A cluster is connected at start and as soon as it is added or its credentials are replaced. A refused token or an unreachable API server gives `0` (a running connection notices when its watches are next renewed); a single kind the ClusterRole doesn't allow does not, it only answers `403` `cluster_forbidden` on that tab ([Troubleshooting](/operations/troubleshooting#a-cluster-shows-empty-lists-or-503)) |
 | `openconsole_http_requests_status_total{status="5xx"}` | answers with an error: a cluster that refuses OpenConsole, a database problem |
 | `openconsole_http_request_duration_ms_sum` / `_count` | average request time |
 | `openconsole_pod_exec_active` | shells open right now |
 | `openconsole_cluster_requests_total{cluster}` | which clusters people use |
+| `openconsole_audit_write_failures_total` | audit events the database refused (full or locked volume); each is also an `audit write failed` error line in the log. Should stay `0` |
 
 ## Alerts {#alerts}
 
@@ -190,6 +191,11 @@ spec:
           labels: {severity: warning}
           annotations:
             summary: OpenConsole requests take more than 1 s on average.
+        - alert: OpenConsoleAuditWriteFailures
+          expr: increase(openconsole_audit_write_failures_total[10m]) > 0
+          labels: {severity: critical}
+          annotations:
+            summary: OpenConsole could not write audit events to its database (full or locked volume).
 ```
 
 The `job` label is the ServiceMonitor's; with pod annotations use `job="kubernetes-pods"`. A cluster nobody has

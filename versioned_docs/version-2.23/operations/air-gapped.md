@@ -6,8 +6,8 @@ description: "Run OpenConsole without internet access: the image from your own r
 # Air-gapped install
 
 The OpenConsole server needs no internet access: it talks to your clusters' API servers and, if you use them, your
-LDAP server, Azure AD, Prometheus and trace receiver. Two things come from outside: the image and the manifests,
-which you copy in once per release, and two files the **browser** loads from public CDNs (see
+LDAP server, Azure AD, Prometheus and trace receiver. Only the image and the manifests come from outside;
+you copy them in once per release. The **browser** loads nothing from the internet either (see
 [What the browser loads](#what-the-browser-loads)).
 
 ## 1. Copy the image into your registry {#1-copy-the-image-into-your-registry}
@@ -17,9 +17,9 @@ then copy it with [crane](https://github.com/google/go-containerregistry/blob/ma
 `skopeo copy --all`). A copy keeps the multi-arch index and its digest:
 
 ```bash
-crane copy ghcr.io/vurulkan/kubernetes-openconsole:2.23.0 \
-  registry.example.internal/openconsole/kubernetes-openconsole:2.23.0
-crane digest registry.example.internal/openconsole/kubernetes-openconsole:2.23.0
+crane copy ghcr.io/vurulkan/kubernetes-openconsole:2.23.1 \
+  registry.example.internal/openconsole/kubernetes-openconsole:2.23.1
+crane digest registry.example.internal/openconsole/kubernetes-openconsole:2.23.1
 # sha256:f4d193cf9d2d65aa0c1c863e3221ced13eb0d17cd3d18cff09ecd3cac91935b2
 ```
 
@@ -30,8 +30,8 @@ The digest is the same as on `ghcr.io`, so the provenance you verified there hol
 The [usual kustomization](/installation/kubernetes) fetches `deploy/` from GitHub. Download it once instead:
 
 ```bash
-curl -sL https://github.com/vurulkan/kubernetes-openconsole/archive/refs/tags/v2.23.0.tar.gz \
-  | tar xz --strip-components=1 kubernetes-openconsole-2.23.0/deploy
+curl -sL https://github.com/vurulkan/kubernetes-openconsole/archive/refs/tags/v2.23.1.tar.gz \
+  | tar xz --strip-components=1 kubernetes-openconsole-2.23.1/deploy
 ```
 
 Keep the `deploy/` folder next to your `kustomization.yaml` (in Git), and point both the resource and the image at
@@ -76,15 +76,9 @@ If your registry needs credentials, add an `imagePullSecrets` entry to the same 
 
 ## What the browser loads {#what-the-browser-loads}
 
-| From | What | Without it |
-|---|---|---|
-| `cdn.jsdelivr.net` | the YAML editor (Monaco), loaded when someone opens a YAML view | the YAML dialog opens and stays at *Loading…*: YAML can't be viewed or edited in OpenConsole. Use `kubectl` for YAML |
-| `fonts.googleapis.com`, `fonts.gstatic.com` | the Inter and Fira Code fonts | the browser's own fonts are used; nothing else changes |
-
-Everything else (lists, details, logs, shells, restart and scale, Secrets, the admin screens) is served by
-OpenConsole itself and works without these. This release has no setting to serve the editor from OpenConsole; if
-your users' browsers may reach `cdn.jsdelivr.net` through a proxy, the editor works as usual. The Content Security
-Policy allows exactly these sources ([Security model](/operations/security#http)).
+Everything, the fonts (Inter, Fira Code) and the YAML editor included, is served by OpenConsole itself. The Content
+Security Policy allows no other source ([Security model](/operations/security#http)). Up to 2.23.0 the fonts came
+from `fonts.googleapis.com` / `fonts.gstatic.com`.
 
 ## Upgrading {#upgrading}
 

@@ -9,8 +9,8 @@ import Screenshot from '@site/src/components/Screenshot';
 
 **Yapmak istediğiniz:** bir container'ın ne yazdığını ya da crash etmeden önce ne yazdığını okumak.
 
-Bir pod satırından (**Loglar**), bir pod'un ayrıntı panelinden ya da bir Deployment'tan / Job'dan (tüm pod'ları
-birlikte) açın.
+Bir pod satırından (**Loglar**), bir pod'un ayrıntı panelinden ya da bir Deployment'tan / Job'dan (pod'ları
+birlikte, en çok 20) açın.
 
 <Screenshot id="logs" alt="Bir storefront pod'unun JSON log satırlarını canlı izleyen log penceresi; Canlı / Son restart öncesi, Logda ara, Duraklat, Satır kaydır, Kopyala ve İndir" />
 
@@ -45,13 +45,15 @@ yanlışlıkla seçilmez. Container menüsünden geçiş yapabilirsiniz; init co
 ## Limitler {/* #limits */}
 
 - Kullanıcı başına aynı anda on log akışı açılabilir, sonra saniyede bir tane daha; bunu aşarsanız biraz bekleyin.
+- Bir Deployment ya da Job logu en çok **20 pod'u** izler, hazır olanlar önce; pencere o zaman *Sınırlandı: 60 pod'dan
+  20 tanesi izleniyor (hazır olanlar önce).* der. Diğerleri için pod'un kendi logunu açın.
 - Açtığınız her log audit'e yazılır (`pod.logs`; restart öncesi log için `previous: true`).
 
 :::info[Göremiyor ya da yapamıyor musunuz?]
-- **Loglar düğmesi yok**, ya da *Bu logu okuma yetkiniz yok.*: bu namespace'te `pods:logs` izniniz yok. `pods:logs`
+- **Loglar düğmesi yok** (satırlarda, panellerde): bu namespace'te `pods:logs` izniniz yok. `pods:logs`
   isteyin; listeyi okumak (`pods:list`) ayrı bir izindir.
 - Restart öncesi logda **"unable to retrieve container logs"**: container, runtime logunu tutamayacak kadar hızlı
   öldü.
-- Şirket proxy'nizin arkasında **akış bir dakikalık sessizlikten sonra duruyor**: yöneticinize WebSocket idle
-  timeout'unu sorun ([Kubernetes'e kurulum](/installation/kubernetes#ingress-with-tls)).
+- Şirket proxy'nizin arkasında **akış bir dakikalık sessizlikten sonra duruyor**: yöneticinize proxy'nin WebSocket
+  idle timeout'unu sorun ([Kubernetes'e kurulum](/installation/kubernetes#ingress-with-tls)).
 :::

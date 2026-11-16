@@ -20,7 +20,7 @@ listeyi baştan sona geçin. Her maddenin neden önemli olduğu [Güvenlik model
   OpenConsole port-forward kullanmaz, bu yüzden onun için bir kurala gerek yoktur. Her kural ve ne işe yaradığı:
   [Kubernetes izinleri](/reference/kubernetes-permissions).
 - **Yazma yalnızca gereken yerde**: okumaları cluster genelinde bırakın; Secret'ları, shell'leri ve yazma verb'lerini
-  namespace başına bağlayın ([Yazma yalnızca bazı namespace'lerde](/installation/connect-cluster)).
+  namespace başına bağlayın ([Yazma yalnızca bazı namespace'lerde](/installation/connect-cluster#writes-in-some-namespaces-only)).
 - **Her cluster için bir ServiceAccount, asla kişisel bir kubeconfig değil**; token'ını yenilemek için de bir plan,
   örneğin 6 ile 12 ayda bir ([Token'ı yenileme](/installation/connect-cluster#rotate-the-token)). Üretilen token'ları
   Git'te tutmayın.
@@ -45,7 +45,7 @@ listeyi baştan sona geçin. Her maddenin neden önemli olduğu [Güvenlik model
   [Ortam değişkenleri](/reference/environment-variables)).
 - **Yalnızca Ingress controller'ınızı ve Prometheus'unuzu içeri alan bir NetworkPolicy.** `/metrics` giriş istemez;
   onu Ingress üzerinden de yönlendirmeyin. Aynı policy
-  [`deploy/optional/networkpolicy.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/deploy/optional/networkpolicy.yaml)
+  [`deploy/optional/networkpolicy.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.1/deploy/optional/networkpolicy.yaml)
   dosyasında da var. İki namespace adını kendinizinkilerle değiştirin:
 
   ```yaml title="networkpolicy.yaml"
@@ -116,7 +116,7 @@ listeyi baştan sona geçin. Her maddenin neden önemli olduğu [Güvenlik model
 ## Volume {#the-volume}
 
 - **Şifreleme anahtarını veritabanının dışında tutun** (bir Secret'tan `ENCRYPTION_KEY_FILE`) ve anahtarın bir
-  kopyasını başka bir yerde saklayın ([Yedekleme ve geri yükleme](/installation/backup-restore)).
+  kopyasını başka bir yerde saklayın ([Yedekleme ve geri yükleme](/installation/backup-restore#keep-the-encryption-key-out-of-the-database)).
 - **Yedekleri volume'un dışına kopyalayın ve cluster kimlik bilgileri gibi koruyun.** OpenConsole her gün
   `/data/backups`'a, yani aynı volume'a bir yedek yazar; volume kaybolursa onlar da kaybolur. Kullanmıyorsanız
   `BACKUP_ALLOW_DOWNLOAD`'ı kapalı bırakın ([Yedekleme ve geri yükleme](/installation/backup-restore)).

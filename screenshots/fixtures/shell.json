@@ -1,38 +1,50 @@
 {
- "time": 1794686787344,
+ "time": 1794861274643,
  "sockets": [
   {
-   "path": "/ws/namespaces/shop/pods/storefront-84fc6d7d6c-8qn52/exec",
+   "path": "/ws/namespaces/shop/pods/storefront-84fc6d7d6c-7mxcx/exec",
    "frames": [
     {
      "s": "{\"type\":\"session\",\"idleTimeoutSeconds\":300}"
     },
     {
-     "s": "{\"type\":\"recording\",\"enabled\":true,\"sessionId\":\"605cc348-84f1-4be5-8684-f528c9eafb95\"}"
-    },
-    {
-     "b": "DQpo"
-    },
-    {
-     "b": "b3N0bmFtZSAmJiBscyAvDQo="
-    },
-    {
-     "b": "cm9vdEBzdG9yZWZyb250LTg0ZmM2ZDdkNmMtOHFuNTI6LyMg"
-    },
-    {
-     "b": "DQpyb290QHN0b3JlZnJvbnQtODRmYzZkN2Q2Yy04cW41MjovIyBob3N0bmFtZSAmJiBscyAvDQo="
-    },
-    {
-     "b": "c3RvcmVmcm9udC04NGZjNmQ3ZDZjLThxbjUyDQo="
-    },
-    {
-     "b": "G1sxOzM0bWJpbhtbbSAgICAbWzE7MzRtZGV2G1ttICAgIBtbMTszNG1ldGMbW20gICAgG1sxOzM0bWhvbWUbW20gICAbWzE7MzRtbGliG1ttICAgIBtbMTszNm1saWI2NBtbbSAgG1sxOzM0bXByb2MbW20gICAbWzE7MzRtcm9vdBtbbSAgIBtbMTszNG1zeXMbW20gICAgG1sxOzM0bXRtcBtbbSAgICAbWzE7MzRtdXNyG1ttICAgIBtbMTszNG12YXIbW20="
+     "s": "{\"type\":\"recording\",\"enabled\":true,\"sessionId\":\"2dc37a71-76c4-4783-8c8d-9876899c02db\"}"
     },
     {
      "b": "DQo="
     },
     {
-     "b": "cm9vdEBzdG9yZWZyb250LTg0ZmM2ZDdkNmMtOHFuNTI6LyMg"
+     "b": "cm9vdEBzdG9yZWZyb250LTg0ZmM2ZDdkNmMtN214Y3g6LyMgDQpyb290QHN0b3JlZnJvbnQtODRmYzZkN2Q2Yy03bXhjeDovIyA="
+    },
+    {
+     "b": "aG9z"
+    },
+    {
+     "b": "dG4="
+    },
+    {
+     "b": "YW1lICY="
+    },
+    {
+     "b": "JiA="
+    },
+    {
+     "b": "bHM="
+    },
+    {
+     "b": "IC8="
+    },
+    {
+     "b": "DQo="
+    },
+    {
+     "b": "c3RvcmVmcm9udC04NGZjNmQ3ZDZjLTdteGN4DQo="
+    },
+    {
+     "b": "G1sxOzM0bWJpbhtbbSAgICAbWzE7MzRtZGV2G1ttICAgIBtbMTszNG1ldGMbW20gICAgG1sxOzM0bWhvbWUbW20gICAbWzE7MzRtbGliG1ttICAgIBtbMTszNm1saWI2NBtbbSAgG1sxOzM0bXByb2MbW20gICAbWzE7MzRtcm9vdBtbbSAgIBtbMTszNG1zeXMbW20gICAgG1sxOzM0bXRtcBtbbSAgICAbWzE7MzRtdXNyG1ttICAgIBtbMTszNG12YXIbW20NCg=="
+    },
+    {
+     "b": "cm9vdEBzdG9yZWZyb250LTg0ZmM2ZDdkNmMtN214Y3g6LyMg"
     }
    ]
   }

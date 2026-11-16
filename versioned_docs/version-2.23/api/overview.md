@@ -33,7 +33,7 @@ flowchart LR
 - **The API access policy:** per role *Off*, *Safe read-only* (the default: `list`, `get`, `logs`, no ConfigMaps or
   Secrets) or *All of the role's permissions*, and an optional per-user override.
 
-A call outside any of them is refused with 403 and a reason in the body: `forbidden` (not in the key or not held),
+A call outside any of them is refused with 403 and a reason code in the body's `error` field: `forbidden` (not in the key or not held),
 `api_access_policy` (held, but the policy keeps it from keys), `api_access_off` (the policy gives this user's keys
 nothing), `feature_disabled` (switched off by the operator). The full list is in [Quick start](/api/quick-start#errors).
 

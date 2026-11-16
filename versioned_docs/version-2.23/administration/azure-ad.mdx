@@ -24,10 +24,10 @@ Note the **Directory (tenant) ID** and **Application (client) ID** on the app's 
 
 **Admin → Azure AD** (example values):
 
-<Screenshot id="admin-azure" alt="Admin → Azure AD: tenant ID, client ID, redirect URL https://openconsole.example.com/api/auth/azure/callback, client secret, Save and Test Connection" />
+<Screenshot id="admin-azure" alt="Admin → Azure AD: tenant ID, client ID, redirect URL https://openconsole.example.com/api/auth/azure/callback, client secret, Save and Test configuration" />
 
 **Enabled**, **Tenant ID**, **Client ID**, **Client secret** (stored encrypted; tick **Update Client Secret** to
-change it), **Redirect URL** (exactly the URI registered above). Save, then **Test Connection**. The sign-in page now
+change it), **Redirect URL** (exactly the URI registered above). Save, then **Test configuration**. The sign-in page now
 shows **Sign in with Microsoft**.
 
 For US Government or China clouds set `AZURE_AD_AUTHORITY` ([Environment variables](/reference/environment-variables)).
@@ -46,9 +46,18 @@ at once.
 2. Otherwise, a **pre-created Azure AD account nobody has signed in to yet** whose name matches `preferred_username`
    in another letter case, or the token's `email` or `upn` (a pre-created `jane.doe@corp.com` is found when the UPN
    is `jdoe@corp.onmicrosoft.com`).
+3. No account at all: one is created (see above).
 
-Local, LDAP and already used accounts are never taken over this way; the `user.login` event notes when an account was
-claimed (`linked_by`, `signed_in_as`). Azure AD accounts never accept a password.
+Only **Azure AD** accounts sign in with Microsoft. A local or LDAP account with the same name is never taken over: the
+sign-in is refused (`403` `sign_in_failed`, detail `this account can't sign in with this Microsoft account`; audit `user.login`, outcome
+`failed`, reason `not_azure_account`). Up to 2.23.0 such an account was switched to Azure AD; to move someone from a
+local account to Azure AD, delete it and pre-create an Azure AD account. The `user.login` event notes when an account
+was claimed (`linked_by`, `signed_in_as`). Azure AD accounts never accept a password.
+
+An account belongs to the Microsoft account that **first** signs in to it, by its Entra object ID (`oid` in the
+token), not by its name. Someone else who later has the same name (a deleted and re-created, or renamed, Entra user)
+is refused the same way, reason `azure_oid_mismatch`. To hand the name to the new person, delete the OpenConsole
+account and pre-create it again. Accounts that signed in before this check existed are bound at their next sign-in.
 
 Signing out of OpenConsole doesn't sign the person out of Microsoft. To stop someone, disable their OpenConsole account
 or block them in Entra ID.

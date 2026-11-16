@@ -30,7 +30,7 @@ OpenConsole'un çalıştığı cluster'da [kurulum](/installation/kubernetes) bu
 ```bash
 kubectl --context <cluster> create namespace kubernetes-openconsole
 kubectl --context <cluster> apply -f \
-  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/rbac.yaml
+  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/rbac.yaml
 ```
 
 Bu komut şunları oluşturur:
@@ -58,6 +58,26 @@ Secret'lar salt okuma dosyasına bilerek konmadı: Kubernetes seviyesinde Secret
 demektir; tek koruma OpenConsole'daki `secrets:reveal` izni olurdu. Secret'lar sekmesine yalnızca metadata için
 ihtiyacınız varsa kuralın yorumunu kaldırın ve yalnızca `secrets:list` / `secrets:get` verin.
 
+### Yazma yalnızca bazı namespace'lerde {#writes-in-some-namespaces-only}
+
+`rbac.yaml`, OpenConsole'un `kube-system` dahil her namespace'te Secret okumasına, shell açmasına ve workload'ları
+değiştirmesine izin verir. Bunu yalnızca seçtiğiniz namespace'lerle sınırlamak için okumaları cluster genelinde
+bırakın (OpenConsole pod'ları, Deployment'ları, … cluster genelinde izler) ve yazma haklarını
+[`deploy/optional/rbac-namespaced-writes.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.1/deploy/optional/rbac-namespaced-writes.yaml) ile namespace
+başına bağlayın:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/rbac-readonly.yaml
+curl -sL https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/optional/rbac-namespaced-writes.yaml \
+  | sed 's/namespace: team-a/namespace: payments/' | kubectl apply -f -
+```
+
+İkinci komutu her namespace için, o namespace'in adıyla bir kez çalıştırın. Diğer namespace'lerde Kubernetes
+reddeder: Secrets sekmesi *OpenConsole'un bu cluster'daki hesabı bunu okuyamıyor (ClusterRole'ü kontrol edin).* der (`403` `cluster_forbidden`), bir shell ya da komut başarısız olur (`exec_failed`), restart, ölçekleme ve YAML apply API server'ın
+mesajıyla başarısız olur. OpenConsole rollerini buna uygun tutun ki kullanıcılar yalnızca hata veren butonlar
+görmesin. `deploy/` klasörüyle kuruyorsanız dosyaları tek tek listeleyin
+([Kubernetes'e kurulum](/installation/kubernetes#2-apply-it)), yoksa her `kubectl apply -k` `rbac.yaml`'ı geri koyar.
+
 ### ClusterRole kuralları ne işe yarar {#what-each-clusterrole-rule-is-for}
 
 Hiç vermeyeceğiniz izinlerin kurallarını silin (dosyanın bir kopyasında).
@@ -65,7 +85,7 @@ Hiç vermeyeceğiniz izinlerin kurallarını silin (dosyanın bir kopyasında).
 | Kural (`rbac.yaml`) | Ne için gerekli | Olmazsa |
 |---|---|---|
 | `namespaces, pods, services, configmaps, events`: get / list / watch | Panel'in tüm sekmeleri, Canlı olaylar | OpenConsole hiçbir şeyi listeleyemez |
-| `secrets`: get / list | `secrets:list`, `secrets:get`, `secrets:reveal` | Secret'lar sekmesi *"ServiceAccount is not allowed to read secrets"* der |
+| `secrets`: get / list | `secrets:list`, `secrets:get`, `secrets:reveal` | Secret'lar sekmesi *"OpenConsole'un bu cluster'daki hesabı bunu okuyamıyor"* der |
 | `secrets`: update | `secrets:edit` | bir Secret'ın YAML'ını uygulamak 403 ile başarısız olur |
 | `pods/log`: get | pod / deployment / job logları (`pods:logs`) | loglar 403 ile başarısız olur |
 | `pods/exec`: create | pod shell'i ve tek komutluk exec (`pods:exec`) | shell 403 ile başarısız olur |
@@ -141,9 +161,12 @@ EOF
 ```
 
 :::warning Kişisel kubeconfig'iniz değil
-Exec plugin ile giriş yapan kubeconfig'ler (`kubelogin`, `aws eks get-token`, `gke-gcloud-auth-plugin`) çalışmaz:
-container'da bu programların hiçbiri yok. Üstelik OpenConsole'un ayrı bir kimlikle değil, sizin adınıza işlem
-yapmasına yol açarlar.
+Bir kubeconfig kimlik bilgilerini yalnızca **satır içi** taşıyabilir: `token`, `client-certificate-data` /
+`client-key-data`, `certificate-authority-data`. Exec plugin ile giriş yapan (`kubelogin`, `aws eks get-token`,
+`gke-gcloud-auth-plugin`), `auth-provider` kullanan ya da bir dosya okuyan (`tokenFile`, `client-certificate`,
+`client-key`, `certificate-authority`) kubeconfig reddedilir (`kubeconfig_unsupported`): OpenConsole pod'unun
+içinde bir program çalıştırır ya da dosya okurdu. Kişisel bir kubeconfig ayrıca OpenConsole'un ayrı bir kimlikle değil,
+sizin adınıza işlem yapmasına yol açar.
 :::
 
 ## Token'ı yenileme {#rotate-the-token}
@@ -157,18 +180,18 @@ NS=kubernetes-openconsole
 kubectl --context $CTX -n $NS delete serviceaccount openconsole-reader          # its token Secret goes with it
 kubectl --context $CTX -n $NS wait --for=delete secret/openconsole-reader-token --timeout=60s
 kubectl --context $CTX apply -f \
-  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/rbac.yaml
+  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/rbac.yaml
 ```
 
 Yalnızca Secret'ı silip yeniden oluşturursanız **aynı token'ı yeniden alırsınız**: Kubernetes ServiceAccount
 token'ını ServiceAccount'tan ve Secret'ın adından türetir; "yeni" token aynısıdır ve eskisi çalışmaya devam eder.
-Yeni bir ServiceAccount ise yeni bir kimlik alır ve eski token hemen reddedilir. (`rbac.yaml` 2.23.0'daki yorum hâlâ
-yalnızca Secret'ı silme yolunu anlatıyor; bu yanlış.)
+Yeni bir ServiceAccount ise yeni bir kimlik alır ve eski token hemen reddedilir. (`rbac.yaml`'daki yorum 2.23.0'a
+kadar yalnızca Secret'ı silme yolunu anlatıyordu; bu yanlıştı.)
 
 Ardından yeni token'ı ve CA'yı okuyun (2. adım), **Yönetim → Cluster'lar** ekranında cluster'ın **Düzenle**
-butonuna tıklayın, **Credential'ları değiştir** kutusunu işaretleyin ve yeni token'ı **ve CA'yı da yeniden**
-yapıştırın: *Credential'ları değiştir* seçiliyken iki alan da boş gelir ve CA olmadan kaydetmek başarısız olur
-(`x509: certificate signed by unknown authority`). Kubeconfig ile eklenmiş bir cluster için yeni dosyayı yükleyin.
+butonuna tıklayın, **Credential'ları değiştir** kutusunu işaretleyin ve yeni token'ı yapıştırın. CA alanını boş
+bırakın: kayıtlı CA kalır (API sunucusunun sertifikası değişmedi). Kubeconfig ile eklenmiş bir cluster için yeni
+dosyayı yükleyin.
 
 Bunu yapana kadar eski token'ı kullanan her cluster kaydı (token ve kubeconfig fark etmez) erişimini kaybetmiştir.
 Listeler OpenConsole'un cache'inde kalanı göstermeye devam edebilir ve Cluster'lar sayfası hata göstermez; pod
@@ -191,6 +214,7 @@ altında ayarlayın; bkz. [Prometheus](/administration/prometheus). "Cluster iç
   `127.0.0.1`) ya da CA eşleşmiyor.
 - **Bir kullanıcı için sekme boş ya da 403**: önce o kullanıcının rol izinlerine, sonra yukarıdaki ClusterRole
   kuralına bakın.
+  *OpenConsole'un bu cluster'daki hesabı bunu okuyamıyor* (`cluster_forbidden`) diyen bir sekmenin nedeni ClusterRole'dür.
 - **CPU / memory yok**: cluster'da metrics-server yok (`kubectl get apiservices v1beta1.metrics.k8s.io`) ya da
   ClusterRole'de `metrics.k8s.io` `pods` eksik. Hangisi olduğunu Pod'lar sekmesi söyler.
 - **Prometheus testi başarısız**: test, başarısız olan adımı söyler; bkz. [Prometheus](/administration/prometheus).

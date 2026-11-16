@@ -517,14 +517,14 @@
                 },
                 {
                   "type": "doc",
-                  "id": "api/endpoints/follow-every-pod-and-container-of-a-deployment-web-socket",
-                  "label": "Follow every pod and container of a Deployment (WebSocket)",
+                  "id": "api/endpoints/follow-the-pods-and-containers-of-a-deployment-web-socket-at-most-20-pods-ready-ones-first",
+                  "label": "Follow the pods and containers of a Deployment (WebSocket; at most 20 pods, ready ones first)",
                   "className": "api-method get"
                 },
                 {
                   "type": "doc",
-                  "id": "api/endpoints/follow-every-pod-of-a-job-web-socket",
-                  "label": "Follow every pod of a Job (WebSocket)",
+                  "id": "api/endpoints/follow-the-pods-of-a-job-web-socket-at-most-20-pods-ready-ones-first",
+                  "label": "Follow the pods of a Job (WebSocket; at most 20 pods, ready ones first)",
                   "className": "api-method get"
                 }
               ]
@@ -935,30 +935,6 @@
                 },
                 {
                   "type": "doc",
-                  "id": "api/endpoints/the-default-clusters-connection-legacy",
-                  "label": "The default cluster's connection (legacy)",
-                  "className": "api-method get"
-                },
-                {
-                  "type": "doc",
-                  "id": "api/endpoints/save-the-default-clusters-connection-legacy",
-                  "label": "Save the default cluster's connection (legacy)",
-                  "className": "api-method post"
-                },
-                {
-                  "type": "doc",
-                  "id": "api/endpoints/save-the-default-clusters-connection-legacy-put",
-                  "label": "Save the default cluster's connection (legacy, PUT)",
-                  "className": "api-method put"
-                },
-                {
-                  "type": "doc",
-                  "id": "api/endpoints/check-cluster-credentials-without-saving",
-                  "label": "Check cluster credentials without saving",
-                  "className": "api-method post"
-                },
-                {
-                  "type": "doc",
                   "id": "api/endpoints/list-clusters",
                   "label": "List clusters",
                   "className": "api-method get"
@@ -1069,6 +1045,24 @@
                   "type": "doc",
                   "id": "api/endpoints/a-recording-as-an-asciicast-file",
                   "label": "A recording as an asciicast file",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/database-backups-list-folder-schedule-whether-downloading-is-allowed-backup-allow-download",
+                  "label": "Database backups: list, folder, schedule, whether downloading is allowed (BACKUP_ALLOW_DOWNLOAD)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/make-a-database-backup-now",
+                  "label": "Make a database backup now",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/download-a-backup-403-backup-download-disabled-unless-backup-allow-download-true",
+                  "label": "Download a backup (403 backup_download_disabled unless BACKUP_ALLOW_DOWNLOAD=true)",
                   "className": "api-method get"
                 },
                 {

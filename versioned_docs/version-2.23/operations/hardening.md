@@ -18,6 +18,8 @@ the [Security model](/operations/security).
   grant no `secrets:*` permission, and its `update` verb if you grant no `secrets:edit`. Uncomment `services/proxy`
   only for Prometheus, and only for your Prometheus Service. OpenConsole doesn't use port-forward, so it needs no
   rule for it. Every rule and what it is for: [Kubernetes permissions](/reference/kubernetes-permissions).
+- **Writes only where they are needed**: keep the reads cluster-wide and bind Secrets, shells and write verbs per
+  namespace ([Writes in some namespaces only](/installation/connect-cluster#writes-in-some-namespaces-only)).
 - **One ServiceAccount per cluster, never a personal kubeconfig**, and a plan to rotate its token, for example every
   6 to 12 months ([Rotate the token](/installation/connect-cluster#rotate-the-token)). Don't keep the generated tokens
   in Git.
@@ -29,11 +31,21 @@ the [Security model](/operations/security).
 
 - **Pin the release and use `Recreate`** ([Install on Kubernetes](/installation/kubernetes#1-write-a-kustomization)),
   one replica, and verify the image you run ([Verify the image](/installation/verify-image)).
+- **Keep the manifest's container settings**: read-only root filesystem with the `/tmp` `emptyDir`, non-root user,
+  no capabilities, no ServiceAccount token. The image has no shell; to look inside the pod use an ephemeral
+  container (`kubectl debug -it <pod> --image=busybox:1.36 --target=dashboard`).
+- **Refuse WebSockets from other sites**: once the log shows no `ws.origin_mismatch` for a while, set
+  `WS_ORIGIN_CHECK=enforce`. Leave `ALLOWED_ORIGINS` empty unless another site's page must call the API
+  ([Security model](/operations/security#http)).
 - **TLS at the Ingress, and nothing else in front of the Service.** OpenConsole speaks plain HTTP. It takes the
-  client address for the audit log and the sign-in lock from `X-Forwarded-For`, so the only way in should be a proxy
-  that sets that header ([Ingress with TLS](/installation/kubernetes#ingress-with-tls)).
+  client address for the audit log and the sign-in lock from `X-Forwarded-For` only when the connection comes from a
+  proxy in `TRUSTED_PROXIES` (the manifest lists the private networks); set it to your ingress controller's pod
+  network, so the only way in is that proxy ([Ingress with TLS](/installation/kubernetes#ingress-with-tls),
+  [Environment variables](/reference/environment-variables)).
 - **A NetworkPolicy** that lets in only your Ingress controller and your Prometheus. `/metrics` has no sign-in;
-  don't route it through the Ingress either. Change the two namespace names to yours:
+  don't route it through the Ingress either. The same policy is
+  [`deploy/optional/networkpolicy.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.1/deploy/optional/networkpolicy.yaml). Change the two namespace names to
+  yours:
 
   ```yaml title="networkpolicy.yaml"
   apiVersion: networking.k8s.io/v1
@@ -83,7 +95,7 @@ the [Security model](/operations/security).
 - **Switch off what you don't use**, for everyone, with feature flags: `FEATURE_POD_EXEC=false`,
   `FEATURE_SECRET_REVEAL=false`, `FEATURE_API_KEYS=false`, …
   ([Feature flags](/administration/customization-and-flags#feature-flags)).
-- **A session lifetime** that fits your policy (60 minutes by default), and an **API key expiry policy**: the
+- **An inactivity timeout** that fits your policy (60 minutes by default; a session ends after 12 hours at the latest), and an **API key expiry policy**: the
   longest lifetime a key may have ([Session lifetime and API key expiry](/administration/sessions#session-lifetime-and-api-key-expiry)).
 - **Keep the API access policy at *Safe read-only*** for roles unless agents need more
   ([API access policy](/administration/api-access-policy)).
@@ -101,7 +113,10 @@ the [Security model](/operations/security).
 
 ## The volume {#the-volume}
 
-- **Back it up, and protect the backups like the cluster credentials.** The database holds the credentials
-  (encrypted) and the key that decrypts them ([Backup and restore](/installation/backup-restore)).
+- **Keep the encryption key outside the database** (`ENCRYPTION_KEY_FILE` from a Secret), and keep a copy of the key
+  somewhere else ([Backup and restore](/installation/backup-restore#keep-the-encryption-key-out-of-the-database)).
+- **Copy the backups off the volume, and protect them like the cluster credentials.** OpenConsole writes one a day to
+  `/data/backups`, on the same volume, so they don't survive losing it. Leave `BACKUP_ALLOW_DOWNLOAD` off unless
+  you use it ([Backup and restore](/installation/backup-restore)).
 - **Encrypt the volume** at the storage layer if your platform offers it (encrypted StorageClass, encrypted
   snapshots).

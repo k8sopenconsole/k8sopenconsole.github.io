@@ -108,37 +108,64 @@ kodu da 200 döner. Komut bir shell oturumu gibi kaydedilir; audit olayı argüm
 
 ## Hatalar {#errors}
 
-Her ret audit'e yazılır. Gövde nedeni söyler:
+Her ret audit'e yazılır. Hata cevabı, [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457)'nin problem details
+biçiminde JSON'dır; `Content-Type: application/problem+json`:
 
-| Durum | Gövde | Anlamı |
+```json
+{"type":"about:blank","title":"Bad Request","status":400,"error":"invalid_input","detail":"cluster \"nope\" is unknown or not yours to use"}
+```
+
+- `error` her zaman bir neden kodudur (`snake_case`): kararı buna göre verin.
+- `detail` (her zaman yoktur) bir insan için İngilizce metindir: hangi alan, hangi ad. Gösterin ya da loglayın;
+  ayrıştırmayın.
+- `title` HTTP durum metnidir, `type` her zaman `about:blank`'tır.
+
+API'nin yolunda sürüm yoktur. Yalnızca büyür (yeni alanlar, yeni kodlar, yeni uçlar); bu yüzden bilmediğiniz şeyleri
+yok sayın. `/api/openapi.json` içindeki `info.version` sunucunun sürümüdür. Bilinmeyen bir `/api/…` yolu `404`
+`not_found`, bilinen bir yola yanlış metotla gelen istek `Allow` header'ıyla `405` `method_not_allowed` cevabı alır.
+
+| Durum | `error` | Anlamı |
 |---|---|---|
-| 401 | boş | Anahtar bilinmiyor, süresi dolmuş ya da iptal edilmiş, veya sahibi devre dışı. |
-| 403 | `{"error":"change your password first"}` | Sahibinin şifresini değiştirmesi gerekiyor (ilk giriş ya da admin sıfırlaması). |
-| 403 | `{"error":"forbidden"}` | Anahtarda listelenmiyor ya da o namespace'te sizde yok. |
-| 403 | `{"error":"api_access_policy"}` | Web'de sizde var, ama admin'in API erişim politikası anahtarlara vermiyor. |
-| 403 | `{"error":"api_access_off"}` | Politika anahtarlarınıza hiçbir şey vermiyor; `/api/auth/me` dahil her çağrı reddedilir. |
-| 403 | `{"error":"api_key_not_allowed"}` | Yalnızca web oturumunda yapılabilir (anahtar yönetimi, şifre, kayıtlı görünümler). |
-| 403 | `{"error":"feature_disabled"}` | Operatör özelliği kapattı (`FEATURE_*=false`). |
-| 403 | `{"error":"admin_only"}` | Bir admin ucu ve anahtar bir admin'in Admin API anahtarı değil. |
-| 400 | `{"error":"cluster \"nope\" is unknown or not reachable with this key"}` | `X-OpenConsole-Cluster`, var olmayan ya da anahtarda olmayan bir cluster'ı belirtiyor. |
-| 429 | boş | Bu anahtar için saniyede 10'dan fazla istek; bkz. [Limitler](/api/limits). |
+| 401 | `unauthorized` | Anahtar yok, anahtar bilinmiyor ya da sahibi devre dışı. |
+| 401 | `api_key_expired` / `api_key_revoked` | Anahtarın süresi doldu / anahtar iptal edildi. |
+| 403 | `password_change_required` | Sahibinin parolasını değiştirmesi gerekiyor (ilk giriş ya da admin sıfırlaması). |
+| 403 | `forbidden` | Anahtarda listelenmiyor ya da o namespace'te sizde yok. |
+| 403 | `api_access_policy` | Web'de sizde var, ama admin'in API erişim politikası anahtarlara vermiyor. |
+| 403 | `api_access_off` | Politika anahtarlarınıza hiçbir şey vermiyor; `/api/auth/me` dahil her çağrı reddedilir. |
+| 403 | `api_key_not_allowed` | Yalnızca web oturumunda yapılabilir (anahtar yönetimi, parola, kayıtlı görünümler). |
+| 403 | `feature_disabled` | Operatör özelliği kapattı (`FEATURE_*=false`). |
+| 403 | `admin_only` | Bir admin ucu ve anahtar bir admin'in Admin API anahtarı değil. |
+| 400 | `invalid_input` | Bir değer kabul edilmedi; hangisi olduğunu `detail` söyler. Örneğin `X-OpenConsole-Cluster` var olmayan bir cluster'ı belirtiyor (anahtarın kapsamadığı biri için `403` `forbidden`). |
+| 404 | `not_found` / `pod_not_found` | Nesne ya da yol yok. |
+| 403 | `cluster_forbidden` | Cluster okumayı reddetti: OpenConsole'un oradaki ClusterRole'ü buna izin vermiyor. |
+| 502 / 503 / 504 | `cluster_unreachable` / `not_connected` / `cluster_timeout` | Cluster'a ulaşılamıyor ya da OpenConsole'un kimlik bilgilerini reddetti / bağlı değil / zamanında cevap vermedi. |
+| 429 | `rate_limited` | Bu anahtar için saniyede 10'dan fazla istek; `Retry-After` kadar (1 saniye) bekleyin. Bkz. [Limitler](/api/limits). |
+
+Tüm kodlar: [Sorun giderme → Hata cevapları](/operations/troubleshooting#error-answers).
 
 Test cluster'ında şu komutlarla görüldü:
 
 ```bash
 curl -s -w ' %{http_code}\n' -H "Authorization: Bearer $OPENCONSOLE_API_KEY" "$OC_URL/api/namespaces/kube-system/pods"
-# {"error":"forbidden"}
+# {"type":"about:blank","title":"Forbidden","status":403,"error":"forbidden"}
 #  403
 curl -s -w ' %{http_code}\n' -H "Authorization: Bearer $OPENCONSOLE_API_KEY" "$OC_URL/api/me/api-keys"
-# {"error":"api_key_not_allowed"}
+# {"type":"about:blank","title":"Forbidden","status":403,"error":"api_key_not_allowed"}
 #  403
 curl -s -w ' %{http_code}\n' -H "Authorization: Bearer $OPENCONSOLE_API_KEY" -H "X-OpenConsole-Cluster: nope" \
   "$OC_URL/api/namespaces/crashlab/pods"
-# {"error":"cluster \"nope\" is unknown or not reachable with this key"}
+# {"type":"about:blank","title":"Bad Request","status":400,"error":"invalid_input","detail":"cluster \"nope\" is unknown or not yours to use"}
 #  400
 curl -s -w ' %{http_code}\n' -H "Authorization: Bearer $OPENCONSOLE_API_KEY" "$OC_URL/api/admin/users"
-# {"error":"admin_only"}
+# {"type":"about:blank","title":"Forbidden","status":403,"error":"admin_only"}
 #  403
+curl -s -w ' %{http_code}\n' -H "Authorization: Bearer oc_notarealkey" "$OC_URL/api/auth/me"
+# {"type":"about:blank","title":"Unauthorized","status":401,"error":"unauthorized"}
+#  401
+curl -s -i -X DELETE -H "Authorization: Bearer $OPENCONSOLE_API_KEY" "$OC_URL/api/namespaces/crashlab/pods" | grep -E '^(HTTP|Allow)|"error"'
+# HTTP/1.1 405 Method Not Allowed
+# Allow: GET
+# {"type":"about:blank","title":"Method Not Allowed","status":405,"error":"method_not_allowed"}
 ```
 
 **Sonraki adım:** anahtarı bir agent'a verin: [Agent tarifleri](/api/agent-recipes). Tüm uçlar:

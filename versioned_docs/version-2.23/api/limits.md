@@ -12,25 +12,27 @@ What OpenConsole refuses or cuts, so a script or an agent can handle it. Every r
 
 | Limit | Applies to | Over it |
 |---|---|---|
-| 10 requests a second, bursts of 30 | each API key, every call | 429 with an empty body and no `Retry-After`; wait a second. Audited as `api_key.use` / `rate_limited`, at most once a minute per key. |
-| 5 at once, then one every 6 seconds | Deployment restart and scale, StatefulSet scale, YAML apply (not the dry run); per user, keys and web together | 429 `{"error":"rate limited"}`; YAML apply also sends `Retry-After: 6`. |
-| 10 at once, then one a second | Log reads and log streams; per user | 429 `{"error":"rate_limited"}` (a stream gets an `error` frame with `retry: true`). |
-| `MAX_EXEC_SESSIONS_PER_USER` open shells (default 3) | Shells and one-command exec; per user, keys and web together | 429 `{"error":"too_many_sessions"}` for a command; a shell is refused with *too many open shells*. |
-| `MAX_REPLICAS` (default 100) | Scale | 400 `replicas must be between 0 and 100`. |
+| 10 requests a second, bursts of 30 | each API key, every call | 429 `rate_limited` with `Retry-After: 1`; wait a second. Audited as `api_key.use` / `rate_limited`, at most once a minute per key. |
+| 5 at once, then one every 6 seconds | Deployment restart and scale, StatefulSet scale, YAML apply (not the dry run); per user, keys and web together | 429 `rate_limited` with `Retry-After: 6`. |
+| 10 at once, then one a second | Log reads and log streams; per user | 429 `rate_limited` (a stream gets an `error` frame with `retry: true`). |
+| `MAX_EXEC_SESSIONS_PER_USER` open shells (default 3) | Shells and one-command exec; per user, keys and web together | 429 `too_many_sessions`; a shell from a browser is refused with *too many open shells* and close code 4429. |
+| `MAX_REPLICAS` (default 100) | Scale | 400 `invalid_input`, detail `replicas must be between 0 and 100`. |
 
-Both variables are on [Environment variables](/reference/environment-variables).
+The status is followed by the body's `error` code; the body is described in [Errors](/api/quick-start#errors). Both
+variables are on [Environment variables](/reference/environment-variables).
 
 ## Reading a log: `GET …/pods/{name}/logs` {#reading-a-log-get-podsnamelogs}
 
 | Parameter | Default | Limit |
 |---|---|---|
-| `tailLines` | 500 | 1 to 10 000; outside → 400 `tailLines must be between 1 and 10000` |
-| `sinceSeconds` | none | a positive number |
+| `tailLines` | 500 | 1 to 10 000; outside → 400 `invalid_input`, detail `tailLines must be between 1 and 10000` |
+| `sinceSeconds` | none | a positive number; otherwise 400 `invalid_input` |
 | `previous`, `timestamps`, `container` | `false`, `false`, the main container | |
 
 The answer is plain text of at most **5 MiB**. A longer log is cut at a line end and the response carries
 `X-OpenConsole-Truncated: true`: ask for fewer lines or a shorter `sinceSeconds`. Errors: 404 `pod_not_found`;
-400 `container_not_found`, `not_ready` (the container hasn't started) or `previous_unavailable`.
+400 `container_not_found`, `not_ready` (the container hasn't started) or `previous_unavailable`; 403
+`cluster_forbidden` when OpenConsole's own account on the cluster may not read the pod or its log (its ClusterRole).
 
 ## Running a command: `POST …/pods/{name}/exec` {#running-a-command-post-podsnameexec}
 

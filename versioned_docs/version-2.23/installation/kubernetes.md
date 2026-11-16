@@ -18,11 +18,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   # the manifests of one release
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.0
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.1
 images:
   # the image of the same release
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.23.0"
+    newTag: "2.23.1"
 patches:
   - patch: |-
       apiVersion: apps/v1
@@ -48,11 +48,12 @@ patches:
 ```
 
 - The `?ref=` resource is fetched with `git`, so the machine running `kubectl` needs `git` and access to GitHub.
-- **Pin the release** in both places (`ref=v2.23.0` and `newTag`). Without the `images:` override the manifest runs
+- **Pin the release** in both places (`ref=v2.23.1` and `newTag`). Without the `images:` override the manifest runs
   `:latest`, and a pod restart could then upgrade you without notice.
 - **`Recreate`** is important. With the default rolling update the new pod starts while the old one still holds
   the database; on 2.23.0 that can lose the writes made after the overlap until the next restart. Upgrades and
-  `rollout restart` then have a few seconds of downtime while the new pod starts.
+  `rollout restart` then have a few seconds of downtime while the new pod starts. From 2.23.1 the
+  manifest itself uses `Recreate`; the patch then changes nothing.
 - Add other variables to the same `env:` list (see [below](#settings-you-may-want-to-change)).
 
 ## 2. Apply it {#2-apply-it}
@@ -79,14 +80,14 @@ the files instead of the folder:
 
 ```yaml
 resources:
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/namespace.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/pvc.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/service.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/deployment.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/namespace.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/pvc.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/service.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/deployment.yaml
 ```
 
 For a [read-only](/installation/connect-cluster#full-or-read-only) console, list the files the same way and add
-`https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/rbac-readonly.yaml`. Installed with
+`https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/rbac-readonly.yaml`. Installed with
 the folder, every `kubectl apply -k` would put the full `rbac.yaml` back.
 
 ## Why exactly one replica {#why-exactly-one-replica}
@@ -100,10 +101,15 @@ from the API server.
 
 The manifest requests `300m` CPU and `384Mi` memory and limits them to `1` CPU and `1Gi`. Memory grows with the
 number of pods, Deployments, Services, … in the connected clusters, since OpenConsole keeps them in memory, plus
-about 10 KB per pod for 24 hours of usage samples. If the pod is OOMKilled, raise the memory limit first.
+about 10 KB per pod for 24 hours of usage samples. The cache leaves out what OpenConsole never reads from it
+(`managedFields` and the `last-applied-configuration` annotation, often half of an object), but ConfigMaps are kept
+with their data. With several large clusters, watch the pod's memory (`kubectl top pod`) after connecting them, and
+if the pod is OOMKilled, raise the memory limit first.
 
-The volume holds the database (small: users, roles, the audit log for `LOG_RETENTION_DAYS`) and shell recordings,
-which are capped at 2 GiB by default (Admin → Recordings). 5 GiB is enough for most installations.
+The volume holds the database (small: users, roles, the audit log for `LOG_RETENTION_DAYS`), up to 7 copies of it in
+`/data/backups` ([Backup and restore](/installation/backup-restore)) and shell recordings, which are capped at 2 GiB
+by default (Admin → Recordings). 5 GiB is enough for most installations; with a large audit log, count the database
+size times 8.
 
 ## Settings you may want to change {#settings-you-may-want-to-change}
 
@@ -112,12 +118,18 @@ Everything else is configured in the UI and stored in the database. These are re
 | Variable | Default | Meaning |
 |---|---|---|
 | `TIMEZONE` | `UTC` (the manifest sets `Europe/Istanbul`) | time zone of audit timestamps in the UI; stored times are UTC |
-| `LOG_RETENTION_DAYS` | `30` | days audit events are kept in the database (`0` or an invalid value means the default, 30) |
+| `LOG_RETENTION_DAYS` | `30` | days audit events are kept in the database; `0` keeps them forever (before 2.23.1 it meant 30) |
+| `BACKUP_ALLOW_DOWNLOAD` | `false` | `true` lets admins download the backups in Admin → Backups |
+| `BACKUP_INTERVAL` / `BACKUP_KEEP` | `24h` / `7` | how often the database is copied to `/data/backups` (`0` = no scheduled copy) and how many copies are kept ([Backup and restore](/installation/backup-restore)) |
+| `ENCRYPTION_KEY_FILE` | empty (the key is in the database) | file with the key that encrypts the stored credentials, from a Secret ([Keep the encryption key out of the database](/installation/backup-restore)) |
 | `RESTART_HISTORY_RETENTION_DAYS` | `30` | container exits kept for the restart history |
 | `API_KEY_READ_RETENTION_DAYS` | `7` | successful reads made with an API key |
 | `APP_ENV` | (the manifest sets `prod`) | environment label on every log line and trace |
 | `LOG_FORMAT` | `text` (the manifest sets `ecs`) | `ecs` for Elastic, `json`, or `text` |
 | `DATA_PATH` | `/data/app.db` | the database file; must be on the volume |
+| `ALLOWED_ORIGINS` | empty | other sites whose pages may call the API from a browser (CORS), e.g. `https://tools.example.com`; the console itself needs nothing here |
+| `WS_ORIGIN_CHECK` | `warn` | a WebSocket opened from another site's page: `warn` logs `ws.origin_mismatch`, `enforce` refuses it |
+| `TRUSTED_PROXIES` | empty (the manifest sets `10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7`) | proxies whose `X-Forwarded-For` gives the client address in the audit, sessions and sign-in lock; narrow it to your ingress controller's pod network |
 
 The full list, including feature flags and limits: [Environment variables](/reference/environment-variables).
 
@@ -156,8 +168,9 @@ kubectl -n kubernetes-openconsole create secret tls openconsole-tls --cert=tls.c
 kubectl apply -f ingress.yaml
 ```
 
-**ingress-nginx closes idle WebSockets after 60 seconds**, which ends a pod shell that waits for input and a log
-stream of a quiet container. Raise its timeouts on this Ingress:
+OpenConsole pings every open WebSocket (shell, live log, Live Events) every 25 seconds, so ingress-nginx's 60-second
+idle timeout doesn't close a shell that waits for input or the log of a quiet container. A proxy that doesn't count
+pings as traffic needs a longer idle timeout; for ingress-nginx that would be (optional):
 
 ```yaml
 metadata:
@@ -166,8 +179,8 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
 ```
 
-Other proxies have the same kind of idle timeout (e.g. an Azure Application Gateway or AWS load balancer in front
-of the Ingress); set it above the shell idle timeout, `EXEC_IDLE_TIMEOUT` (5 minutes).
+If shells still close after a minute or so behind another proxy (e.g. an Azure Application Gateway or AWS load
+balancer in front of the Ingress), set its idle timeout above the shell idle timeout, `EXEC_IDLE_TIMEOUT` (5 minutes).
 
 Don't route `/metrics` from outside: it is unauthenticated, for your Prometheus inside the cluster
 ([Metrics](/operations/metrics)).

@@ -26,17 +26,17 @@ değişikliklerini beraberinde getirir ve açılışta eksik olanları uygular.
 
 ```yaml title="kustomization.yaml"
 resources:
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.0   # was v2.22.0
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.1   # was v2.23.0
 images:
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.23.0"                                                         # was 2.22.0
+    newTag: "2.23.1"                                                         # was 2.23.0
 ```
 
 ```bash
 kubectl diff -k .      # the image tag, plus whatever the release changed in deploy/
 kubectl apply -k .
 kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole --timeout=5m
-kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.23.0"
+kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.23.1"
 ```
 
 Oturumlar geçerli kalır; giriş yapmış kullanıcılar sayfayı yenileyip kaldıkları yerden devam eder. `Recreate` ile
@@ -105,8 +105,28 @@ cluster'da `deploy/` ile birlikte gelir; bağlı diğer her cluster'da yeni `rba
   ([Denetim logu](/administration/audit-log)).
 - **Loglar**: WebSocket istek satırları `status=101` der; tracing açıkken `tracing enabled` `LOG_FORMAT`'a uyar;
   başarısız bir LDAP girişi dizinin mesajıyla `ldap sign-in failed` yazar ([Loglama](/operations/logging)).
+- **Kubeconfig ile eklenen cluster'lar**: bir program çalıştıran (`exec`, örn. kubelogin), `auth-provider` kullanan ya
+  da bir dosya okuyan kubeconfig reddedilir (`kubeconfig_unsupported`) ve böyle bir kubeconfig ile kaydedilmiş cluster
+  artık bağlanmaz. Yükseltmeden önce Yönetim → Cluster'lar'a bakın ve böyle bir kubeconfig'i token'lı ya da inline
+  olanla değiştirin ([Kubeconfig yöntemi](/installation/connect-cluster#kubeconfig-method)).
+- **Kendi manifest'iniz**: `TRUSTED_PROXIES`'i konsolun önündeki proxy'lerin ağına ayarlayın (`deploy/deployment.yaml`
+  özel ağları yazar). Ayarlanmazsa hiçbir `X-Forwarded-For`'a güvenilmez: audit log, Yönetim → Oturumlar ve giriş
+  kilidi kullanıcının değil ingress pod'unun adresini görür ([Kubernetes'e kurulum](/installation/kubernetes)).
+- **LDAP**: parolası tutmayan bir local hesap (yerleşik `admin` dahil) artık dizinde denenmez. *Kullanıcı base
+  DN'leri* her satıra bir DN alır: birden çok DN'i virgülle ayıran bir değer tek DN olarak okunur, her birini ayrı
+  satıra yazın. StartTLS dizinin sertifikasını doğrular; CA'nızı **CA sertifikası (PEM)** alanına yapıştırın
+  ([LDAP](/administration/ldap)).
+- **Oturum süresi**: Yönetim → Oturum'daki dakika artık hareketsiz geçen süredir ve oturum girişten en geç 12 saat
+  sonra biter; sabit bir ömür olarak düşünülmüş uzun bir değeri gözden geçirin ([Oturumlar](/administration/sessions)).
+- **`openconsole_cluster_connected`**, kimlik bilgileri reddedilen ya da ulaşılamayan bir cluster için artık `0`'dır;
+  buna bağlı bir alarm yükseltmeden sonra tetiklenebilir: o cluster'ın kimlik bilgilerini düzeltin
+  ([Metrikler](/operations/metrics)).
+- **API üzerinden loglar**: Kubernetes OpenConsole'un kendi hesabını reddettiğinde `GET …/pods/{name}/logs` `403`
+  `cluster_forbidden` döner (eskiden `502` `forbidden`). İsteğin kendisi hatalı olduğu için reddedilen bir cluster
+  değişikliği `failed`, nedeni `invalid` olarak audit'e yazılır.
+- **Ad**: ürünün adı artık **OpenConsole for Kubernetes**. İmaj, repo, namespace ve manifest'ler adlarını korur.
 - **İsteğe bağlı**: şifreleme anahtarını bir Secret'ta tutun
-  ([Şifreleme anahtarını veritabanının dışında tutun](/installation/backup-restore)).
+  ([Şifreleme anahtarını veritabanının dışında tutun](/installation/backup-restore#keep-the-encryption-key-out-of-the-database)).
 
 ### 2.22'ye yükseltme {#upgrading-to-222}
 

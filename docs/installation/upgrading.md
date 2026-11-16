@@ -26,17 +26,17 @@ Change the version in both places of your `kustomization.yaml` and apply it:
 
 ```yaml title="kustomization.yaml"
 resources:
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.0   # was v2.22.0
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.1   # was v2.23.0
 images:
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.23.0"                                                         # was 2.22.0
+    newTag: "2.23.1"                                                         # was 2.23.0
 ```
 
 ```bash
 kubectl diff -k .      # the image tag, plus whatever the release changed in deploy/
 kubectl apply -k .
 kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole --timeout=5m
-kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.23.0"
+kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.23.1"
 ```
 
 Sessions stay valid, so signed-in users carry on after a page reload. With `Recreate` the console is unavailable
@@ -105,8 +105,30 @@ cluster OpenConsole runs in; on every other connected cluster apply the new `rba
   ([Audit log](/administration/audit-log)).
 - **Logs**: WebSocket request lines say `status=101`; with tracing on, `tracing enabled` follows `LOG_FORMAT`; a
   failed LDAP sign-in writes `ldap sign-in failed` with the directory's message ([Logging](/operations/logging)).
+- **Kubeconfig clusters**: a kubeconfig that runs a program (`exec`, e.g. kubelogin), uses an `auth-provider` or
+  reads a file is refused (`kubeconfig_unsupported`), and a cluster saved with one no longer connects. Before
+  upgrading, check Admin → Clusters and replace such a kubeconfig with a token or an inline one
+  ([Kubeconfig method](/installation/connect-cluster#kubeconfig-method)).
+- **Your own manifest**: set `TRUSTED_PROXIES` to the network of the proxies in front of the console
+  (`deploy/deployment.yaml` sets the private ranges). Without it no `X-Forwarded-For` is believed: the audit log,
+  Admin → Sessions and the sign-in lock see the ingress pod's address instead of the user's
+  ([Install on Kubernetes](/installation/kubernetes)).
+- **LDAP**: a local account (the built-in `admin` included) whose password doesn't match is no longer tried against
+  the directory. *User base DNs* takes one DN per line: a value that lists several DNs separated by commas is read as
+  one DN, so put each on its own line. StartTLS checks the directory's certificate; paste your CA in **CA
+  certificate (PEM)** ([LDAP](/administration/ldap)).
+- **Session timeout**: the minutes in Admin → Session are now the time without activity, and a session ends at the
+  latest 12 hours after sign-in; review a long value that was meant as a fixed lifetime
+  ([Sessions](/administration/sessions)).
+- **`openconsole_cluster_connected`** is now `0` for a cluster whose credentials are refused or that can't be
+  reached, so an alert on it may fire after the upgrade: fix that cluster's credentials ([Metrics](/operations/metrics)).
+- **Logs over the API**: when Kubernetes refuses OpenConsole's own account, `GET …/pods/{name}/logs` answers `403`
+  `cluster_forbidden` (it was `502` `forbidden`). A change to the cluster refused because the request itself is wrong
+  is audited as `failed`, reason `invalid`.
+- **Name**: the product is now called **OpenConsole for Kubernetes**. The image, the repository, the namespace and
+  the manifests keep their names.
 - **Optional**: keep the encryption key in a Secret
-  ([Keep the encryption key out of the database](/installation/backup-restore)).
+  ([Keep the encryption key out of the database](/installation/backup-restore#keep-the-encryption-key-out-of-the-database)).
 
 ### Upgrading to 2.22 {#upgrading-to-222}
 

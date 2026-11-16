@@ -41,7 +41,7 @@ Her pod shell oturumu ve `POST …/pods/{name}/exec` ile çalıştırılan her t
 
 Bir limit aşılacaksa ne olacağına **disk politikası** karar verir:
 
-- `evict_oldest` (varsayılan) — en eski tamamlanmış kayıtlar, saklama süreleri dolmamış olsa bile, sıradaki oturum sığana kadar silinir. Her silme `recording.evict` olarak audit'e yazılır (kullanıcı `system`, neden `quota` / `low_disk`).
+- `evict_oldest` (varsayılan) — en eski tamamlanmış kayıtlar, saklama süreleri dolmamış olsa bile, sıradaki oturum sığana kadar silinir. Her silme `recording.evict` olarak audit'e yazılır (kullanıcı `system`, neden `quota` / `low_disk`). Tamamlanmış bütün kayıtları silmek bile yer açmayacaksa (volume başka bir şey yüzünden dolu, örneğin veritabanı, ya da yalnızca süren oturumlar kotayı aşıyor) hiçbir şey silinmez: yeni oturum `stop`'taki gibi kaydedilmez, 30 saniyelik kontrol de süren kayıtları aynı şekilde durdurur.
 - `stop` — mevcut kayıtlar korunur. Yeni shell'ler yine açılır ama **kaydedilmez** (`recording.create` failed, neden `disk_quota`); süren kayıtlar bir kesilme işaretiyle durur. Yer açılana kadar yönetim ekranında bir uyarı görünür.
 
 Kayıt, shell'in kendisini asla engellemez: kapalı, dolu ya da bozuk bir kaydedici yalnızca oturumun kaydedilmemesi demektir. İstisna, [API anahtarıyla](/api/overview) açılan shell'dir: kayıt kapalı olsa bile kaydedilir, kaydedilemiyorsa reddedilir (503, `pod.exec` failed, neden `recording_unavailable`). Tam izolasyon için kayıtlara ayrı bir PVC verin; `deploy/pvc.yaml` ve `deploy/deployment.yaml` yorum satırı halinde bir örnek içerir. Ardından `SESSION_RECORDING_DIR=/recordings` ayarlayın.
@@ -53,7 +53,7 @@ Kayıt, shell'in kendisini asla engellemez: kapalı, dolu ya da bozuk bir kayded
 | Olay | Ne zaman |
 |---|---|
 | `recording.create` success | Oturum sonu — kaynak olarak oturum id'si, `pod`, `container`, `size_bytes`, `duration_ms`, `truncate_reason`; `pod.exec` olaylarıyla aynı `request_id` |
-| `recording.create` failed | Kaydedilmedi: neden `disk_quota` (disk politikası `stop`) ya da `error` (örn. dizin yazılabilir değil) |
+| `recording.create` failed | Kaydedilmedi: neden `disk_quota` (disk politikası `stop`, ya da silme yer açamadığında `evict_oldest`) veya `error` (örn. dizin yazılabilir değil) |
 | `recording.view` / `recording.download` | Bir yönetici kaydı oynattı ya da indirdi |
 | `recording.delete` (success / denied / failed) | UI / API'den silme — satır ve dosya sonrasında yok olacağı için kaydın `owner`, `started_at`, `size_bytes`, `pod`, `container` ve cluster bilgisini tutar |
 | `recording` üzerinde `settings.update` | Ayar değişikliği |
