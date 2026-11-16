@@ -49,3 +49,12 @@
 .mobile {
   padding: 0.5rem var(--ifm-menu-link-padding-horizontal);
 }
+
+/* Narrow screens: the top bar keeps the search only; the switch is in the menu
+   (the mobile variant above). Without this, inline-flex beats Docusaurus' rule
+   that hides top-bar items and the switch slides under the search button. */
+@media (max-width: 996px) {
+  .desktop {
+    display: none;
+  }
+}
