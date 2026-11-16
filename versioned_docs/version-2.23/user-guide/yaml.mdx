@@ -30,7 +30,8 @@ too, but only with `secrets:edit` ([Secrets](/user-guide/secrets)).
 
 4. **Apply** stores it. **Reset** throws your changes away.
 
-Every apply is in the audit log (`<kind>.apply`, with `dry_run` and short hashes of the YAML before and after,
+Opening the YAML is audited as a read (`<kind>.get`, e.g. `deployment.get`). Every apply is in the audit log
+(`<kind>.apply`, with `dry_run` and short hashes of the YAML before and after,
 never the YAML itself).
 
 ## "Conflict": someone changed it first {/* #conflict-someone-changed-it-first */}

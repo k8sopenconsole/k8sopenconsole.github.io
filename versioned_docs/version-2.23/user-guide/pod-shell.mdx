@@ -18,8 +18,14 @@ Click **Shell** on a pod row, a pod card or in the pod's drawer.
 - A pod with several containers first asks which one. The main container is on top and focused (`Enter` opens it);
   containers that aren't running are greyed out. The terminal can still switch container later.
 - The menu at the top right picks the shell: *Auto* tries `bash`, then `ash`, then `sh`. Minimal images (distroless,
-  scratch) have no shell at all; then nothing can be opened.
+  scratch) have no shell at all; then nothing can be opened. Picking another shell or container starts a new session.
 - **Reconnect** starts a new session in the same container.
+
+## Keyboard {/* #keyboard */}
+
+Every key you type goes to the shell, `Tab` and `Esc` included (completion, vim). `Ctrl+]` (`Ctrl+Ü` on a Turkish Q
+keyboard) leaves the terminal for the menus above it; there `Esc` closes the window and the focus goes back to the
+button you opened it from. `Tab` from the menus returns to the terminal. The banner above the terminal says the same.
 
 ## It is recorded {/* #it-is-recorded */}
 

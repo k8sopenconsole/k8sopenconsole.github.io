@@ -10,7 +10,7 @@ satırları container runtime'ınız tutar, log toplayıcınız okur. Dört tür
 
 | Satır | `message` (`ecs`) | Ne zaman |
 |---|---|---|
-| HTTP isteği | `GET /api/namespaces/{…}/pods 200` | her istek, bittiğinde |
+| HTTP isteği | `GET /api/namespaces/{…}/pods 200` | her istek, bittiğinde; bir WebSocket (shell, canlı log, Canlı olaylar) kapandığında, status `101` ve süre olarak açık kaldığı zamanla |
 | Denetim olayı | `alice: deployment.scale success shop/web on prod-eu` | audit'e yazılan her aksiyon, `LOG_INCLUDE_AUDIT=true` iken (varsayılan) |
 | Kubernetes istemcisi | `…/reflector.go:229: failed to list *v1.Pod: Unauthorized` | client-go'nun kendi mesajları (watch hataları, yeniden denemeler) |
 | Uygulama | `starting openconsole`, `cluster connected`, `session recording ready`, … | açılış, cluster bağlantıları, kayıtlar, arka plan işleri |
@@ -91,9 +91,8 @@ Her `ecs` kaydında `event.dataset` vardır: denetim olaylarında `openconsole.a
 anlatır. Log toplayıcınızın kendi `kubernetes.*` ve `container.*` alanları ise satırı yazan OpenConsole pod'unu
 anlatır; ikisi hiç karışmaz.
 
-Tracing açıkken açılıştaki `tracing enabled` satırı JSON logger kurulmadan önce yazılır, bu yüzden düz metin
-olarak gelir (`2026/11/14 11:42:09 INFO tracing enabled service=openconsole`). Diğer bütün satırlar `LOG_FORMAT`'a
-uyar.
+Tracing açıkken açılıştaki `tracing enabled` satırı da diğer bütün satırlar gibi `LOG_FORMAT`'a uyar
+([Tracing](/operations/tracing)).
 
 ## Seviyeler {#levels}
 
@@ -106,8 +105,11 @@ uyar.
 | başarılı `/healthz`, `/livez`, `/readyz` ve `/metrics` | `debug`; böylece probe'lar ve scrape'ler logu doldurmaz. Başarısız olanlar kendi seviyelerini korur |
 | diğer istekler, denetim olayları | `info` |
 | Kubernetes istemcisi | başarısız list için `info`, başarısız watch için `error` |
+| `ldap sign-in failed` (kullanıcı, dizinin `error`'u, `request_id`) | yanlış parola için `info`, diğer her şey için `warn` ([Giriş yapılamıyor](/operations/troubleshooting#sign-in-fails)) |
+| `cluster read failed` | `warn`; cluster 404 döndüyse (nesne artık yok) `debug` |
 
-`debug` yalnızca başarılı probe ve scrape satırlarını ekler; istek gövdelerini loglamaz.
+`debug` yalnızca başarılı probe ve scrape satırlarını ve cluster okumalarının 404'lerini ekler; istek gövdelerini hiçbir
+zaman loglamaz.
 
 ## Bir isteği denetim olayıyla eşleştirmek {#linking-a-request-and-its-audit-event}
 

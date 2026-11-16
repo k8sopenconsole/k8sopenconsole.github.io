@@ -3,6 +3,8 @@ title: "Yedekleme ve geri yükleme"
 description: "SQLite volume'ünün yedeğini alın, yedeği güvende tutun; aynı yere ya da yeni bir namespace'e geri yükleyin."
 ---
 
+import Screenshot from '@site/src/components/Screenshot';
+
 # Yedekleme ve geri yükleme
 
 OpenConsole'un sakladığı her şey `/data`'ya mount edilen tek bir volume'dedir:
@@ -20,10 +22,10 @@ sürece anahtar da aynı dosyadadır; kopyaya sahip olan herkes bunları okuyabi
 ekrana bastığı her şey bulunabilir. Yedekleri şifreli saklayın; erişimi en az cluster'ların kendisi kadar sıkı tutun.
 :::
 
-## Otomatik yedekler {#automatic-backups}
+## Otomatik yedekler {/* #automatic-backups */}
 
 OpenConsole veritabanını SQLite'ın `VACUUM INTO`'su ile, yani çalışmaya devam ederken alınan tutarlı bir kopyayla
-`/data/backups`'a kopyalar ([backup.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/backup/backup.go)):
+`/data/backups`'a kopyalar ([backup.go](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.1/backend/internal/backup/backup.go)):
 
 - her `BACKUP_INTERVAL`'de (varsayılan `24h`; `0` zamanlamayı kapatır), en yeni kopyadan itibaren sayılarak; böylece
   bir restart bir kopyayı ne atlar ne tekrarlar;
@@ -35,10 +37,12 @@ adını taşır ve yalnızca sunucunun kullanıcısı okuyabilir. Kayıtlar bunl
 kopya bir `backup.create` audit olayıdır. **Yönetim → Yedekler** kopyaları boyutları ve zamanlarıyla listeler;
 anahtar veritabanındayken uyarı gösterir.
 
+<Screenshot id="admin-backups" alt="Yönetim → Yedekler: zamanlama (24 saatte bir yedek, en yeni 7'si /data/backups'ta), şifreleme anahtarının veritabanında olduğu uyarısı, Şimdi yedekle ve zamanı ile boyutuyla kopyalar" />
+
 Bu kopyalar aynı volume'dadır: kötü bir yükseltmeden ya da bir hatadan sonra işe yararlar, volume kaybolduğunda
 değil. Onları başka bir yere de kopyalayın.
 
-### Yedekleri indirme {#downloading-backups}
+### Yedekleri indirme {/* #downloading-backups */}
 
 İndirme varsayılan olarak kapalıdır. Arayüzden değil, Deployment'ta `BACKUP_ALLOW_DOWNLOAD=true` ile açılır; böylece
 bir admin hesabı tek başına (ya da çalınmış bir admin oturumu) onu açamaz: Deployment'ı değiştirebilen biri volume'ü
@@ -51,7 +55,7 @@ kubectl -n kubernetes-openconsole set env deploy/kubernetes-openconsole BACKUP_A
 Açıkken her admin, eskiler dahil her kopyayı indirebilir. Her indirme bir `backup.download` audit olayıdır;
 reddedilen de öyle (`denied`, `backup_download_disabled`). Bir API anahtarı hiçbir zaman yedek indiremez.
 
-## Bir yedeği volume'un dışına kopyalama {#copy-a-backup-off-the-volume}
+## Bir yedeği volume'un dışına kopyalama {/* #copy-a-backup-off-the-volume */}
 
 - **Tarayıcıda**: `BACKUP_ALLOW_DOWNLOAD=true` iken Yönetim → Yedekler → indirme ikonu.
 - **kubectl ile, konsolu durdurmadan.** İmajda shell yoktur; bu yüzden pod'un process'lerini paylaşan kısa ömürlü bir
@@ -71,7 +75,7 @@ sqlite3 app-20261115-020000.db 'PRAGMA integrity_check'   # ok
   verir; kopya yine de çalışır. `sqlite3` pod'da değil, sizin makinenizde çalışır.
 - Depolamanız destekliyorsa PVC'nin bir **volume snapshot**'ı (CSI `VolumeSnapshot`).
 
-## Bütün volume'ün yedeği {#back-up}
+## Bütün volume'ün yedeği {/* #back-up */}
 
 Kayıtlar dahil her şeyi kopyalamak için uygulamayı kısa bir süre durdurun ve volume'ü kısa ömürlü bir yardımcı
 pod'dan okuyun. Konsol yaklaşık bir dakika erişilemez.
@@ -100,7 +104,7 @@ kubectl -n $NS scale deploy/kubernetes-openconsole --replicas=1
 Storage'ınız destekliyorsa PVC'nin volume snapshot'ı (CSI `VolumeSnapshot`) bir alternatiftir; snapshot'ı da
 yukarıdaki gibi Deployment 0'a ölçeklenmişken alın.
 
-## Geri yükleme {#restore}
+## Geri yükleme {/* #restore */}
 
 Geri yükleme, volume'deki her şeyi yedekteki içerikle değiştirir. Aynı kuruluma (kaybolan ya da bozulan volume) ya
 da yeni bir kuruluma (başka bir namespace ya da cluster) yapılabilir.
@@ -140,7 +144,7 @@ Eski bir sürümün yedeği daha yeni bir sürüme geri yüklenebilir: yeni sür
 Geri yüklenen kurulum cluster'lara yedekten sonra [yenilenmiş](/installation/connect-cluster#rotate-the-token)
 token'larla bağlanıyorsa, bu token'ları Yönetim → Cluster'lar'da değiştirin.
 
-### Tek bir veritabanı kopyasını geri yükleme {#restore-one-database-copy}
+### Tek bir veritabanı kopyasını geri yükleme {/* #restore-one-database-copy */}
 
 `/data/backups`'taki bir kopya (örneğin yükseltme öncesi olan) ya da dışarı kopyaladığınız bir kopya yalnızca
 veritabanının yerine geçer; kayıtlar olduğu gibi kalır:
@@ -169,11 +173,11 @@ kubectl -n $NS rollout status deploy/kubernetes-openconsole --timeout=5m
 
 Anahtar veritabanının dışına taşındıktan sonra alınmış bir kopya aynı `ENCRYPTION_KEY_FILE`'ı ister.
 
-## Şifreleme anahtarını veritabanının dışında tutun {#keep-the-encryption-key-out-of-the-database}
+## Şifreleme anahtarını veritabanının dışında tutun {/* #keep-the-encryption-key-out-of-the-database */}
 
 Varsayılan olarak saklanan kimlik bilgilerini şifreleyen anahtar veritabanının içindedir. Bunun yerine onu bir
 Kubernetes Secret'ında tutun; böylece veritabanının bir kopyası (bir yedek, bir snapshot) kimlik bilgilerini tek
-başına açığa çıkarmaz ([keys.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/store/keys.go)).
+başına açığa çıkarmaz ([keys.go](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.1/backend/internal/store/keys.go)).
 
 1. **Anahtarı ve Secret'ı oluşturun.** `openconsole.key`'i cluster'ın dışında da güvenli bir yerde saklayın: o
    olmadan saklanan kimlik bilgileri kaybolur.
@@ -211,9 +215,9 @@ kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | grep 'mov
 
 Daha önce alınan kopyalar, yükseltme öncesi olan dahil, eski anahtarı hâlâ içerir ve kimlik bilgilerini açar;
 `BACKUP_KEEP` yeni kopyadan sonra yerlerini yenileri alır. Bir değer çözülemezse açılış hatayı loga yazarak durur ve
-hiçbir şey değişmez ([Sorun giderme](/operations/troubleshooting)).
+hiçbir şey değişmez ([Sorun giderme](/operations/troubleshooting#the-pod-doesnt-start)).
 
-### Anahtarı değiştirme {#rotate-the-key}
+### Anahtarı değiştirme {/* #rotate-the-key */}
 
 Yeni anahtarı ve eskisini Secret'a koyun, `ENCRYPTION_KEY_PREVIOUS_FILE` ile bir kez başlatın, sonra kaldırın. Herkes
 yeniden giriş yapar.
@@ -227,7 +231,7 @@ kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole -
 kubectl -n kubernetes-openconsole set env deploy/kubernetes-openconsole ENCRYPTION_KEY_PREVIOUS_FILE-
 ```
 
-### Anahtar kaybolursa {#if-the-key-is-lost}
+### Anahtar kaybolursa {/* #if-the-key-is-lost */}
 
 Onunla şifrelenmiş değerler geri getirilemez. Yukarıdaki gibi yeni bir anahtar ve Secret oluşturun ve
 `ENCRYPTION_KEY_LOST=true` ile bir kez başlatın (`kubectl -n kubernetes-openconsole set env

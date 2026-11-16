@@ -144,11 +144,12 @@ Pod annotation'ı pod template'ini değiştirir; bu yüzden uygulamak OpenConsol
 | Metrik | Size ne söyler |
 |---|---|
 | OpenConsole target'ının `up`'ı | pod yanıt veriyor |
-| `openconsole_cluster_connected{cluster}` | OpenConsole cluster'a bağlantısını açtığında `1`. Bağlantılar açılışta ve bir cluster ilk kullanıldığında açılır; bu yüzden son restart'tan sonra eklenen bir cluster, biri onu seçene kadar `0` gösterir. Değer bundan sonra cluster'ın kimlik bilgilerini takip etmez: iptal edilmiş bir token, 5xx yanıtlar ve [logdaki](/operations/troubleshooting#a-cluster-shows-empty-lists-or-503) `failed to list … Unauthorized` satırları olarak ortaya çıkar |
+| `openconsole_cluster_connected{cluster}` | OpenConsole'un cluster önbelleği nesneleri listelemişken ve watch'larından hiçbiri hata vermiyorken `1`. Cluster açılışta, eklenir eklenmez ve kimlik bilgileri değiştirilir değiştirilmez bağlanır. Reddedilen bir token ya da ulaşılamayan bir API server `0` verir (çalışan bir bağlantı bunu watch'ları bir sonraki yenilendiğinde fark eder); ClusterRole'ün izin vermediği tek bir tür ise vermez, yalnızca o sekmede `403` `cluster_forbidden` döner ([Sorun giderme](/operations/troubleshooting#a-cluster-shows-empty-lists-or-503)) |
 | `openconsole_http_requests_status_total{status="5xx"}` | hatalı yanıtlar: OpenConsole'u reddeden bir cluster, bir veritabanı sorunu |
 | `openconsole_http_request_duration_ms_sum` / `_count` | ortalama istek süresi |
 | `openconsole_pod_exec_active` | şu an açık shell'ler |
 | `openconsole_cluster_requests_total{cluster}` | insanların hangi cluster'ları kullandığı |
+| `openconsole_audit_write_failures_total` | veritabanının reddettiği denetim olayları (dolu ya da kilitli volume); her biri logda ayrıca bir `audit write failed` hata satırıdır. `0` kalmalı |
 
 ## Alert'ler {#alerts}
 
@@ -191,6 +192,11 @@ spec:
           labels: {severity: warning}
           annotations:
             summary: OpenConsole requests take more than 1 s on average.
+        - alert: OpenConsoleAuditWriteFailures
+          expr: increase(openconsole_audit_write_failures_total[10m]) > 0
+          labels: {severity: critical}
+          annotations:
+            summary: OpenConsole could not write audit events to its database (full or locked volume).
 ```
 
 `job` label'ı ServiceMonitor'ınkidir; pod annotation'larıyla `job="kubernetes-pods"` kullanın. Eklendiğinden beri
@@ -203,7 +209,7 @@ rule'u olarak:
 
 | Alert | Sorgu (`logs-openconsole.audit-*`) |
 |---|---|
-| 5 yanlış şifreden sonra bir giriş kilitlendi | `openconsole.outcome : "locked"` |
+| 5 yanlış paroladan sonra bir giriş kilitlendi | `openconsole.outcome : "locked"` |
 | Biri shell limitine takıldı | `event.action : "pod.exec" and openconsole.outcome : "rate_limited"` |
 | Bir Secret gösterildi | `event.action : "secret.reveal" and event.outcome : "success"` |
 | Bir kullanıcı için tekrarlanan retler | `openconsole.outcome : "denied"`, `user.name`'e göre gruplanmış |

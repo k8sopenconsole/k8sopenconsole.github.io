@@ -2,7 +2,7 @@
 // do. Pages open in the target language; L() gives the UI text a selector needs in that
 // language (from the app's i18n.ts). Wait only for things that are in the recording.
 const TR = {
-  'Columns': 'Sütunlar', 'Logs': 'Loglar', 'Shell': 'Shell', 'Before last restart': 'Son restart öncesi',
+  'Back up now': 'Şimdi yedekle', 'Columns': 'Sütunlar', 'Logs': 'Loglar', 'Shell': 'Shell', 'Before last restart': 'Son restart öncesi',
   'YAML': 'YAML', 'Edit': 'Düzenle', 'Dry-run': 'Dry-run', 'Restart': 'Yeniden başlat', 'Scale': 'Ölçekle',
   'Keys': 'Anahtarlar', 'Show': 'Göster', 'Details': 'Ayrıntılar', 'LDAP Configuration': 'LDAP Yapılandırması',
   'Azure AD Configuration': 'Azure AD Yapılandırması', 'User Base DN (single)': 'Kullanıcı Base DN (tek)',
@@ -32,7 +32,7 @@ export const SCENES = [
     run: async (page) => { await row(page, 'catalog-').waitFor(); }},
   {id: 'dashboard-cards', as: 'alice', storage: {...shop('pods'), dashboardViewMode: 'card'},
     run: async (page) => { await page.getByText(/^catalog-/).first().waitFor(); }},
-  {id: 'dashboard-columns', as: 'alice', storage: shop('pods'),
+  {id: 'dashboard-columns', tolerance: 0.03, /* the open column menu scrolls the table by a few pixels, more or less (app bug, 2.23.1) */ as: 'alice', storage: shop('pods'),
     run: async (page) => {
       await row(page, 'catalog-').waitFor();
       await page.getByRole('button', {name: L('Columns')}).click();
@@ -232,6 +232,11 @@ export const SCENES = [
     run: async (page) => { await row(page, 'alice').waitFor(); }},
   {id: 'admin-session-settings', as: 'admin', path: '/admin', storage: admin('session'),
     run: async (page) => { await page.waitForTimeout(1500); }},
+  {id: 'admin-backups', as: 'admin', path: '/admin', storage: admin('backups'),
+    run: async (page) => {
+      await page.getByRole('button', {name: L('Back up now')}).click();
+      await row(page, '-manual').waitFor();
+    }},
   {id: 'admin-recordings', tolerance: 0.02, /* disk usage bar */ as: 'admin', path: '/admin', storage: admin('recordings'),
     run: async (page) => { await row(page, 'alice').waitFor(); }},
   {id: 'admin-api-keys', as: 'admin', path: '/admin', storage: admin('api-keys'),

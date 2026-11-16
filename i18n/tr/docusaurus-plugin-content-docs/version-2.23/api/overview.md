@@ -33,12 +33,12 @@ flowchart LR
 - **API erişim politikası:** rol başına *Kapalı*, *Güvenli salt okuma* (varsayılan: `list`, `get`, `logs`;
   ConfigMap ve Secret hariç) ya da *Rolün tüm yetkileri*; isterseniz kullanıcı başına bir istisna.
 
-Bunlardan herhangi birinin dışında kalan bir çağrı 403 ile reddedilir ve gövdede bir neden yazar: `forbidden`
+Bunlardan herhangi birinin dışında kalan bir çağrı 403 ile reddedilir ve gövdenin `error` alanında bir neden kodu yazar: `forbidden`
 (anahtarda yok ya da sahip olunmuyor), `api_access_policy` (sahip olunuyor ama politika anahtarlara vermiyor),
 `api_access_off` (politika bu kullanıcının anahtarlarına hiçbir şey vermiyor), `feature_disabled` (operatör bu
 özelliği kapattı). Tam liste [Hızlı başlangıç](/api/quick-start#errors) sayfasında.
 
-**Bir anahtar hiçbir zaman** anahtar oluşturamaz ya da değiştiremez, şifre değiştiremez, seçili cluster'ınızı
+**Bir anahtar hiçbir zaman** anahtar oluşturamaz ya da değiştiremez, parola değiştiremez, seçili cluster'ınızı
 değiştiremez ya da görünüm kaydedemez (403 `api_key_not_allowed`); admin uçları (`/api/admin/*`) için, bir admin'in
 **Admin API** kutusu işaretlenerek oluşturulmuş anahtarı gerekir.
 

@@ -1,140 +1,125 @@
 {
- "time": 1794686797051,
+ "time": 1794861283320,
  "sockets": [
   {
    "path": "/ws/events",
    "frames": [
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-14T20:06:38.498621374Z\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-16T20:34:47.817718094Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout.18e802227ad1aef1\",\"at\":\"2026-11-14T20:06:38Z\",\"reason\":\"ScalingReplicaSet\",\"message\":\"Scaled up replica set checkout-57745d5dc8 from 0 to 1\",\"type\":\"Normal\",\"involvedKind\":\"Deployment\",\"involvedName\":\"checkout\"}\n"
+     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout.18e8a0d500b11a14\",\"at\":\"2026-11-16T20:34:48Z\",\"reason\":\"ScalingReplicaSet\",\"message\":\"Scaled up replica set checkout-595b6dfb87 from 0 to 1\",\"type\":\"Normal\",\"involvedKind\":\"Deployment\",\"involvedName\":\"checkout\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-14T20:06:38.686005291Z\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-16T20:34:48.39921509Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-14T20:06:38.82046052Z\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-16T20:34:48.570081914Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"added\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8-kf6v6\",\"at\":\"2026-11-14T20:06:39.066915616Z\"}\n"
+     "s": "{\"verb\":\"added\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-595b6dfb87-qxl9g\",\"at\":\"2026-11-16T20:34:48.623302547Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8.18e802229504c03d\",\"at\":\"2026-11-14T20:06:39Z\",\"reason\":\"SuccessfulCreate\",\"message\":\"Created pod: checkout-57745d5dc8-kf6v6\",\"type\":\"Normal\",\"involvedKind\":\"ReplicaSet\",\"involvedName\":\"checkout-57745d5dc8\"}\n"
+     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-595b6dfb87.18e8a0d51958fe6c\",\"at\":\"2026-11-16T20:34:48Z\",\"reason\":\"SuccessfulCreate\",\"message\":\"Created pod: checkout-595b6dfb87-qxl9g\",\"type\":\"Normal\",\"involvedKind\":\"ReplicaSet\",\"involvedName\":\"checkout-595b6dfb87\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8-kf6v6\",\"at\":\"2026-11-14T20:06:39.261282265Z\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-595b6dfb87-qxl9g\",\"at\":\"2026-11-16T20:34:48.837741071Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8-kf6v6.18e80222a0c754a6\",\"at\":\"2026-11-14T20:06:39.255971Z\",\"reason\":\"Scheduled\",\"message\":\"Successfully assigned shop/checkout-57745d5dc8-kf6v6 to k3d-oc-docs-server-0\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"checkout-57745d5dc8-kf6v6\"}\n"
+     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-595b6dfb87-qxl9g.18e8a0d52506008f\",\"at\":\"2026-11-16T20:34:48.816561Z\",\"reason\":\"Scheduled\",\"message\":\"Successfully assigned shop/checkout-595b6dfb87-qxl9g to k3d-oc-docs-server-0\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"checkout-595b6dfb87-qxl9g\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8-kf6v6\",\"at\":\"2026-11-14T20:06:39.445447465Z\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-16T20:34:48.950200297Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-14T20:06:39.447269902Z\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-595b6dfb87-qxl9g\",\"at\":\"2026-11-16T20:34:49.227086392Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8-kf6v6.18e8022308720d30\",\"at\":\"2026-11-14T20:06:40Z\",\"reason\":\"Pulled\",\"message\":\"Container image \\\"busybox:1.36\\\" already present on machine and can be accessed by the pod\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"checkout-57745d5dc8-kf6v6\"}\n"
+     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-595b6dfb87-qxl9g.18e8a0d649b60015\",\"at\":\"2026-11-16T20:34:53Z\",\"reason\":\"Pulled\",\"message\":\"Container image \\\"busybox:1.36\\\" already present on machine and can be accessed by the pod\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"checkout-595b6dfb87-qxl9g\"}\n"
     },
     {
-     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8-kf6v6.18e80223137b6f7f\",\"at\":\"2026-11-14T20:06:41Z\",\"reason\":\"Created\",\"message\":\"Container created\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"checkout-57745d5dc8-kf6v6\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"storefront\",\"at\":\"2026-11-16T20:34:54.275384748Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8-kf6v6.18e80223274bb466\",\"at\":\"2026-11-14T20:06:41Z\",\"reason\":\"Started\",\"message\":\"Container started\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"checkout-57745d5dc8-kf6v6\"}\n"
+     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"storefront.18e8a0d655e1a7e6\",\"at\":\"2026-11-16T20:34:53Z\",\"reason\":\"SuccessfulRescale\",\"message\":\"New size: 4; reason: cpu resource utilization (percentage of request) above target\",\"type\":\"Normal\",\"involvedKind\":\"HorizontalPodAutoscaler\",\"involvedName\":\"storefront\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8-kf6v6\",\"at\":\"2026-11-14T20:06:42.358308801Z\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"HorizontalPodAutoscaler\",\"namespace\":\"shop\",\"name\":\"storefront\",\"at\":\"2026-11-16T20:34:54.679911979Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout.18e80223658f5daa\",\"at\":\"2026-11-14T20:06:42Z\",\"reason\":\"ScalingReplicaSet\",\"message\":\"Scaled down replica set checkout-b69774745 from 1 to 0\",\"type\":\"Normal\",\"involvedKind\":\"Deployment\",\"involvedName\":\"checkout\"}\n"
+     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-595b6dfb87-qxl9g.18e8a0d663d7685b\",\"at\":\"2026-11-16T20:34:54Z\",\"reason\":\"Created\",\"message\":\"Container created\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"checkout-595b6dfb87-qxl9g\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-14T20:06:42.8219588Z\"}\n"
+     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"storefront.18e8a0d720276034\",\"at\":\"2026-11-16T20:34:57Z\",\"reason\":\"ScalingReplicaSet\",\"message\":\"Scaled up replica set storefront-84fc6d7d6c from 3 to 4\",\"type\":\"Normal\",\"involvedKind\":\"Deployment\",\"involvedName\":\"storefront\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-b69774745-2s4zr\",\"at\":\"2026-11-14T20:06:42.831890629Z\"}\n"
+     "s": "{\"verb\":\"added\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"storefront-84fc6d7d6c-mnsh5\",\"at\":\"2026-11-16T20:34:57.764379902Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-b69774745.18e8022375ce704c\",\"at\":\"2026-11-14T20:06:42Z\",\"reason\":\"SuccessfulDelete\",\"message\":\"Deleted pod: checkout-b69774745-2s4zr\",\"type\":\"Normal\",\"involvedKind\":\"ReplicaSet\",\"involvedName\":\"checkout-b69774745\"}\n"
+     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-595b6dfb87-qxl9g.18e8a0d7225dcf07\",\"at\":\"2026-11-16T20:34:57Z\",\"reason\":\"Started\",\"message\":\"Container started\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"checkout-595b6dfb87-qxl9g\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-14T20:06:43.074581738Z\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"storefront\",\"at\":\"2026-11-16T20:34:57.818353533Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-b69774745-2s4zr\",\"at\":\"2026-11-14T20:06:43.128610917Z\"}\n"
+     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"storefront-84fc6d7d6c.18e8a0d73845dd1b\",\"at\":\"2026-11-16T20:34:57Z\",\"reason\":\"SuccessfulCreate\",\"message\":\"Created pod: storefront-84fc6d7d6c-mnsh5\",\"type\":\"Normal\",\"involvedKind\":\"ReplicaSet\",\"involvedName\":\"storefront-84fc6d7d6c\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-14T20:06:43.288495139Z\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"storefront-84fc6d7d6c-mnsh5\",\"at\":\"2026-11-16T20:34:58.099462615Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8-kf6v6.18e8022308720d30\",\"at\":\"2026-11-14T20:06:43Z\",\"reason\":\"Pulled\",\"message\":\"Container image \\\"busybox:1.36\\\" already present on machine and can be accessed by the pod\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"checkout-57745d5dc8-kf6v6\"}\n"
+     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"storefront-84fc6d7d6c-mnsh5.18e8a0d751327746\",\"at\":\"2026-11-16T20:34:58.147718Z\",\"reason\":\"Scheduled\",\"message\":\"Successfully assigned shop/storefront-84fc6d7d6c-mnsh5 to k3d-oc-docs-server-0\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"storefront-84fc6d7d6c-mnsh5\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8-kf6v6\",\"at\":\"2026-11-14T20:06:43.468701035Z\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-595b6dfb87-qxl9g\",\"at\":\"2026-11-16T20:34:58.660758788Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8-kf6v6.18e80223137b6f7f\",\"at\":\"2026-11-14T20:06:43Z\",\"reason\":\"Created\",\"message\":\"Container created\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"checkout-57745d5dc8-kf6v6\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"storefront\",\"at\":\"2026-11-16T20:34:58.713091431Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-14T20:06:43.695120542Z\"}\n"
+     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-595b6dfb87-qxl9g.18e8a0d649b60015\",\"at\":\"2026-11-16T20:34:58Z\",\"reason\":\"Pulled\",\"message\":\"Container image \\\"busybox:1.36\\\" already present on machine and can be accessed by the pod\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"checkout-595b6dfb87-qxl9g\"}\n"
     },
     {
-     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8-kf6v6.18e80223274bb466\",\"at\":\"2026-11-14T20:06:43Z\",\"reason\":\"Started\",\"message\":\"Container started\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"checkout-57745d5dc8-kf6v6\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"storefront-84fc6d7d6c-mnsh5\",\"at\":\"2026-11-16T20:34:59.170710312Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-b69774745-2s4zr\",\"at\":\"2026-11-14T20:06:44.111121884Z\"}\n"
+     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-595b6dfb87-qxl9g.18e8a0d663d7685b\",\"at\":\"2026-11-16T20:34:58Z\",\"reason\":\"Created\",\"message\":\"Container created\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"checkout-595b6dfb87-qxl9g\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-14T20:06:44.24177222Z\"}\n"
+     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout.18e8a0d7881cb454\",\"at\":\"2026-11-16T20:34:59Z\",\"reason\":\"ScalingReplicaSet\",\"message\":\"Scaled down replica set checkout-b69774745 from 1 to 0\",\"type\":\"Normal\",\"involvedKind\":\"Deployment\",\"involvedName\":\"checkout\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8-kf6v6\",\"at\":\"2026-11-14T20:06:44.520847497Z\"}\n"
+     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-b69774745.18e8a0d799553e64\",\"at\":\"2026-11-16T20:34:59Z\",\"reason\":\"SuccessfulDelete\",\"message\":\"Deleted pod: checkout-b69774745-7ctl4\",\"type\":\"Normal\",\"involvedKind\":\"ReplicaSet\",\"involvedName\":\"checkout-b69774745\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-b69774745-2s4zr\",\"at\":\"2026-11-14T20:06:44.704535731Z\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"storefront\",\"at\":\"2026-11-16T20:34:59.462490325Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-14T20:06:44.768414339Z\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-16T20:34:59.492602119Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"deleted\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-b69774745-2s4zr\",\"at\":\"2026-11-14T20:06:44.800722531Z\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-b69774745-7ctl4\",\"at\":\"2026-11-16T20:34:59.493823111Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8-kf6v6.18e8022410f12be9\",\"at\":\"2026-11-14T20:06:45Z\",\"reason\":\"BackOff\",\"message\":\"Back-off restarting failed container checkout in pod checkout-57745d5dc8-kf6v6_shop(bc0ef868-fa4d-4b0a-83c6-17d5624619f0)\",\"type\":\"Warning\",\"involvedKind\":\"Pod\",\"involvedName\":\"checkout-57745d5dc8-kf6v6\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-16T20:34:59.764425268Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8-kf6v6\",\"at\":\"2026-11-14T20:06:45.566835264Z\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-595b6dfb87-qxl9g\",\"at\":\"2026-11-16T20:34:59.930178139Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-14T20:06:45.679093041Z\"}\n"
+     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-595b6dfb87-qxl9g.18e8a0d7225dcf07\",\"at\":\"2026-11-16T20:34:59Z\",\"reason\":\"Started\",\"message\":\"Container started\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"checkout-595b6dfb87-qxl9g\"}\n"
     },
     {
-     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8-kf6v6.18e8022410f12be9\",\"at\":\"2026-11-14T20:06:46Z\",\"reason\":\"BackOff\",\"message\":\"Back-off restarting failed container checkout in pod checkout-57745d5dc8-kf6v6_shop(bc0ef868-fa4d-4b0a-83c6-17d5624619f0)\",\"type\":\"Warning\",\"involvedKind\":\"Pod\",\"involvedName\":\"checkout-57745d5dc8-kf6v6\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-16T20:35:00.725480726Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-57745d5dc8-kf6v6\",\"at\":\"2026-11-14T20:06:46.544827901Z\"}\n"
+     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"catalog-5fc6df4d55-5ppq7.18e8a0cb69f9aeb4\",\"at\":\"2026-11-16T20:35:00Z\",\"reason\":\"Pulled\",\"message\":\"Container image \\\"busybox:1.36\\\" already present on machine and can be accessed by the pod\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"catalog-5fc6df4d55-5ppq7\"}\n"
     },
     {
-     "s": "{\"verb\":\"updated\",\"kind\":\"HorizontalPodAutoscaler\",\"namespace\":\"shop\",\"name\":\"storefront\",\"at\":\"2026-11-14T20:06:47.33174336Z\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"checkout-b69774745-7ctl4\",\"at\":\"2026-11-16T20:35:00.964529099Z\"}\n"
     },
     {
-     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"catalog-7f4ff758f7-758vf.18e80218dc97f59c\",\"at\":\"2026-11-14T20:06:49Z\",\"reason\":\"Pulled\",\"message\":\"Container image \\\"busybox:1.36\\\" already present on machine and can be accessed by the pod\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"catalog-7f4ff758f7-758vf\"}\n"
-    },
-    {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"catalog-7f4ff758f7-758vf\",\"at\":\"2026-11-14T20:06:50.01711367Z\"}\n"
-    },
-    {
-     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"catalog-7f4ff758f7-758vf.18e8021902f303ee\",\"at\":\"2026-11-14T20:06:49Z\",\"reason\":\"Created\",\"message\":\"Container created\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"catalog-7f4ff758f7-758vf\"}\n"
-    },
-    {
-     "s": "{\"verb\":\"event\",\"kind\":\"Event\",\"namespace\":\"shop\",\"name\":\"catalog-7f4ff758f7-758vf.18e802193bb0a4fe\",\"at\":\"2026-11-14T20:06:50Z\",\"reason\":\"Started\",\"message\":\"Container started\",\"type\":\"Normal\",\"involvedKind\":\"Pod\",\"involvedName\":\"catalog-7f4ff758f7-758vf\"}\n"
-    },
-    {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Pod\",\"namespace\":\"shop\",\"name\":\"catalog-7f4ff758f7-758vf\",\"at\":\"2026-11-14T20:06:50.882980919Z\"}\n"
-    },
-    {
-     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"catalog\",\"at\":\"2026-11-14T20:06:51.063988372Z\"}\n"
+     "s": "{\"verb\":\"updated\",\"kind\":\"Deployment\",\"namespace\":\"shop\",\"name\":\"checkout\",\"at\":\"2026-11-16T20:35:01.199230503Z\"}\n"
     }
    ]
   }

@@ -41,7 +41,7 @@ Do these in order; each step needs the one before.
      groups (Admin → Users → New user → Import from LDAP…), or turn on *Create an account on a user's first
      sign-in* with default groups. Sign in once as an LDAP user before telling everyone.
      [LDAP / Active Directory](/administration/ldap)
-   - **Azure AD (Entra ID)**: create the app registration, fill in Admin → Azure AD, **Test Connection**, then
+   - **Azure AD (Entra ID)**: create the app registration, fill in Admin → Azure AD, **Test configuration**, then
      pre-create users with their groups (New user → Azure AD user) so they see something on their first
      "Sign in with Microsoft". [Azure AD](/administration/azure-ad)
 6. **Check what a user sees.** Sign in as a non-admin in a private window: only their namespaces, no Admin,
@@ -56,6 +56,8 @@ Do these in order; each step needs the one before.
      ([API and agents](/api/overview)).
    - Admin → Clusters → Prometheus: longer usage history ([Prometheus](/administration/prometheus)).
    - Admin → Customization: your logo.
+   - Admin → Backups: the database copies (downloading them needs `BACKUP_ALLOW_DOWNLOAD=true`)
+     ([Backup and restore](/installation/backup-restore)).
 8. **Ship the audit log.** It is in the database for `LOG_RETENTION_DAYS` (30) and on stdout as JSON; send stdout
    to your log platform to keep it longer ([Elastic](/operations/elastic)).
 9. **Plan backups** of the volume ([Backup and restore](/installation/backup-restore)).

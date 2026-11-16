@@ -31,7 +31,7 @@ cluster:
 ```bash
 kubectl --context <cluster> create namespace kubernetes-openconsole
 kubectl --context <cluster> apply -f \
-  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/rbac.yaml
+  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/rbac.yaml
 ```
 
 This creates:
@@ -58,6 +58,26 @@ Secrets are left out of the read-only file on purpose: at the Kubernetes level `
 values, so the OpenConsole permission `secrets:reveal` would be the only protection. If you need the Secrets tab with
 metadata only, uncomment the rule and grant `secrets:list` / `secrets:get` only.
 
+### Writes in some namespaces only {#writes-in-some-namespaces-only}
+
+`rbac.yaml` lets OpenConsole read Secrets, open shells and change workloads in every namespace, `kube-system`
+included. To allow that only in the namespaces you choose, keep the reads cluster-wide (OpenConsole watches pods,
+Deployments, … across the cluster) and bind the write rights per namespace with
+[`deploy/optional/rbac-namespaced-writes.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.1/deploy/optional/rbac-namespaced-writes.yaml):
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/rbac-readonly.yaml
+curl -sL https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/optional/rbac-namespaced-writes.yaml \
+  | sed 's/namespace: team-a/namespace: payments/' | kubectl apply -f -
+```
+
+Run the second command once per namespace, with its name. Elsewhere Kubernetes refuses: the Secrets tab says
+*OpenConsole's account on this cluster may not read this (check its ClusterRole).* (`403` `cluster_forbidden`), a shell or a command
+fails (`exec_failed`), and restart, scale and YAML apply fail with the API server's message. Keep the OpenConsole
+roles in line, so users don't get buttons that only fail. If you install with the `deploy/` folder, list the files
+instead ([Install on Kubernetes](/installation/kubernetes#2-apply-it)), or every `kubectl apply -k` puts `rbac.yaml`
+back.
+
 ### What each ClusterRole rule is for {#what-each-clusterrole-rule-is-for}
 
 Delete the rules for permissions you will never grant (from a copy of the file).
@@ -65,7 +85,7 @@ Delete the rules for permissions you will never grant (from a copy of the file).
 | Rule (`rbac.yaml`) | Needed for | Without it |
 |---|---|---|
 | `namespaces, pods, services, configmaps, events`: get / list / watch | every Dashboard tab, Live Events | OpenConsole can't list anything |
-| `secrets`: get / list | `secrets:list`, `secrets:get`, `secrets:reveal` | the Secrets tab says *"ServiceAccount is not allowed to read secrets"* |
+| `secrets`: get / list | `secrets:list`, `secrets:get`, `secrets:reveal` | the Secrets tab says *"OpenConsole's account on this cluster may not read this"* |
 | `secrets`: update | `secrets:edit` | applying a Secret's YAML fails with 403 |
 | `pods/log`: get | pod / deployment / job logs (`pods:logs`) | logs fail with 403 |
 | `pods/exec`: create | pod shell and one-command exec (`pods:exec`) | the shell fails with 403 |
@@ -141,9 +161,12 @@ EOF
 ```
 
 :::warning Not your personal kubeconfig
-Kubeconfigs that sign in through an exec plugin (`kubelogin`, `aws eks get-token`, `gke-gcloud-auth-plugin`) don't
-work: the container has none of those programs. They would also make OpenConsole act as you instead of as a
-dedicated identity.
+A kubeconfig may only carry its credentials **inline**: `token`, `client-certificate-data` / `client-key-data`,
+`certificate-authority-data`. One that signs in through an exec plugin (`kubelogin`, `aws eks get-token`,
+`gke-gcloud-auth-plugin`), an `auth-provider`, or reads a file (`tokenFile`, `client-certificate`, `client-key`,
+`certificate-authority`) is refused (`kubeconfig_unsupported`): it would run a program or read a file inside
+the OpenConsole pod. A personal kubeconfig would also make OpenConsole act as you instead of as a dedicated
+identity.
 :::
 
 ## Rotate the token {#rotate-the-token}
@@ -157,18 +180,17 @@ NS=kubernetes-openconsole
 kubectl --context $CTX -n $NS delete serviceaccount openconsole-reader          # its token Secret goes with it
 kubectl --context $CTX -n $NS wait --for=delete secret/openconsole-reader-token --timeout=60s
 kubectl --context $CTX apply -f \
-  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.0/deploy/rbac.yaml
+  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/rbac.yaml
 ```
 
 Deleting and re-creating only the Secret gives you **the same token again**: Kubernetes derives a ServiceAccount
 token from the ServiceAccount and the Secret's name, so the "new" token is identical and the old one keeps working.
-A new ServiceAccount gets a new identity, and the old token is refused at once. (The comment in `rbac.yaml` 2.23.0
-still describes the Secret-only way; it is wrong.)
+A new ServiceAccount gets a new identity, and the old token is refused at once. (The comment in `rbac.yaml` up to
+2.23.0 described the Secret-only way; it was wrong.)
 
 Then read the new token and CA (step 2), click **Edit** on the cluster in **Admin → Clusters**, tick **Replace
-credentials** and paste the new token **and the CA again**: with *Replace credentials* both fields start empty, and
-a save without the CA fails (`x509: certificate signed by unknown authority`). For a kubeconfig cluster, upload the
-new file.
+credentials** and paste the new token. Leave the CA field empty: the stored CA stays (the API server's certificate
+didn't change). For a kubeconfig cluster, upload the new file.
 
 Until you do, every cluster entry that uses the old token (token and kubeconfig alike) has lost access. The lists may
 still show what OpenConsole had cached, and the Clusters page shows no error; the pod log has
@@ -189,6 +211,7 @@ For up to 7 days, set the cluster's Prometheus under **Admin → Clusters → Pr
 - **Save fails**: the API server is not reachable from the pod (network policy, private endpoint, `127.0.0.1` in a
   kubeconfig), or the CA doesn't match.
 - **A tab is empty or 403 for a user**: check that user's role permissions first, then the ClusterRole rule above.
+  A tab that says *OpenConsole's account on this cluster may not read this* (`cluster_forbidden`) is the ClusterRole.
 - **No CPU / memory**: the cluster has no metrics-server (`kubectl get apiservices v1beta1.metrics.k8s.io`), or the
   ClusterRole lacks `metrics.k8s.io` `pods`. The Pods tab says which.
 - **Prometheus test fails**: the test names the failing step; see [Prometheus](/administration/prometheus).

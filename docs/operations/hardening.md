@@ -19,7 +19,7 @@ the [Security model](/operations/security).
   only for Prometheus, and only for your Prometheus Service. OpenConsole doesn't use port-forward, so it needs no
   rule for it. Every rule and what it is for: [Kubernetes permissions](/reference/kubernetes-permissions).
 - **Writes only where they are needed**: keep the reads cluster-wide and bind Secrets, shells and write verbs per
-  namespace ([Writes in some namespaces only](/installation/connect-cluster)).
+  namespace ([Writes in some namespaces only](/installation/connect-cluster#writes-in-some-namespaces-only)).
 - **One ServiceAccount per cluster, never a personal kubeconfig**, and a plan to rotate its token, for example every
   6 to 12 months ([Rotate the token](/installation/connect-cluster#rotate-the-token)). Don't keep the generated tokens
   in Git.
@@ -44,7 +44,7 @@ the [Security model](/operations/security).
   [Environment variables](/reference/environment-variables)).
 - **A NetworkPolicy** that lets in only your Ingress controller and your Prometheus. `/metrics` has no sign-in;
   don't route it through the Ingress either. The same policy is
-  [`deploy/optional/networkpolicy.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/deploy/optional/networkpolicy.yaml). Change the two namespace names to
+  [`deploy/optional/networkpolicy.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.1/deploy/optional/networkpolicy.yaml). Change the two namespace names to
   yours:
 
   ```yaml title="networkpolicy.yaml"
@@ -114,7 +114,7 @@ the [Security model](/operations/security).
 ## The volume {#the-volume}
 
 - **Keep the encryption key outside the database** (`ENCRYPTION_KEY_FILE` from a Secret), and keep a copy of the key
-  somewhere else ([Backup and restore](/installation/backup-restore)).
+  somewhere else ([Backup and restore](/installation/backup-restore#keep-the-encryption-key-out-of-the-database)).
 - **Copy the backups off the volume, and protect them like the cluster credentials.** OpenConsole writes one a day to
   `/data/backups`, on the same volume, so they don't survive losing it. Leave `BACKUP_ALLOW_DOWNLOAD` off unless
   you use it ([Backup and restore](/installation/backup-restore)).

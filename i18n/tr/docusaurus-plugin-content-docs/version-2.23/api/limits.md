@@ -12,25 +12,27 @@ ret, `rate_limited` (ya da `denied` / `failed`) sonucuyla audit'e yazılır.
 
 | Limit | Neye uygulanır | Aşılınca |
 |---|---|---|
-| Saniyede 10 istek, 30'luk patlamalar | her API anahtarı, her çağrı | Boş gövdeli, `Retry-After` içermeyen 429; bir saniye bekleyin. `api_key.use` / `rate_limited` olarak audit'e yazılır; anahtar başına dakikada en fazla bir kez. |
-| Aynı anda 5, sonra 6 saniyede bir | Deployment restart ve ölçekleme, StatefulSet ölçekleme, YAML uygulama (dry run hariç); kullanıcı başına, anahtarlar ve web birlikte | 429 `{"error":"rate limited"}`; YAML uygulama ayrıca `Retry-After: 6` gönderir. |
-| Aynı anda 10, sonra saniyede bir | Log okumaları ve log akışları; kullanıcı başına | 429 `{"error":"rate_limited"}` (bir akış `retry: true` içeren bir `error` frame'i alır). |
-| `MAX_EXEC_SESSIONS_PER_USER` açık shell (varsayılan 3) | Shell'ler ve tek komutluk exec; kullanıcı başına, anahtarlar ve web birlikte | Komut için 429 `{"error":"too_many_sessions"}`; shell ise *too many open shells* ile reddedilir. |
-| `MAX_REPLICAS` (varsayılan 100) | Ölçekleme | 400 `replicas must be between 0 and 100`. |
+| Saniyede 10 istek, 30'luk patlamalar | her API anahtarı, her çağrı | `Retry-After: 1` ile 429 `rate_limited`; bir saniye bekleyin. `api_key.use` / `rate_limited` olarak audit'e yazılır; anahtar başına dakikada en fazla bir kez. |
+| Aynı anda 5, sonra 6 saniyede bir | Deployment restart ve ölçekleme, StatefulSet ölçekleme, YAML uygulama (dry run hariç); kullanıcı başına, anahtarlar ve web birlikte | `Retry-After: 6` ile 429 `rate_limited`. |
+| Aynı anda 10, sonra saniyede bir | Log okumaları ve log akışları; kullanıcı başına | 429 `rate_limited` (bir akış `retry: true` içeren bir `error` frame'i alır). |
+| `MAX_EXEC_SESSIONS_PER_USER` açık shell (varsayılan 3) | Shell'ler ve tek komutluk exec; kullanıcı başına, anahtarlar ve web birlikte | 429 `too_many_sessions`; tarayıcıdan açılan shell ise *too many open shells* ve 4429 kapanış koduyla reddedilir. |
+| `MAX_REPLICAS` (varsayılan 100) | Ölçekleme | 400 `invalid_input`, detail `replicas must be between 0 and 100`. |
 
+Durumdan sonra gelen kod, gövdenin `error` alanıdır; gövde [Hatalar](/api/quick-start#errors) bölümünde anlatılır.
 İki değişken de [Ortam değişkenleri](/reference/environment-variables) sayfasında.
 
 ## Log okuma: `GET …/pods/{name}/logs` {#reading-a-log-get-podsnamelogs}
 
 | Parametre | Varsayılan | Limit |
 |---|---|---|
-| `tailLines` | 500 | 1 ile 10 000 arası; dışında → 400 `tailLines must be between 1 and 10000` |
-| `sinceSeconds` | yok | pozitif bir sayı |
+| `tailLines` | 500 | 1 ile 10 000 arası; dışında → 400 `invalid_input`, detail `tailLines must be between 1 and 10000` |
+| `sinceSeconds` | yok | pozitif bir sayı; değilse 400 `invalid_input` |
 | `previous`, `timestamps`, `container` | `false`, `false`, ana container | |
 
 Yanıt en fazla **5 MiB** düz metindir. Daha uzun bir log satır sonunda kesilir ve yanıt
 `X-OpenConsole-Truncated: true` başlığını taşır: daha az satır ya da daha kısa bir `sinceSeconds` isteyin. Hatalar: 404
-`pod_not_found`; 400 `container_not_found`, `not_ready` (container henüz başlamadı) ya da `previous_unavailable`.
+`pod_not_found`; 400 `container_not_found`, `not_ready` (container henüz başlamadı) ya da `previous_unavailable`; 403
+`cluster_forbidden`: OpenConsole'un cluster'daki kendi hesabı pod'u ya da logunu okuyamıyor (ClusterRole'ü).
 
 ## Komut çalıştırma: `POST …/pods/{name}/exec` {#running-a-command-post-podsnameexec}
 

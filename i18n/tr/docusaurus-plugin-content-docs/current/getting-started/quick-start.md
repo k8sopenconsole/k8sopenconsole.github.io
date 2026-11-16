@@ -13,14 +13,14 @@ Makinenizde tek bir container; etrafa göz atmak için yeterli. Bir ekip için [
 ```bash
 docker run -d --name openconsole -p 8080:8080 \
   -v openconsole-data:/data \
-  ghcr.io/vurulkan/kubernetes-openconsole:2.23.0
+  ghcr.io/vurulkan/kubernetes-openconsole:2.23.1
 ```
 
 | Parça | Anlamı |
 |---|---|
 | `-p 8080:8080` | arayüz ve API, http://localhost:8080 adresinde |
 | `-v openconsole-data:/data` | SQLite veritabanı ve shell kayıtları; yeniden başlatmalarda korunur. Sonra silinecek bir deneme için bunu çıkarın |
-| `:2.23.0` | sürüm. İmajlar `linux/amd64` ve `linux/arm64` için var |
+| `:2.23.1` | sürüm. İmajlar `linux/amd64` ve `linux/arm64` için var |
 
 Ayakta olduğunu kontrol edin: `curl http://localhost:8080/readyz` `ready` yanıtını verir.
 
@@ -47,7 +47,7 @@ kind, k3d) olduğu gibi çalışmaz: container'ın içinde bu adres container'ı
   docker rm -f openconsole
   docker run -d --name openconsole --network k3d-<name> -p 8080:8080 \
     -v openconsole-data:/data \
-    ghcr.io/vurulkan/kubernetes-openconsole:2.23.0
+    ghcr.io/vurulkan/kubernetes-openconsole:2.23.1
   ```
 
   ve API server olarak `https://k3d-<name>-server-0:6443` kullanın. [k3d'de deneyin](/getting-started/try-on-k3d)

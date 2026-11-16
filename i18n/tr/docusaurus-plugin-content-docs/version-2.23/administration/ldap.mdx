@@ -24,11 +24,13 @@ verirsiniz.
 | Etkin | LDAP girişini tek hamlede açar ya da kapatır |
 | Host + Port ya da URL | `dc01.example.corp` ve `389`, ya da `ldaps://dc01.example.corp:636` |
 | SSL kullan (ldaps) | baştan TLS (port 636) |
-| StartTLS | 389'daki düz bağlantıyı TLS'e yükseltir (aşağıdaki nota bakın) |
+| StartTLS | 389'daki düz bağlantıyı TLS'e yükseltir |
 | TLS sertifika doğrulamasını atla | yalnızca test için |
+| CA sertifikası (PEM) | dizinin sertifikası genel bir CA'dan değilse kendi CA'nız (aşağıdaki nota bakın) |
 | Zaman aşımı | LDAP işlemi başına saniye (varsayılan 10) |
-| Bind DN / Bind şifresi | dizinde arama yapan servis hesabı, örn. `CN=svc-openconsole,OU=ServiceAccounts,DC=example,DC=corp`. Şifre şifrelenerek saklanır; **Bind şifresini güncelle**'yi yalnızca şifreyi değiştirirken işaretleyin |
-| Kullanıcı Base DN (tek) | kişilerin arandığı yer, örn. `OU=Users,DC=example,DC=corp`. Kişiler birden çok OU'daysa ortak üst OU'yu kullanın (2.23.0'da *Kullanıcı Base DN'leri (virgülle ayrılmış)* alanı bir DN'i kendi virgüllerinden böler, bu yüzden tam bir DN yazılamaz) |
+| Bind DN / Bind parolası | dizinde arama yapan servis hesabı, örn. `CN=svc-openconsole,OU=ServiceAccounts,DC=example,DC=corp`. Parola şifrelenerek saklanır; **Bind parolasını güncelle**'yi yalnızca parolayı değiştirirken işaretleyin |
+| Kullanıcı Base DN (tek) | kişilerin arandığı yer, örn. `OU=Users,DC=example,DC=corp` |
+| Kullanıcı base DN'leri (her satıra bir tane) | aranacak başka yerler, her satıra bir tam DN, örn. iki satırda `OU=Users,DC=example,DC=corp` ve `OU=Contractors,DC=example,DC=corp`. 2.23.0'a kadar bu alan virgüllerden bölünüyordu; o zaman kaydedilmiş değer tek bir DN olarak okunur, yükseltmeden sonra alanı kontrol edin |
 | Kullanıcı filtresi | `%s`, kişinin yazdığı değerdir. Active Directory `(sAMAccountName=%s)`, OpenLDAP `(uid=%s)` |
 | Kullanıcı adı attribute'u | OpenConsole kullanıcı adı olacak attribute: `sAMAccountName` ya da `uid` |
 
@@ -43,12 +45,14 @@ verirsiniz.
 | Kullanıcı adı attribute'u | `sAMAccountName` |
 
 Önce **LDAP ayarlarını kaydet**, sonra **Bağlantıyı test et**: servis hesabıyla bind olur ve her base DN'de arama yapar.
+Kaydetme başarısız olursa ekran nedenini söyler (örneğin PEM olmayan bir CA sertifikası).
 
-:::warning[2.23.0'da TLS]
-2.23.0'da **StartTLS yalnızca *TLS sertifika doğrulamasını atla* işaretliyken bağlanır**: sunucu sertifikası
-doğrulanamıyor (hata olarak kaydedildi). Hem şifreli **hem de** doğrulanmış bir bağlantı için port 636'da **SSL kullan
-(ldaps)** seçin. Bu durumda sertifika genel (public) bir CA'dan gelmelidir, çünkü kendi CA'nızı girebileceğiniz bir
-alan henüz yok.
+:::note[TLS]
+**SSL kullan (ldaps)** ya da **StartTLS** ile dizinin sertifikası doğrulanır: *Host* / *URL*'deki host adı (ya da IP
+adresi) için geçerli olmalı ve OpenConsole'un güvendiği bir CA tarafından imzalanmış olmalıdır: imajdaki genel CA'lar
+ya da **CA sertifikası (PEM)** alanındaki. Kendi CA'nızı oraya yapıştırın (`-----BEGIN CERTIFICATE-----` …; birden
+çok sertifika arka arkaya olabilir). Sertifika içermeyen bir metin kaydederken reddedilir. 2.23.0'a kadar StartTLS
+yalnızca *TLS sertifika doğrulamasını atla* işaretliyken bağlanıyordu ve CA alanı yoktu.
 :::
 
 ## 2. Kişileri içe aktarın (ya da ilk girişte oluşturun) {/* #2-import-people-or-create-them-on-first-sign-in */}
@@ -62,9 +66,9 @@ başına en fazla 100 sonuç gelir. Önek araması için filtreye `(sAMAccountNa
 **İlk girişte** (varsayılan olarak kapalı): *Kullanıcının ilk girişinde hesabını oluştur* seçeneğini işaretleyin,
 **Yeni hesapları şu gruplara ekle** alanında grupları seçin ve kaydedin. Bundan sonra:
 
-- kullanıcı filtresinin bulduğu ve geçerli bir dizin şifresiyle giriş yapan herkes anında, bu gruplarda ve dizindeki
+- kullanıcı filtresinin bulduğu ve geçerli bir dizin parolasıyla giriş yapan herkes anında, bu gruplarda ve dizindeki
   adıyla bir hesap alır (`John` yazan kişi `john` olarak girer);
-- hesabı olmayan ve şifresi yanlış olan kişi reddedilir; hiçbir şey oluşturulmaz;
+- hesabı olmayan ve parolası yanlış olan kişi reddedilir; hiçbir şey oluşturulmaz;
 - yeni hesaplar asla yönetici olmaz (`auto_provisioned: true` ile `user.create`);
 - birini dışarıda bırakmak için hesabını **devre dışı bırakın**: silinen hesap, kişinin bir sonraki girişinde yeniden
   oluşturulur.
@@ -82,21 +86,28 @@ bir yönetici belirler.
 
 ## Giriş {/* #signing-in */}
 
-Kişiler normal giriş formuna dizin kullanıcı adlarını ve şifrelerini yazar. OpenConsole kullanıcı filtresiyle DN'lerini
-bulur ve onların kimliğiyle bind olur; yani şifreyi her seferinde dizin kontrol eder. Dizinde devre dışı ya da süresi
+Kişiler normal giriş formuna dizin kullanıcı adlarını ve parolalarını yazar. OpenConsole kullanıcı filtresiyle DN'lerini
+bulur ve onların kimliğiyle bind olur; yani parolayı her seferinde dizin kontrol eder. Dizinde devre dışı ya da süresi
 dolmuş bir hesap giriş yapamaz. Joker karakterli filtre güvenlidir: girişte OpenConsole ayrıca kullanıcı adı
 attribute'unda **birebir eşleşme** arar, yani `jo` asla `john` olarak giriş yapamaz. **Etkin** kapatıldığında tüm LDAP
 girişleri anında durur.
+
+Dizinle yalnızca kaynağı **LDAP** olan bir hesap (içe aktarılmış ya da ilk girişte oluşturulmuş) giriş yapar. **Local**
+bir hesap, dizinde aynı adla biri olsa bile asla dizinle giriş yapmaz; yani bir dizin kaydı local bir hesabı (yerleşik
+`admin` dahil) ele geçiremez. 2.23.0'a kadar parolası tutmayan local hesap dizine düşüyor ve LDAP'a çevriliyordu. 2.13'ten
+önce içe aktarılmış ve Yönetim → Kullanıcılar'da hâlâ kaynağı *Local* görünen kişileri silip yeniden içe aktarmanız
+gerekir.
 
 ## Çalışmadığında {/* #when-it-doesnt-work */}
 
 | Belirti | Genellikle |
 |---|---|
 | Test: connection refused / timeout | host ya da port yanlış, ya da OpenConsole pod'u ile dizin arasında bir firewall var |
-| Test: `x509: certificate signed by unknown authority` | kendi CA'nızın sertifikasıyla ldaps; yukarıdaki TLS notuna bakın |
-| Test: *TLS sertifika doğrulamasını atla* olmadan StartTLS başarısız | yukarıdaki 2.23.0 kısıtı |
-| Test: `Invalid Credentials (49)` | bind DN ya da bind şifresi yanlış (AD'de bind DN tam `CN=…` ya da `user@domain` biçimindedir) |
+| Test: `x509: certificate signed by unknown authority` | sertifika kendi CA'nızdan: onu **CA sertifikası (PEM)** alanına yapıştırın |
+| Test: `x509: certificate is valid for …, not …` | *Host* / *URL* sertifikadaki bir ad değil: sertifikanın verildiği adı kullanın |
+| Test: `Invalid Credentials (49)` | bind DN ya da bind parolası yanlış (AD'de bind DN tam `CN=…` ya da `user@domain` biçimindedir) |
 | Test çalışıyor ama bir kişi giriş yapamıyor | kullanıcı filtresi kişiyi base DN'lerin altında bulamıyor ya da kullanıcı adı attribute'u kişinin yazdığından farklı; ya da (ilk giriş seçeneği kapalıyken) kişi hiç içe aktarılmamış |
 | Giriş yaptı ama hiçbir şey görmüyor | rolü olan hiçbir OpenConsole grubunda değil |
 
-Denetim Logları'ndaki başarısız `user.login` olayında nedeni yazar (`login_method: ldap`).
+Denetim Logları'ndaki başarısız `user.login` olayında nedeni yazar (`login_method: ldap`); pod logundaki
+`ldap sign-in failed` satırında dizinin mesajı vardır ([Giriş yapılamıyor](/operations/troubleshooting#sign-in-fails)).

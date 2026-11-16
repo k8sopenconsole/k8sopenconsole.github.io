@@ -19,10 +19,14 @@ The cluster you work on is in the header. Click it, or press `c`:
 - The list has the clusters your permissions cover. The one marked **default** is where you start until you pick
   another.
 - Picking a cluster switches **only you**. OpenConsole remembers it, on every device you sign in from.
+- Each browser tab keeps working on the cluster it shows. If you pick another cluster in a second tab, the first
+  one says so (*staging was selected in another tab. This tab still works on prod-eu.*) and its actions still go to
+  prod-eu; **Switch to staging** follows, **Stay on prod-eu** closes the note. A reloaded tab opens on your latest pick.
 - In the open list, `1`–`9` pick by position, `↑` / `↓` move and `Enter` selects.
 - Every action you take is recorded with the cluster it ran on.
 
-If your cluster is removed, or you lose every permission on it, you are moved back to the default.
+If your cluster is removed, or you lose every permission on it, you are moved back to the default (a tab open on it
+shows an error until you reload it).
 
 ## Your namespaces {/* #your-namespaces */}
 

@@ -40,6 +40,14 @@ satırı olarak yazılır ([Elastic](/operations/elastic)).
 Bir satırdaki **Ayrıntılar** bunları gösterir. Tüm alanlar ve tüm ayrıntı anahtarları:
 [Denetim olayları](/reference/audit-events).
 
+Kullanıcılar, gruplar, roller, rol izinleri ve LDAP, Azure AD, oturum ve logo ayarlarındaki yönetici değişiklikleri
+her cevap için bir olay yazar: `success`, `denied` (yönetici olmayan biri, neden `admin_only`) ya da neden olarak
+cevabın kodunu taşıyan `failed` (`not_found`, `invalid_id`, `weak_password`, …); yani reddedilen ya da başarısız
+olan bir değişiklik de logda olur. İsteğin kendisi hatalı olduğu için reddedilen bir cluster değişikliği (aralık dışı
+replika sayısı, ayrıştırılamayan ya da başka bir nesneyi adlandıran YAML, boş komut, anahtar adı olmadan
+`secret.reveal`) `failed` olur, nedeni `invalid`. Bir nesnenin YAML'ını açmak bir okumadır (`pod.get`, `deployment.get`,
+`configmap.get`, …). Hesap hâlâ parolasını değiştirmek zorunda olduğu için reddedilen bir istek `denied` olur.
+
 Audit'e yazılmayanlar: UI'nin kendiliğinden çektiği listeler (Panel'in 10 saniyelik yenilemesi, komut paletinin ve rol
 düzenleyicisinin arkasındaki namespace listesi; bunlar `X-OpenConsole-Refresh: auto` gönderir. API anahtarıyla bu başlık
 yok sayılır, yani anahtarla yapılan her okuma audit'e yazılır) ve hiçbir cluster
@@ -53,8 +61,8 @@ satırlarını görmek için log platformunuzda bu ID'yi arayın.
 
 ## CSV {/* #csv */}
 
-**CSV olarak dışa aktar**, filtrelerin gösterdiğini dışa aktarır; her alan bir sütundur (ayrıntılar JSON olarak, artı
-`api_key_name`). Her dışa aktarma da audit'e yazılır. Erişim gözden geçirmeleri için Kullanıcılar ve Gruplar'ın CSV'sini
+**CSV olarak dışa aktar**, filtrelerin gösterdiğini en yeniden başlayarak en fazla 50 000 satır olarak dışa aktarır; her alan bir sütundur (ayrıntılar JSON olarak, artı
+`api_key_name`); daha eskileri için filtreleri daraltın. Her dışa aktarma da audit'e yazılır. Erişim gözden geçirmeleri için Kullanıcılar ve Gruplar'ın CSV'sini
 de ekleyin ([Kullanıcılar ve gruplar](/administration/users#access-reviews)).
 
 Denetim logu yalnızca yöneticilere açıktır; yönetici olmayanlara açmak için bkz.

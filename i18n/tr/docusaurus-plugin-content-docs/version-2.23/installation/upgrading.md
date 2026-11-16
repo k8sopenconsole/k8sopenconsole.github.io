@@ -11,7 +11,8 @@ description: "Yeni bir sürüme nasıl geçilir, veritabanına ne olur ve nasıl
    Sürüme özel adımlar [aşağıda](#version-notes) da var. Sürümünüzü öğrenmek için sol menünün altındaki GitHub
    ikonunun üzerine gelin ya da pod'un ilk log satırına bakın (`"version":"…"`).
 2. **Volume'ün yedeğini alın** ([Yedekleme ve geri yükleme](/installation/backup-restore)). Yükseltmeden önceki
-   duruma birebir dönmenin tek yolu bu.
+   duruma birebir dönmenin tek yolu bu. 2.23.1'den itibaren OpenConsole, yeni bir sürüm veritabanını değiştirmeden
+   önce onu `/data/backups/app-<zaman>-pre-upgrade.db`'ye de kopyalar, ama bu kopya aynı volume'dadır.
 3. Deployment'ın `strategy: Recreate` kullandığından emin olun ([Kubernetes'e kurulum](/installation/kubernetes)).
    Varsayılan rolling update'te yeni pod, eskisi hâlâ çalışırken veritabanını açar; 2.23.0'da bu, bir sonraki
    restart'a kadar yazılanların kaybolmasına yol açabilir.
@@ -25,17 +26,17 @@ değişikliklerini beraberinde getirir ve açılışta eksik olanları uygular.
 
 ```yaml title="kustomization.yaml"
 resources:
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.0   # was v2.22.0
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.1   # was v2.23.0
 images:
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.23.0"                                                         # was 2.22.0
+    newTag: "2.23.1"                                                         # was 2.23.0
 ```
 
 ```bash
 kubectl diff -k .      # the image tag, plus whatever the release changed in deploy/
 kubectl apply -k .
 kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole --timeout=5m
-kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.23.0"
+kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.23.1"
 ```
 
 Oturumlar geçerli kalır; giriş yapmış kullanıcılar sayfayı yenileyip kaldıkları yerden devam eder. `Recreate` ile
@@ -54,6 +55,8 @@ cluster'da `deploy/` ile birlikte gelir; bağlı diğer her cluster'da yeni `rba
 - Migration'lar yeni sürümün ilk açılışında otomatik çalışır: tablo ve sütun eklerler; bazı sürümler mevcut
   satırları bir kez yeniden yazar (2.17, eski audit satırlarına yeni aksiyon / sonuç alanlarını ekledi). Elle
   çalıştırılacak bir adım yok.
+- 2.23.1'den itibaren migration tek bir transaction içinde çalışır: başarısız olursa (dolu disk, bozuk dosya) pod
+  hatayı loguna yazarak durur ve veritabanı olduğu gibi kalır.
 - Geri migration yok. Eski bir sürüme dönmek desteklenmez. Pratikte değişiklikler yalnızca ekleme yaptığı için eski
   sürüm yeni veritabanıyla genellikle açılır (denendi: 2.22.0 veritabanında 2.21.0), ama yeni sürümün yazdığı
   veriler yok sayılabilir ya da yanlış okunabilir.
@@ -66,6 +69,64 @@ cluster'da `deploy/` ile birlikte gelir; bağlı diğer her cluster'da yeni `rba
    kullanıcılar, ayarlar) kaybolur.
 
 ## Sürüme özel notlar {#version-notes}
+
+### 2.23.1'e yükseltme {#upgrading-to-2231}
+
+- **Kendi manifest'iniz**: imaj artık distroless ve `deploy/deployment.yaml`, `/tmp`'de bir `emptyDir` ile
+  `readOnlyRootFilesystem: true` ayarlar. Bu ayarları kopyalıyorsanız `/tmp` volume'unu da ekleyin: sunucunun `/data`
+  dışında geçici dosya yazabileceği tek yer orasıdır.
+- **İmajda shell yok**: OpenConsole pod'una `kubectl exec` artık çalışmaz;
+  `kubectl debug -it <pod> --image=busybox:1.36 --target=dashboard` kullanın.
+- **Siteler arası istekler**: API artık hiçbir origin'e CORS cevabı vermez; sayfaları API'yi çağıran başka siteler
+  varsa onları `ALLOWED_ORIGINS`'e yazın. Başka bir siteden gelen WebSocket'ler `ws.origin_mismatch` olarak loglanır
+  (varsayılan `WS_ORIGIN_CHECK=warn` ile hâlâ kabul edilir).
+- **YAML editörü** imajla gelir; tarayıcı onu artık `cdn.jsdelivr.net`'ten yüklemez.
+- **Kendi manifest'iniz**: `deploy/` gibi `strategy: Recreate` ve `terminationGracePeriodSeconds: 30` kullanın.
+  Kapanışta açık shell'ler 1012 koduyla (*server restarting*) kapanır; bitişleri ve kayıtları audit'e yazılır.
+- **Veritabanı**: ilk açılış onu `/data/backups/app-<zaman>-pre-upgrade.db`'ye kopyalar. Grup üyelikleri ve rol
+  izinleri foreign key alır: daha önce silinmiş kullanıcı, grup ve rollerden kalan satırlar atılır; olmayan bir id
+  saklanmak yerine reddedilir (`400` / `404`).
+- **Yedekler**: her gün veritabanının bir kopyası; en yeni 7 tanesi `/data/backups`'ta tutulur (Yönetim → Yedekler).
+  Volume'daki boş alana bakın: veritabanı boyutunun yaklaşık 7 katı.
+- **`LOG_RETENTION_DAYS=0`** artık audit olaylarını hiç silmez (eskiden 30 demekti); temizlik açılışta da çalışır.
+- **Denetim Logları**: bir sayfada en fazla 500 satır olur; **CSV olarak dışa aktar** artık filtreye uyan bütün
+  satırları, en fazla 50 000, içerir (eskiden 1 000'de duruyordu).
+- **API hata cevapları**: her hata artık problem details'tır (`application/problem+json`): `{"type", "title",
+  "status", "error", "detail"}`. `error` her zaman bir neden kodudur; eskiden `error`'un tamamı olan bir mesaj (örneğin
+  `cluster "nope" is unknown or not yours to use`) artık `invalid_input` gibi bir kodun altında, `detail`'dedir.
+  `401` ve `429`'un da gövdesi var (`unauthorized`, `api_key_expired`, `api_key_revoked`, `Retry-After: 1` ile
+  `rate_limited`); parolasını değiştirmesi gereken bir hesabın API anahtarı sayfası `password_change_required` döner.
+  `error`'u İngilizce bir cümleyle karşılaştıran bir script koda geçmelidir ([Hatalar](/api/quick-start#errors)).
+- **Bilinmeyen API yolları**: bilinmeyen bir `/api/…` ya da `/ws/…` yolu `404` `not_found` döner (eskiden web
+  arayüzünün sayfasıyla `200` dönüyordu), yanlış metot `Allow` ile `405`. `GET` / `POST` / `PUT /api/admin/cluster` ve
+  `POST /api/admin/cluster/validate` kaldırıldı: `/api/admin/clusters`'ı kullanın.
+- **Audit hacmi**: kullanıcılar, gruplar, roller ve giriş, oturum ve logo ayarlarındaki her yönetici değişikliği, retler
+  ve hatalar dahil her cevapta audit'e yazılır; her YAML görüntüleme bir `<kind>.get` okumasıdır
+  ([Denetim logu](/administration/audit-log)).
+- **Loglar**: WebSocket istek satırları `status=101` der; tracing açıkken `tracing enabled` `LOG_FORMAT`'a uyar;
+  başarısız bir LDAP girişi dizinin mesajıyla `ldap sign-in failed` yazar ([Loglama](/operations/logging)).
+- **Kubeconfig ile eklenen cluster'lar**: bir program çalıştıran (`exec`, örn. kubelogin), `auth-provider` kullanan ya
+  da bir dosya okuyan kubeconfig reddedilir (`kubeconfig_unsupported`) ve böyle bir kubeconfig ile kaydedilmiş cluster
+  artık bağlanmaz. Yükseltmeden önce Yönetim → Cluster'lar'a bakın ve böyle bir kubeconfig'i token'lı ya da inline
+  olanla değiştirin ([Kubeconfig yöntemi](/installation/connect-cluster#kubeconfig-method)).
+- **Kendi manifest'iniz**: `TRUSTED_PROXIES`'i konsolun önündeki proxy'lerin ağına ayarlayın (`deploy/deployment.yaml`
+  özel ağları yazar). Ayarlanmazsa hiçbir `X-Forwarded-For`'a güvenilmez: audit log, Yönetim → Oturumlar ve giriş
+  kilidi kullanıcının değil ingress pod'unun adresini görür ([Kubernetes'e kurulum](/installation/kubernetes)).
+- **LDAP**: parolası tutmayan bir local hesap (yerleşik `admin` dahil) artık dizinde denenmez. *Kullanıcı base
+  DN'leri* her satıra bir DN alır: birden çok DN'i virgülle ayıran bir değer tek DN olarak okunur, her birini ayrı
+  satıra yazın. StartTLS dizinin sertifikasını doğrular; CA'nızı **CA sertifikası (PEM)** alanına yapıştırın
+  ([LDAP](/administration/ldap)).
+- **Oturum süresi**: Yönetim → Oturum'daki dakika artık hareketsiz geçen süredir ve oturum girişten en geç 12 saat
+  sonra biter; sabit bir ömür olarak düşünülmüş uzun bir değeri gözden geçirin ([Oturumlar](/administration/sessions)).
+- **`openconsole_cluster_connected`**, kimlik bilgileri reddedilen ya da ulaşılamayan bir cluster için artık `0`'dır;
+  buna bağlı bir alarm yükseltmeden sonra tetiklenebilir: o cluster'ın kimlik bilgilerini düzeltin
+  ([Metrikler](/operations/metrics)).
+- **API üzerinden loglar**: Kubernetes OpenConsole'un kendi hesabını reddettiğinde `GET …/pods/{name}/logs` `403`
+  `cluster_forbidden` döner (eskiden `502` `forbidden`). İsteğin kendisi hatalı olduğu için reddedilen bir cluster
+  değişikliği `failed`, nedeni `invalid` olarak audit'e yazılır.
+- **Ad**: ürünün adı artık **OpenConsole for Kubernetes**. İmaj, repo, namespace ve manifest'ler adlarını korur.
+- **İsteğe bağlı**: şifreleme anahtarını bir Secret'ta tutun
+  ([Şifreleme anahtarını veritabanının dışında tutun](/installation/backup-restore#keep-the-encryption-key-out-of-the-database)).
 
 ### 2.22'ye yükseltme {#upgrading-to-222}
 
