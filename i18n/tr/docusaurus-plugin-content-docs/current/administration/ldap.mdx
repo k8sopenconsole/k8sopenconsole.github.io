@@ -45,6 +45,7 @@ verirsiniz.
 | Kullanıcı adı attribute'u | `sAMAccountName` |
 
 Önce **LDAP ayarlarını kaydet**, sonra **Bağlantıyı test et**: servis hesabıyla bind olur ve her base DN'de arama yapar.
+Kaydetme başarısız olursa ekran nedenini söyler (örneğin PEM olmayan bir CA sertifikası).
 
 :::note[TLS]
 **SSL kullan (ldaps)** ya da **StartTLS** ile dizinin sertifikası doğrulanır: *Host* / *URL*'deki host adı (ya da IP
@@ -108,4 +109,5 @@ gerekir.
 | Test çalışıyor ama bir kişi giriş yapamıyor | kullanıcı filtresi kişiyi base DN'lerin altında bulamıyor ya da kullanıcı adı attribute'u kişinin yazdığından farklı; ya da (ilk giriş seçeneği kapalıyken) kişi hiç içe aktarılmamış |
 | Giriş yaptı ama hiçbir şey görmüyor | rolü olan hiçbir OpenConsole grubunda değil |
 
-Denetim Logları'ndaki başarısız `user.login` olayında nedeni yazar (`login_method: ldap`).
+Denetim Logları'ndaki başarısız `user.login` olayında nedeni yazar (`login_method: ldap`); pod logundaki
+`ldap sign-in failed` satırında dizinin mesajı vardır ([Giriş yapılamıyor](/operations/troubleshooting#sign-in-fails)).

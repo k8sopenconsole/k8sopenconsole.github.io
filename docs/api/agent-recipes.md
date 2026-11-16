@@ -42,8 +42,19 @@ export OPENCONSOLE_API_KEY=oc_…                  # the key; never in a prompt 
 {"key":"claude-code","namespaces":["crashlab"]}
 ```
 
-A refused call prints `curl: (22) The requested URL returned error: 403` and the body (`{"error":"forbidden"}`), and
-exits non-zero, which agents read well.
+A refused call prints `curl: (22) The requested URL returned error: 403` and the body, and exits non-zero, which
+agents read well:
+
+```bash
+./oc /api/namespaces/kube-system/pods
+```
+
+```text
+curl: (22) The requested URL returned error: 403
+{"type":"about:blank","title":"Forbidden","status":403,"error":"forbidden"}
+```
+
+The `error` field is the reason; the codes are in [Quick start → Errors](/api/quick-start#errors).
 
 ## A shell script {#a-shell-script}
 
@@ -78,24 +89,24 @@ chmod +x oc-crashes.sh
 ```
 
 ```text
-== badimage-67b7966bb-82lhs (app): 0 restarts, ImagePullBackOff
-   {"error":"previous_unavailable"}
-== brokendb-0 (db): 6 restarts, CrashLoopBackOff
+== badimage-67b7966bb-c4g8n (app): 0 restarts, ImagePullBackOff
+   {"type":"about:blank","title":"Bad Request","status":400,"error":"previous_unavailable"}
+== brokendb-0 (db): 5 restarts, CrashLoopBackOff
    boom
-== exit1-6bb6b857dc-bbcxg (app): 6 restarts, CrashLoopBackOff
-   fatal: config missing
+== exit1-6bb6b857dc-fg8xm (app): 5 restarts, CrashLoopBackOff
    starting
-== flappy-54fcb745f9-5m6cl (app): 6 restarts, CrashLoopBackOff
-   line 56 11:54:09
-   line 57 11:54:09
-   line 58 11:54:09
-   line 59 11:54:10
-   line 60 11:54:10
-== liveness-5cb5798b6b-8t27p (app): 7 restarts, CrashLoopBackOff
+   fatal: config missing
+== flappy-54fcb745f9-tg5bn (app): 5 restarts, Error
+   line 56 07:13:59
+   line 57 07:13:59
+   line 58 07:13:59
+   line 59 07:13:59
+   line 60 07:14:00
+== liveness-5cb5798b6b-999kw (app): 6 restarts, CrashLoopBackOff
    up
-== missingcm-64757c46c4-8xlpj (app): 0 restarts, CreateContainerConfigError
-   {"error":"previous_unavailable"}
-== oom-56b9dbd646-dkkpz (app): 6 restarts, CrashLoopBackOff
+== missingcm-64757c46c4-fn7pg (app): 0 restarts, CreateContainerConfigError
+   {"type":"about:blank","title":"Bad Request","status":400,"error":"previous_unavailable"}
+== oom-56b9dbd646-jgsnc (app): 5 restarts, CrashLoopBackOff
    allocating
 ```
 
@@ -170,9 +181,10 @@ Then ask in the agent chat, for example: *Find the crash-looping pods in the cra
 of their logs.*
 
 :::info[Can't see it or can't do it?]
-- **`{"error":"forbidden"}`**: the key doesn't list that namespace or permission, or you don't hold it any more
+- **`"error":"forbidden"`**: the key doesn't list that namespace or permission, or you don't hold it any more
   (`./oc /api/auth/me` shows what it reaches now).
-- **`{"error":"api_access_policy"}`**: you hold it, but the admin's API access policy keeps it from keys.
-- **`curl: (22) The requested URL returned error: 401`**: the key is unknown, expired or revoked, or its owner is
-  disabled. **`… error: 429`**: more than 10 calls a second with this key; see [Limits](/api/limits).
+- **`"error":"api_access_policy"`**: you hold it, but the admin's API access policy keeps it from keys.
+- **`curl: (22) The requested URL returned error: 401`**: the key is unknown (`unauthorized`), expired
+  (`api_key_expired`) or revoked (`api_key_revoked`), or its owner is disabled (`unauthorized`). **`… error: 429`**
+  (`rate_limited`): more than 10 calls a second with this key; wait the `Retry-After` second, see [Limits](/api/limits).
 :::

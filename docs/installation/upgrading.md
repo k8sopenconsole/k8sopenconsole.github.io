@@ -90,6 +90,21 @@ cluster OpenConsole runs in; on every other connected cluster apply the new `rba
 - **`LOG_RETENTION_DAYS=0`** now keeps audit events forever (it used to mean 30), and the purge also runs at start.
 - **Audit Logs**: a page has at most 500 rows; **Export CSV** now has every matching row up to 50 000 (it stopped at
   1 000).
+- **API error answers**: every error is now problem details (`application/problem+json`): `{"type", "title",
+  "status", "error", "detail"}`. `error` is always a reason code; a message that used to be the whole `error` (for
+  example `cluster "nope" is unknown or not yours to use`) is now in `detail`, under a code such as `invalid_input`.
+  `401` and `429` have a body too (`unauthorized`, `api_key_expired`, `api_key_revoked`, `rate_limited` with
+  `Retry-After: 1`), and the API key page of an account that must change its password answers
+  `password_change_required`. A script that compares `error` with an English sentence must switch to the code
+  ([Errors](/api/quick-start#errors)).
+- **Unknown API paths**: an unknown `/api/…` or `/ws/…` path answers `404` `not_found` (it used to answer `200` with
+  the web UI's page), a wrong method `405` with `Allow`. `GET` / `POST` / `PUT /api/admin/cluster` and
+  `POST /api/admin/cluster/validate` are removed: use `/api/admin/clusters`.
+- **Audit volume**: every admin change on users, groups, roles and the sign-in, session and logo settings is audited
+  for every answer, refusals and failures included, and every YAML view is a `<kind>.get` read
+  ([Audit log](/administration/audit-log)).
+- **Logs**: WebSocket request lines say `status=101`; with tracing on, `tracing enabled` follows `LOG_FORMAT`; a
+  failed LDAP sign-in writes `ldap sign-in failed` with the directory's message ([Logging](/operations/logging)).
 - **Optional**: keep the encryption key in a Secret
   ([Keep the encryption key out of the database](/installation/backup-restore)).
 

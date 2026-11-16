@@ -164,7 +164,7 @@ EOF
 A kubeconfig may only carry its credentials **inline**: `token`, `client-certificate-data` / `client-key-data`,
 `certificate-authority-data`. One that signs in through an exec plugin (`kubelogin`, `aws eks get-token`,
 `gke-gcloud-auth-plugin`), an `auth-provider`, or reads a file (`tokenFile`, `client-certificate`, `client-key`,
-`certificate-authority`) is refused with `kubeconfig_unsupported: …`: it would run a program or read a file inside
+`certificate-authority`) is refused (`kubeconfig_unsupported`): it would run a program or read a file inside
 the OpenConsole pod. A personal kubeconfig would also make OpenConsole act as you instead of as a dedicated
 identity.
 :::

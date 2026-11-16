@@ -11,8 +11,9 @@ logs. The log lines are in `kubectl -n kubernetes-openconsole logs deploy/kubern
 
 ## Adding a cluster fails {#adding-a-cluster-fails}
 
-**Save Cluster** answers `cluster validation failed: cannot list namespaces with these credentials: …`. The end of
-the message says why:
+**Save Cluster** answers *The cluster refused the credentials or could not be reached.* with the cause in parentheses:
+`(cannot list namespaces with these credentials: …)` (the API answers `400` `cluster_invalid` with that `detail`).
+The end of the message says why:
 
 | Message ends with | Cause | Fix |
 |---|---|---|
@@ -33,19 +34,19 @@ credentials* or *OpenConsole's account on this cluster may not read this (check 
 ```
 
 and of `cluster read failed` lines naming the resource, the cluster and the request id. Requests answer
-`502` `{"error":"cluster_unreachable"}`, or `403` `{"error":"cluster_forbidden"}`.
+`502` `cluster_unreachable`, or `403` `cluster_forbidden` (the body's `error`).
 
 The credentials OpenConsole holds for that cluster stopped working: the token was rotated or its ServiceAccount
 deleted (`Unauthorized`), or the ClusterRole or its binding changed (`forbidden`). For `Unauthorized` the cluster's
 connection gauge reads `0` ([Metrics](/operations/metrics#what-to-watch)), and picking the cluster in the header fails
-with `cannot connect to cluster: Unauthorized`. Fix the identity, then in **Admin → Clusters → Edit**
+with *The cluster cannot be reached, or it refused OpenConsole's credentials. (cannot connect to cluster: Unauthorized)*. Fix the identity, then in **Admin → Clusters → Edit**
 tick **Replace credentials** and paste the token and the CA ([Rotate the token](/installation/connect-cluster#rotate-the-token)).
 The cluster works again at once; no restart is needed.
 
-`403` `{"error":"cluster_forbidden"}` alone, on one tab (say Ingresses), means only that rule is missing
+`403` `cluster_forbidden` alone, on one tab (say Ingresses), means only that rule is missing
 ([Kubernetes permissions](/reference/kubernetes-permissions)); the other tabs and the gauge are unaffected.
-A cluster that answers too slowly gives `504` `{"error":"cluster_timeout"}`.
-A write the ClusterRole doesn't allow answers 403 with the API server's message, e.g.
+A cluster that answers too slowly gives `504` `cluster_timeout`.
+A write the ClusterRole doesn't allow answers `403` `cluster_forbidden` with the API server's message as `detail`, e.g.
 `restart failed: deployments.apps "web" is forbidden: …` (a view-only ClusterRole, or the `patch` / `update` verb
 removed).
 
@@ -83,13 +84,22 @@ More: [Prometheus](/administration/prometheus).
 | Symptom | Where to look |
 |---|---|
 | `Login failed. Please check your credentials.` | Admin → Audit Logs, action `user.login`, outcome `failed`. The reason says which: `bad_password` (wrong password; also an LDAP account whose directory bind failed), `unknown_user` (no such account, or deactivated), `azure_account` (an Azure AD account typed a password: use **Sign in with Microsoft**). A local account never signs in with a directory password: an LDAP user whose account shows source *Local* gets `bad_password` ([LDAP](/administration/ldap#signing-in)) |
-| the same message after 5 tries, and `429` with `Retry-After` from `/api/auth/login` | that user name is locked for 5 minutes from that address, audited as `user.login` `locked` (`too_many_failures`); after 20 failures from any addresses, the name is locked everywhere for 5 minutes. Wait, or sign in from another machine |
+| the same message after 5 tries, and `429` `rate_limited` with `Retry-After` from `/api/auth/login` | that user name is locked for 5 minutes from that address, audited as `user.login` `locked` (`too_many_failures`); after 20 failures from any addresses, the name is locked everywhere for 5 minutes. Wait, or sign in from another machine |
 | everyone's sign-ins and sessions show the same address (the ingress pod's), and one person's typos lock others out | `TRUSTED_PROXIES` doesn't cover your ingress, so `X-Forwarded-For` isn't read: set it to the ingress controller's pod network ([Environment variables](/reference/environment-variables)) |
-| **Sign in with Microsoft** answers `this account can't sign in with this Microsoft account` | `user.login` `failed` with reason `not_azure_account` (a local or LDAP account has that name), `azure_oid_mismatch` (the account belongs to another Entra user, e.g. one deleted and re-created) or `azure_no_oid` ([Azure AD](/administration/azure-ad#how-the-account-is-found)) |
+| **Sign in with Microsoft** answers `403` `sign_in_failed` with the detail `this account can't sign in with this Microsoft account` | `user.login` `failed` with reason `not_azure_account` (a local or LDAP account has that name), `azure_oid_mismatch` (the account belongs to another Entra user, e.g. one deleted and re-created) or `azure_no_oid` ([Azure AD](/administration/azure-ad#how-the-account-is-found)) |
 | `Your session has ended. Please sign in again.` | no activity for the inactivity time (Admin → Sessions, 60 minutes by default), 12 hours since sign-in, or an admin revoked it |
 
-The audit reason doesn't say why an LDAP bind failed. Test the directory from **Admin → LDAP → Test connection**,
-which answers with the directory client's message, for example:
+The audit reason doesn't say why an LDAP bind failed; the pod log does. Every failed LDAP sign-in (the first one,
+which would create the account, too) writes a line `ldap sign-in failed` with the user name, the directory's message
+(`error`) and the request id of the sign-in: level `INFO` for a wrong password
+(`LDAP Result Code 49 "Invalid Credentials"`), `WARN` for anything else:
+
+```text
+level=WARN msg="ldap sign-in failed" service=openconsole version=dev user=ghost error="LDAP Result Code 200 \"Network Error\": dial tcp 127.0.0.1:1: connect: connection refused" request_id=_Ehr0EXS3V9EnInT
+```
+
+To check the directory without anyone signing in, use **Admin → LDAP → Test connection**; on a failure it shows
+*The connection test failed.* with the same client message in parentheses, for example:
 
 ```text
 LDAP Result Code 200 "Network Error": dial tcp 127.0.0.1:389: connect: connection refused
@@ -103,7 +113,7 @@ certificate error is the TLS settings.
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| the shell says `Connection error.` or `Session closed (1006).` at once; the log has `GET /ws/namespaces/…/exec 400`, the answer is `{"error":"a WebSocket upgrade is required"}` | the proxy drops the `Upgrade` / `Connection` headers | pass WebSockets through (ingress-nginx, Traefik and the Gateway API do by default; a hand-written nginx needs `proxy_http_version 1.1` and both headers) |
+| the shell says `Connection error.` or `Session closed (1006).` at once; the log has `GET /ws/namespaces/…/exec 400`, the answer is `400` `invalid_input` with the detail `a WebSocket upgrade is required` | the proxy drops the `Upgrade` / `Connection` headers | pass WebSockets through (ingress-nginx, Traefik and the Gateway API do by default; a hand-written nginx needs `proxy_http_version 1.1` and both headers) |
 | a quiet shell closes after about a minute with `Session closed (1006).`; a quiet log stream shows `Connection dropped; reconnecting…` | the proxy's idle timeout, and the proxy doesn't count WebSocket pings as traffic (OpenConsole pings every open shell, log and Live Events socket every 25 seconds) | raise the proxy's idle timeout above `EXEC_IDLE_TIMEOUT` (5 minutes) ([Ingress with TLS](/installation/kubernetes#ingress-with-tls)) |
 | `You already have 3 shells open, the most allowed. Close one and try again.` | `MAX_EXEC_SESSIONS_PER_USER` (3) open shells; audited `pod.exec` `rate_limited` (`max_sessions`) | close one, or raise the limit |
 | `Too many log streams; try again shortly.` | the per-user log stream limit | close log viewers you don't need |
@@ -127,28 +137,68 @@ The pod restarts (`CrashLoopBackOff`) and its log ends with an `ERROR` line:
 
 ## Error answers {#error-answers}
 
-Every error answer is JSON, `{"error": "<reason or message>"}`. `401` has no body: the session or API key is
-missing, expired or revoked. The web UI shows the reason codes below as a sentence in your language (for example
-`admin_only` as *Only administrators can do this.*); other messages as the server wrote them.
+Every error answer of the API is JSON in the problem details format (RFC 9457), `Content-Type:
+application/problem+json`, `401` and `429` included:
+
+```json
+{"type":"about:blank","title":"Forbidden","status":403,"error":"admin_only"}
+```
+
+`error` is always one of the reason codes below; `detail`, when there is one, is English text that names the field,
+the object or the message of the cluster or directory. The web UI shows the code as a sentence in your language and
+the detail in parentheses, for example *The new password does not meet the password policy. (password must be at
+least 8 characters)*. Search this page for the code or the detail. An unknown `/api/…` or `/ws/…` path answers `404`
+`not_found`; a known path with the wrong method `405` `method_not_allowed` with an `Allow` header.
+
+| `error` | Status | Meaning |
+|---|---|---|
+| `unauthorized` | 401 | not signed in, or the session or API key is no longer valid (unknown, signed out, owner deactivated) |
+| `api_key_expired` / `api_key_revoked` | 401 | the API key has expired / was revoked |
+| `password_change_required` | 403 | the account must change its password first |
+| `forbidden`, `admin_only`, `feature_disabled`, `api_key_not_allowed`, `api_access_policy`, `api_access_off`, `backup_download_disabled` | 403 | refused by OpenConsole; see [403 reasons](#403-reasons) |
+| `rate_limited` | 429 | too many requests; wait for `Retry-After` ([Limits](/api/limits)) |
+| `too_many_sessions` | 429 | too many shells open at once for this user |
+| `not_found` | 404 | the object or the path doesn't exist |
+| `method_not_allowed` | 405 | the path exists, not with this method (`Allow` lists the methods) |
+| `invalid_id` | 400 | an id in the path isn't a number |
+| `invalid_body` | 400 | the body is missing or isn't JSON of the expected shape |
+| `invalid_input` | 400 | a value isn't accepted; `detail` says which |
+| `body_too_large` | 413 | the body is over 1 MiB (4 MiB for a YAML apply) |
+| `conflict` | 409 | the change conflicts with the current state (a name that exists, a revoked key, a recording still running, a stale `resourceVersion`) |
+| `wrong_password` / `weak_password` / `password_unchanged` | 400 | the current password is wrong / the new one doesn't meet the policy (`detail` says why) / the new one equals the current one |
+| `cannot_delete_self` | 409 | deleting your own account |
+| `kubeconfig_unsupported` | 400 | the kubeconfig runs a program or reads a file; see [Other answers](#other-answers) |
+| `cluster_invalid` | 400, 502 | the cluster's credentials were refused or its API server couldn't be reached when saving or activating it; see [Adding a cluster fails](#adding-a-cluster-fails) |
+| `cluster_forbidden`, `cluster_unreachable`, `cluster_timeout`, `not_connected` | 403, 502, 504, 503 | the cluster failed the request, not OpenConsole's permissions; see [A cluster shows errors instead of lists](#a-cluster-shows-empty-lists-or-503) |
+| `cluster_error` | the API server's status | the cluster refused a change; `detail` has its message |
+| `pod_not_found` / `container_not_found` | 404 / 400 | a log or command for a pod that doesn't exist (any more) / a container the pod doesn't have |
+| `not_ready` / `previous_unavailable` | 400 | the container isn't running yet / it has no previous log (it hasn't restarted, or never ran) |
+| `unavailable` | 502 | the cluster couldn't serve the log or the command; try again |
+| `exec_failed` | 502 | the command could not be started in the container (no such program) |
+| `connection_failed` | 400 | an LDAP / Azure AD **Test connection** or LDAP search failed; `detail` has the directory's message |
+| `not_configured` | 400, 503 | not set up on this server (Azure AD, backups) |
+| `sign_in_failed` | 400, 401, 403, 502 | the Microsoft sign-in failed or doesn't match this account; see [Sign-in fails](#sign-in-fails) |
+| `recording_unavailable` | 503 | a shell that must be recorded (API key) can't be right now ([Recordings](/administration/recordings)) |
+| `internal_error` | 500 | OpenConsole failed; the pod log has the cause under the response's `X-Request-Id` |
 
 ### 403 reasons {#403-reasons}
 
-| `error` | Meaning | Source (v2.23.0) |
+| `error` | Meaning | Source |
 |---|---|---|
-| `forbidden` | no permission for this action here (namespace, cluster) | [audit_events.go#L91](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L91), [router.go#L2642-L2651](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L2642-L2651) |
-| `api_access_policy` | with an API key: the owner has the permission and the key lists it, but the admin's API access policy keeps it from keys | [audit_events.go#L95-L97](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L95-L97), [router.go#L2612-L2629](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L2612-L2629) |
-| `api_access_off` | with an API key: the policy turns API access off for this user | [audit_events.go#L98-L99](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L98-L99), [apikeys.go#L205-L208](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L205-L208) |
-| `api_key_not_allowed` | an API key may never do this (manage keys, change the password, pick the cluster, save views) | [apikeys.go#L51](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L51), [apikeys.go#L244-L252](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L244-L252) |
-| `feature_disabled` | the operator switched the capability off (`FEATURE_*=false`) | [audit_events.go#L92](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L92), [router.go#L2637-L2640](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L2637-L2640) |
-| `admin_only` | an admin screen or endpoint; with an API key, one without the Admin API scope | [audit_events.go#L93](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/audit_events.go#L93), [router.go#L598-L605](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L598-L605) |
-| `change your password first` | an API key, or the API keys page, of an account that still has to change its initial password (on other screens such an account gets `forbidden`) | [apikeys.go#L196-L199](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L196-L199), [apikeys.go#L431-L432](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/apikeys.go#L431-L432) |
-| `backup_download_disabled` | downloading backups is off (`BACKUP_ALLOW_DOWNLOAD` isn't `true`) | [backups.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/backups.go) |
-| `you have no permissions on this cluster` | picking a cluster none of your grants cover | [cluster_ctx.go#L172](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/cluster_ctx.go#L172) |
-| `only the owner can change this view` | editing someone else's shared view | [views.go#L161](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/views.go#L161) |
-| `user is disabled` | an Azure AD sign-in for a deactivated account | [router.go#L989-L991](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/router.go#L989-L991) |
-| `this account can't sign in with this Microsoft account` | an Azure AD sign-in for a local or LDAP account, or for an account another Entra user signed in to first (see [Sign-in fails](#sign-in-fails)) | [router.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/router.go) |
-| `cluster_forbidden` (*OpenConsole's account on this cluster may not read this*) | Kubernetes refused OpenConsole's identity, not you | [kube_errors.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/kube_errors.go) |
-| `restart failed: …` / `scale failed: …` / the API server's message | Kubernetes refused a write (ClusterRole without that verb) | [deployment_actions.go#L160-L164](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/deployment_actions.go#L160-L164), [yaml_apply.go#L111](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.0/backend/internal/api/yaml_apply.go#L111) |
+| `forbidden` | no permission for this action here (namespace, cluster) | [audit_events.go#L93](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/audit_events.go#L93), [access.go#L116-L140](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/access.go#L116-L140) |
+| `api_access_policy` | with an API key: the owner has the permission and the key lists it, but the admin's API access policy keeps it from keys | [audit_events.go#L97-L99](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/audit_events.go#L97-L99), [access.go#L97-L114](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/access.go#L97-L114) |
+| `api_access_off` | with an API key: the policy turns API access off for this user | [audit_events.go#L100-L101](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/audit_events.go#L100-L101), [apikeys.go#L207-L209](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/apikeys.go#L207-L209) |
+| `api_key_not_allowed` | an API key may never do this (manage keys, change the password, pick the cluster, save views) | [apikeys.go#L52](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/apikeys.go#L52), [apikeys.go#L243-L253](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/apikeys.go#L243-L253) |
+| `feature_disabled` | the operator switched the capability off (`FEATURE_*=false`) | [audit_events.go#L94](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/audit_events.go#L94), [access.go#L122-L126](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/access.go#L122-L126) |
+| `admin_only` | an admin screen or endpoint; with an API key, one without the Admin API scope | [audit_events.go#L95](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/audit_events.go#L95), [access.go#L21-L43](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/access.go#L21-L43) |
+| `password_change_required` | an API key, or the API keys page, of an account that still has to change its initial password (on other screens such an account gets `forbidden`) | [apikeys.go#L197-L200](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/apikeys.go#L197-L200), [apikeys.go#L422-L423](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/apikeys.go#L422-L423) |
+| `backup_download_disabled` | downloading backups is off (`BACKUP_ALLOW_DOWNLOAD` isn't `true`) | [backups.go#L86-L88](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/backups.go#L86-L88) |
+| `forbidden`, detail `you have no permissions on this cluster` | picking a cluster none of your grants cover | [cluster_ctx.go#L191](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/cluster_ctx.go#L191) |
+| `forbidden`, detail `only the owner can change this view` | editing someone else's shared view | [views.go#L162](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/views.go#L162) |
+| `sign_in_failed`, detail `user is disabled` | an Azure AD sign-in for a deactivated account | [auth_handlers.go#L469](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/auth_handlers.go#L469) |
+| `sign_in_failed`, detail `this account can't sign in with this Microsoft account` | an Azure AD sign-in for a local or LDAP account, or for an account another Entra user signed in to first (see [Sign-in fails](#sign-in-fails)) | [auth_handlers.go#L424](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/auth_handlers.go#L424), [auth_handlers.go#L479](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/auth_handlers.go#L479) |
+| `cluster_forbidden` (*OpenConsole's account on this cluster may not read this*) | Kubernetes refused OpenConsole's identity, not you | [kube_errors.go#L28-L48](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/kube_errors.go#L28-L48) |
+| `cluster_forbidden`, detail `restart failed: …` / `scale failed: …` / the API server's message | Kubernetes refused a write (ClusterRole without that verb) | [deployment_actions.go#L155-L163](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/deployment_actions.go#L155-L163), [yaml_apply.go#L113](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/yaml_apply.go#L113), [kube_errors.go#L74-L90](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/kube_errors.go#L74-L90) |
 
 The first six are also the `reason` of the `denied` audit event. For API keys and agents, see also
 [API overview](/api/overview).
@@ -157,14 +207,15 @@ The first six are also the `reason` of the `denied` audit event. For API keys an
 
 | Answer | Meaning |
 |---|---|
-| `400` / `403` `cluster "<name>" is unknown or not yours to use` | the `X-OpenConsole-Cluster` header names a cluster that doesn't exist (`400`), or one the key or the user doesn't cover (`403`, audited `cluster.use` or `api_key.use` `denied`). In the browser: the cluster this tab works on was deleted or your permissions on it were removed; reload the page |
+| `400` `invalid_input` / `403` `forbidden`, detail `cluster "<name>" is unknown or not yours to use` | the `X-OpenConsole-Cluster` header names a cluster that doesn't exist (`400`), or one the key or the user doesn't cover (`403`, audited `cluster.use` or `api_key.use` `denied`). In the browser: the cluster this tab works on was deleted or your permissions on it were removed; reload the page |
 | `403` `cluster_forbidden`, `502` `cluster_unreachable`, `503` `not_connected`, `504` `cluster_timeout` | the cluster failed the read, not OpenConsole's permissions; see [A cluster shows errors instead of lists](#a-cluster-shows-empty-lists-or-503) |
-| `429` (no body) with an API key | more than 10 requests per second (bursts of 30) for that key |
-| `429` `too many open shells (limit 3 per user); close one first` | the shell limit, from a client that isn't a browser |
-| `400` `kubeconfig_unsupported: user "…" uses exec; …` | the kubeconfig runs a program or reads a file (exec plugin, `auth-provider`, `tokenFile`, a certificate or key path): use one with inline credentials ([Connect a cluster](/installation/connect-cluster)). A cluster saved with such a kubeconfig before doesn't connect: its lists say *The cluster is not connected.* (`503` `not_connected`), and the pod log has `cluster not connected: its kubeconfig runs a program or reads a file` once; upload an inline kubeconfig under **Admin → Clusters → Edit** |
-| `409` `a revoked key can't be regenerated; create a new one` | regenerating a revoked API key; only an expired key can be regenerated |
-| `413` `request body too large` | the body is over 1 MiB (4 MiB for a YAML apply) |
-| `400` `username is required` | `PUT /api/admin/users/{id}` without `username`: send the user's name with every update |
-| `404`, `409`, `400` or `504` from restart, scale, YAML apply or a Secret request | Kubernetes answered NotFound, Conflict (e.g. a stale `resourceVersion`), Invalid or Timeout; OpenConsole passes that status on, so a proxy doesn't wrap a 5xx around a 4xx. The `failed` audit event has the reason (`not_found`, `conflict`, `invalid`) and the `error` |
-| `400` `unknown group or role id` / `unknown user or group id`, `404` `role not found` | a group, role or user id in the request doesn't exist (deleted meanwhile); nothing was changed |
+| `429` `rate_limited` with an API key | more than 10 requests per second (bursts of 30) for that key; the answer has `Retry-After: 1` |
+| `429` `too_many_sessions`, detail `too many open shells (limit 3 per user); close one first` | the shell limit, from a client that isn't a browser |
+| `400` `kubeconfig_unsupported`, detail `user "…" uses exec; …` | the kubeconfig runs a program or reads a file (exec plugin, `auth-provider`, `tokenFile`, a certificate or key path): use one with inline credentials ([Connect a cluster](/installation/connect-cluster)). A cluster saved with such a kubeconfig before doesn't connect: its lists say *The cluster is not connected.* (`503` `not_connected`), and the pod log has `cluster not connected: its kubeconfig runs a program or reads a file` once; upload an inline kubeconfig under **Admin → Clusters → Edit** |
+| `409` `conflict`, detail `a revoked key can't be regenerated; create a new one` | regenerating a revoked API key; only an expired key can be regenerated |
+| `413` `body_too_large` | the body is over 1 MiB (4 MiB for a YAML apply) |
+| `400` `invalid_input`, detail `username is required` | `PUT /api/admin/users/{id}` without `username`: send the user's name with every update |
+| `404` `not_found`, `409` `conflict`, `400` `invalid_input` or `504` `cluster_timeout` from restart, scale, YAML apply or a Secret request | Kubernetes answered NotFound, Conflict (e.g. a stale `resourceVersion`), Invalid or Timeout; OpenConsole passes that status on, so a proxy doesn't wrap a 5xx around a 4xx, and puts the API server's message in `detail`. The `failed` audit event has the reason (`not_found`, `conflict`, `invalid`) and the `error` |
+| `400` `invalid_input`, detail `unknown group or role id` / `unknown user or group id`; `404` `not_found`, detail `role not found` | a group, role or user id in the request doesn't exist (deleted meanwhile); nothing was changed |
+| `404` `not_found` for a path you expect to exist | the path is wrong, the server is older than the page you read, or the endpoint was removed: `GET` / `POST` / `PUT /api/admin/cluster` and `POST /api/admin/cluster/validate` (single-cluster era) are gone, use `/api/admin/clusters` |
 | `503` from `/readyz`: `db not reachable` | the database file can't be opened: check the volume ([Health probes](/operations/health-probes)) |

@@ -91,6 +91,20 @@ cluster'da `deploy/` ile birlikte gelir; bağlı diğer her cluster'da yeni `rba
 - **`LOG_RETENTION_DAYS=0`** artık audit olaylarını hiç silmez (eskiden 30 demekti); temizlik açılışta da çalışır.
 - **Denetim Logları**: bir sayfada en fazla 500 satır olur; **CSV olarak dışa aktar** artık filtreye uyan bütün
   satırları, en fazla 50 000, içerir (eskiden 1 000'de duruyordu).
+- **API hata cevapları**: her hata artık problem details'tır (`application/problem+json`): `{"type", "title",
+  "status", "error", "detail"}`. `error` her zaman bir neden kodudur; eskiden `error`'un tamamı olan bir mesaj (örneğin
+  `cluster "nope" is unknown or not yours to use`) artık `invalid_input` gibi bir kodun altında, `detail`'dedir.
+  `401` ve `429`'un da gövdesi var (`unauthorized`, `api_key_expired`, `api_key_revoked`, `Retry-After: 1` ile
+  `rate_limited`); parolasını değiştirmesi gereken bir hesabın API anahtarı sayfası `password_change_required` döner.
+  `error`'u İngilizce bir cümleyle karşılaştıran bir script koda geçmelidir ([Hatalar](/api/quick-start#errors)).
+- **Bilinmeyen API yolları**: bilinmeyen bir `/api/…` ya da `/ws/…` yolu `404` `not_found` döner (eskiden web
+  arayüzünün sayfasıyla `200` dönüyordu), yanlış metot `Allow` ile `405`. `GET` / `POST` / `PUT /api/admin/cluster` ve
+  `POST /api/admin/cluster/validate` kaldırıldı: `/api/admin/clusters`'ı kullanın.
+- **Audit hacmi**: kullanıcılar, gruplar, roller ve giriş, oturum ve logo ayarlarındaki her yönetici değişikliği, retler
+  ve hatalar dahil her cevapta audit'e yazılır; her YAML görüntüleme bir `<kind>.get` okumasıdır
+  ([Denetim logu](/administration/audit-log)).
+- **Loglar**: WebSocket istek satırları `status=101` der; tracing açıkken `tracing enabled` `LOG_FORMAT`'a uyar;
+  başarısız bir LDAP girişi dizinin mesajıyla `ldap sign-in failed` yazar ([Loglama](/operations/logging)).
 - **İsteğe bağlı**: şifreleme anahtarını bir Secret'ta tutun
   ([Şifreleme anahtarını veritabanının dışında tutun](/installation/backup-restore)).
 

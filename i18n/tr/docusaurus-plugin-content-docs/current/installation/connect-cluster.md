@@ -164,7 +164,7 @@ EOF
 Bir kubeconfig kimlik bilgilerini yalnızca **satır içi** taşıyabilir: `token`, `client-certificate-data` /
 `client-key-data`, `certificate-authority-data`. Exec plugin ile giriş yapan (`kubelogin`, `aws eks get-token`,
 `gke-gcloud-auth-plugin`), `auth-provider` kullanan ya da bir dosya okuyan (`tokenFile`, `client-certificate`,
-`client-key`, `certificate-authority`) kubeconfig `kubeconfig_unsupported: …` ile reddedilir: OpenConsole pod'unun
+`client-key`, `certificate-authority`) kubeconfig reddedilir (`kubeconfig_unsupported`): OpenConsole pod'unun
 içinde bir program çalıştırır ya da dosya okurdu. Kişisel bir kubeconfig ayrıca OpenConsole'un ayrı bir kimlikle değil,
 sizin adınıza işlem yapmasına yol açar.
 :::

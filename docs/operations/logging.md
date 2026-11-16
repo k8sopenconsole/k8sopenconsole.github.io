@@ -10,7 +10,7 @@ container runtime keeps the lines and your log shipper reads them. Four kinds of
 
 | Record | `message` (`ecs`) | When |
 |---|---|---|
-| HTTP request | `GET /api/namespaces/{…}/pods 200` | every request, when it ends |
+| HTTP request | `GET /api/namespaces/{…}/pods 200` | every request, when it ends; a WebSocket (shell, live log, Live Events) when it closes, with status `101` and how long it was open as the duration |
 | Audit event | `alice: deployment.scale success shop/web on prod-eu` | every audited action, when `LOG_INCLUDE_AUDIT=true` (the default) |
 | Kubernetes client | `…/reflector.go:229: failed to list *v1.Pod: Unauthorized` | client-go's own messages (watch errors, retries) |
 | Application | `starting openconsole`, `cluster connected`, `session recording ready`, … | start-up, cluster connections, recordings, background jobs |
@@ -89,8 +89,8 @@ sign-ins) and, where it applies, `event.category` (`authentication`, `session`, 
 action was performed on. Your shipper's own `kubernetes.*` and `container.*` fields describe the OpenConsole pod
 that wrote the line; the two never mix.
 
-With tracing on, the start-up line `tracing enabled` is printed before the JSON logger is set up, so it arrives as
-plain text (`2026/11/14 11:42:09 INFO tracing enabled service=openconsole`). Every other line follows `LOG_FORMAT`.
+With tracing on, the start-up line `tracing enabled` follows `LOG_FORMAT` like every other line
+([Tracing](/operations/tracing)).
 
 ## Levels {#levels}
 
@@ -103,8 +103,10 @@ plain text (`2026/11/14 11:42:09 INFO tracing enabled service=openconsole`). Eve
 | successful `/healthz`, `/livez`, `/readyz` and `/metrics` | `debug`, so probes and scrapes don't fill the log; failing ones keep their level |
 | other requests, audit events | `info` |
 | Kubernetes client | `info` for a failed list, `error` for a failed watch |
+| `ldap sign-in failed` (user, the directory's `error`, `request_id`) | `info` for a wrong password, `warn` for anything else ([Sign-in fails](/operations/troubleshooting#sign-in-fails)) |
+| `cluster read failed` | `warn`; `debug` when the cluster answered 404 (the object is gone) |
 
-`debug` adds only the successful probe and scrape lines; it doesn't log request bodies.
+`debug` adds only the successful probe and scrape lines and the 404s of cluster reads; it never logs request bodies.
 
 ## Linking a request and its audit event {#linking-a-request-and-its-audit-event}
 

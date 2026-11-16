@@ -40,6 +40,12 @@ satırı olarak yazılır ([Elastic](/operations/elastic)).
 Bir satırdaki **Ayrıntılar** bunları gösterir. Tüm alanlar ve tüm ayrıntı anahtarları:
 [Denetim olayları](/reference/audit-events).
 
+Kullanıcılar, gruplar, roller, rol izinleri ve LDAP, Azure AD, oturum ve logo ayarlarındaki yönetici değişiklikleri
+her cevap için bir olay yazar: `success`, `denied` (yönetici olmayan biri, neden `admin_only`) ya da neden olarak
+cevabın kodunu taşıyan `failed` (`not_found`, `invalid_id`, `weak_password`, …); yani reddedilen ya da başarısız
+olan bir değişiklik de logda olur. Bir nesnenin YAML'ını açmak bir okumadır (`pod.get`, `deployment.get`,
+`configmap.get`, …). Hesap hâlâ parolasını değiştirmek zorunda olduğu için reddedilen bir istek `denied` olur.
+
 Audit'e yazılmayanlar: UI'nin kendiliğinden çektiği listeler (Panel'in 10 saniyelik yenilemesi, komut paletinin ve rol
 düzenleyicisinin arkasındaki namespace listesi; bunlar `X-OpenConsole-Refresh: auto` gönderir. API anahtarıyla bu başlık
 yok sayılır, yani anahtarla yapılan her okuma audit'e yazılır) ve hiçbir cluster

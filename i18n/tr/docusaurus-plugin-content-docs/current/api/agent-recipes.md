@@ -43,8 +43,19 @@ export OPENCONSOLE_API_KEY=oc_…                  # the key; never in a prompt 
 {"key":"claude-code","namespaces":["crashlab"]}
 ```
 
-Reddedilen bir çağrı `curl: (22) The requested URL returned error: 403` satırını ve gövdeyi
-(`{"error":"forbidden"}`) yazar, sıfırdan farklı bir kodla çıkar. Agent'lar bunu kolayca anlar.
+Reddedilen bir çağrı `curl: (22) The requested URL returned error: 403` satırını ve gövdeyi yazar, sıfırdan farklı
+bir kodla çıkar. Agent'lar bunu kolayca anlar:
+
+```bash
+./oc /api/namespaces/kube-system/pods
+```
+
+```text
+curl: (22) The requested URL returned error: 403
+{"type":"about:blank","title":"Forbidden","status":403,"error":"forbidden"}
+```
+
+Nedeni `error` alanı söyler; kodlar [Hızlı başlangıç → Hatalar](/api/quick-start#errors) bölümünde.
 
 ## Bir shell script {#a-shell-script}
 
@@ -79,24 +90,24 @@ chmod +x oc-crashes.sh
 ```
 
 ```text
-== badimage-67b7966bb-82lhs (app): 0 restarts, ImagePullBackOff
-   {"error":"previous_unavailable"}
-== brokendb-0 (db): 6 restarts, CrashLoopBackOff
+== badimage-67b7966bb-c4g8n (app): 0 restarts, ImagePullBackOff
+   {"type":"about:blank","title":"Bad Request","status":400,"error":"previous_unavailable"}
+== brokendb-0 (db): 5 restarts, CrashLoopBackOff
    boom
-== exit1-6bb6b857dc-bbcxg (app): 6 restarts, CrashLoopBackOff
-   fatal: config missing
+== exit1-6bb6b857dc-fg8xm (app): 5 restarts, CrashLoopBackOff
    starting
-== flappy-54fcb745f9-5m6cl (app): 6 restarts, CrashLoopBackOff
-   line 56 11:54:09
-   line 57 11:54:09
-   line 58 11:54:09
-   line 59 11:54:10
-   line 60 11:54:10
-== liveness-5cb5798b6b-8t27p (app): 7 restarts, CrashLoopBackOff
+   fatal: config missing
+== flappy-54fcb745f9-tg5bn (app): 5 restarts, Error
+   line 56 07:13:59
+   line 57 07:13:59
+   line 58 07:13:59
+   line 59 07:13:59
+   line 60 07:14:00
+== liveness-5cb5798b6b-999kw (app): 6 restarts, CrashLoopBackOff
    up
-== missingcm-64757c46c4-8xlpj (app): 0 restarts, CreateContainerConfigError
-   {"error":"previous_unavailable"}
-== oom-56b9dbd646-dkkpz (app): 6 restarts, CrashLoopBackOff
+== missingcm-64757c46c4-fn7pg (app): 0 restarts, CreateContainerConfigError
+   {"type":"about:blank","title":"Bad Request","status":400,"error":"previous_unavailable"}
+== oom-56b9dbd646-jgsnc (app): 5 restarts, CrashLoopBackOff
    allocating
 ```
 
@@ -171,10 +182,12 @@ Sonra agent sohbetinde sorun, örneğin: *crashlab namespace'inde crash loop'a g
 loglarının son kısmını özetle.*
 
 :::info[Göremiyor ya da yapamıyor musunuz?]
-- **`{"error":"forbidden"}`**: anahtar o namespace'i ya da izni içermiyor, ya da bu izin artık sizde yok
+- **`"error":"forbidden"`**: anahtar o namespace'i ya da izni içermiyor, ya da bu izin artık sizde yok
   (`./oc /api/auth/me` anahtarın şu an nelere eriştiğini gösterir).
-- **`{"error":"api_access_policy"}`**: izin sizde var, ama yöneticinin API erişimi politikası onu anahtarlara
+- **`"error":"api_access_policy"`**: izin sizde var, ama yöneticinin API erişimi politikası onu anahtarlara
   vermiyor.
-- **`curl: (22) The requested URL returned error: 401`**: anahtar bilinmiyor, süresi dolmuş ya da iptal edilmiş, ya
-  da sahibi devre dışı. **`… error: 429`**: bu anahtarla saniyede 10'dan fazla çağrı; bkz. [Limitler](/api/limits).
+- **`curl: (22) The requested URL returned error: 401`**: anahtar bilinmiyor (`unauthorized`), süresi dolmuş
+  (`api_key_expired`) ya da iptal edilmiş (`api_key_revoked`), ya da sahibi devre dışı (`unauthorized`).
+  **`… error: 429`** (`rate_limited`): bu anahtarla saniyede 10'dan fazla çağrı; `Retry-After` kadar bir saniye
+  bekleyin, bkz. [Limitler](/api/limits).
 :::

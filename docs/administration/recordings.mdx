@@ -41,7 +41,7 @@ Every pod shell session, and every single command run through `POST …/pods/{na
 
 When a limit would be crossed, the **disk policy** decides what happens:
 
-- `evict_oldest` (default) — the oldest finished recordings are deleted, even before their retention ends, until the next session fits. Each eviction is audited as `recording.evict` (user `system`, reason `quota` / `low_disk`).
+- `evict_oldest` (default) — the oldest finished recordings are deleted, even before their retention ends, until the next session fits. Each eviction is audited as `recording.evict` (user `system`, reason `quota` / `low_disk`). When deleting every finished recording still wouldn't make room (the volume is full because of something else, such as the database, or the live sessions alone are over the quota), nothing is deleted: the new session is not recorded, as with `stop`, and the 30-second check stops running recordings the same way.
 - `stop` — existing recordings are kept. New shells still open but are **not** recorded (`recording.create` failed, reason `disk_quota`), and running recordings stop with a truncation marker. The admin screen shows a warning until space is freed.
 
 The shell itself is never blocked by recording: a disabled, full or broken recorder only means the session isn't recorded. The exception is a shell opened with an [API key](/api/overview): it is recorded even when recording is switched off, and refused (503, `pod.exec` failed, reason `recording_unavailable`) when it can't be. For full isolation, give recordings their own PVC; `deploy/pvc.yaml` and `deploy/deployment.yaml` contain a commented example. Then set `SESSION_RECORDING_DIR=/recordings`.
@@ -53,7 +53,7 @@ The shell itself is never blocked by recording: a disabled, full or broken recor
 | Event | When |
 |---|---|
 | `recording.create` success | Session end — the session id as the resource, `pod`, `container`, `size_bytes`, `duration_ms`, `truncate_reason`; same `request_id` as the `pod.exec` events |
-| `recording.create` failed | Not recorded: reason `disk_quota` (disk policy `stop`) or `error` (e.g. directory not writable) |
+| `recording.create` failed | Not recorded: reason `disk_quota` (disk policy `stop`, or `evict_oldest` when eviction can't make room) or `error` (e.g. directory not writable) |
 | `recording.view` / `recording.download` | An admin played or downloaded a recording |
 | `recording.delete` (success / denied / failed) | Delete from the UI / API — records the recording's `owner`, `started_at`, `size_bytes`, `pod`, `container` and cluster, since the row and file are gone afterwards |
 | `settings.update` on `recording` | Settings change |
