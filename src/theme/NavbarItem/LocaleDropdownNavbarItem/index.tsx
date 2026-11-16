@@ -17,7 +17,7 @@ export default function LocaleToggle({mobile}: {mobile?: boolean}): ReactNode {
   const hash = useHistorySelector((h) => h.location.hash);
   const label = currentLocale === 'tr' ? 'Dil' : 'Language';
   const toggle = (
-    <div className={clsx(styles.toggle, !mobile && 'navbar__item')} role="group" aria-label={label}>
+    <div className={clsx(styles.toggle, !mobile && ['navbar__item', styles.desktop])} role="group" aria-label={label}>
       <IconLanguage className={styles.icon} aria-hidden="true" />
       {locales.map((locale) => {
         const active = locale === currentLocale;
