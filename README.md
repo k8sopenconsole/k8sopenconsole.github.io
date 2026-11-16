@@ -1,6 +1,6 @@
-# Kubernetes OpenConsole documentation
+# OpenConsole for Kubernetes documentation
 
-Source of the documentation site for [Kubernetes OpenConsole](https://github.com/vurulkan/kubernetes-openconsole),
+Source of the documentation site for [OpenConsole for Kubernetes](https://github.com/vurulkan/kubernetes-openconsole),
 published at **https://k8sopenconsole.github.io/** in English and Turkish. Built with [Docusaurus 3](https://docusaurus.io/).
 
 ```bash

@@ -51,14 +51,14 @@ export default function Home(): ReactNode {
     i18n.currentLocale === 'tr' ? `/img/screens/dashboard-pods.tr.${theme}.webp` : `/img/screenshot-${theme}.png`;
   return (
     <Layout
-      title="Kubernetes OpenConsole"
+      title="OpenConsole for Kubernetes"
       description={translate({
         id: 'home.description',
         message: 'A web console for several Kubernetes clusters, with access granted in the app and every action audited.',
       })}>
       <header className={styles.hero}>
         <div className="container">
-          <Heading as="h1" className={styles.title}>Kubernetes OpenConsole</Heading>
+          <Heading as="h1" className={styles.title}>OpenConsole for Kubernetes</Heading>
           <p className={styles.tagline}>
             {translate({
               id: 'home.tagline',

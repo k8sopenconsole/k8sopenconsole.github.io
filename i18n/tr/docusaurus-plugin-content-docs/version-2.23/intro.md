@@ -1,12 +1,12 @@
 ---
 title: "Giriş"
 slug: /intro
-description: "Kubernetes OpenConsole nedir, kimin içindir, nasıl çalışır."
+description: "OpenConsole for Kubernetes nedir, kimin içindir, nasıl çalışır."
 ---
 
 # Giriş
 
-Kubernetes OpenConsole, birden çok Kubernetes cluster'ı için bir web konsoludur. Kullanıcılar yerel, LDAP ya da
+OpenConsole for Kubernetes, birden çok Kubernetes cluster'ı için bir web konsoludur. Kullanıcılar yerel, LDAP ya da
 Azure AD hesabıyla giriş yapar. Kendilerine verilen namespace'lerdeki iş yüklerini görür, rolleri izin veriyorsa
 bunlar üzerinde işlem de yaparlar: pod durumu ve logları, shell, restart ve ölçekleme, YAML düzenleme, Secret'lar.
 Her aksiyon ve her okuma audit'e yazılır. Script'ler ve AI agent'ları da aynı kurallara tabidir; kapsamı sınırlı

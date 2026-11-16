@@ -33,7 +33,7 @@ const endpointDocs = (spec: string, outputDir: string): OpenApiPlugin.Options =>
 });
 
 const config: Config = {
-  title: 'Kubernetes OpenConsole',
+  title: 'OpenConsole for Kubernetes',
   tagline:
     'A web console for several Kubernetes clusters, with access granted in the app and every action audited.',
   favicon: 'img/favicon.svg',
@@ -154,7 +154,7 @@ const config: Config = {
     navbar: {
       title: 'OpenConsole',
       logo: {
-        alt: 'Kubernetes OpenConsole',
+        alt: 'OpenConsole for Kubernetes',
         src: 'img/logo.svg',
       },
       items: [
@@ -197,7 +197,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Kubernetes OpenConsole. Documentation CC BY 4.0, code Apache-2.0. Built with Docusaurus.`,
+      copyright: `OpenConsole for Kubernetes. Documentation CC BY 4.0, code Apache-2.0. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,

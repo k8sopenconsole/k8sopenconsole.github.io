@@ -1,12 +1,12 @@
 ---
 title: "Introduction"
 slug: /intro
-description: "What Kubernetes OpenConsole is, who it is for, and how it works."
+description: "What OpenConsole for Kubernetes is, who it is for, and how it works."
 ---
 
 # Introduction
 
-Kubernetes OpenConsole is a web console for several Kubernetes clusters. People sign in with a local, LDAP or
+OpenConsole for Kubernetes is a web console for several Kubernetes clusters. People sign in with a local, LDAP or
 Azure AD account and see, and if their role allows, operate the workloads of the namespaces they were given:
 pod status and logs, a shell, restart and scale, YAML edit, Secrets. Every action and every read is audited.
 Scripts and AI agents use the same rules through a REST API with scoped API keys.

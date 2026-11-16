@@ -2,6 +2,8 @@
 
 Docusaurus 3 site for [vurulkan/kubernetes-openconsole](https://github.com/vurulkan/kubernetes-openconsole) (the
 code repo; its `CLAUDE.md` maps the code). Served at `https://k8sopenconsole.github.io/` from GitHub Pages.
+The product is **OpenConsole for Kubernetes** (short: OpenConsole) in EN and TR, never "Kubernetes OpenConsole"
+(Linux Foundation marks); the old name stays only in technical identifiers (repo, image, namespace, this site's address).
 
 ## Map
 

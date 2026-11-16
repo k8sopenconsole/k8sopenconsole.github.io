@@ -31,7 +31,8 @@ variables are on [Environment variables](/reference/environment-variables).
 
 The answer is plain text of at most **5 MiB**. A longer log is cut at a line end and the response carries
 `X-OpenConsole-Truncated: true`: ask for fewer lines or a shorter `sinceSeconds`. Errors: 404 `pod_not_found`;
-400 `container_not_found`, `not_ready` (the container hasn't started) or `previous_unavailable`.
+400 `container_not_found`, `not_ready` (the container hasn't started) or `previous_unavailable`; 403
+`cluster_forbidden` when OpenConsole's own account on the cluster may not read the pod or its log (its ClusterRole).
 
 ## Running a command: `POST …/pods/{name}/exec` {#running-a-command-post-podsnameexec}
 

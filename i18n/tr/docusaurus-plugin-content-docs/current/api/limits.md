@@ -31,7 +31,8 @@ Durumdan sonra gelen kod, gövdenin `error` alanıdır; gövde [Hatalar](/api/qu
 
 Yanıt en fazla **5 MiB** düz metindir. Daha uzun bir log satır sonunda kesilir ve yanıt
 `X-OpenConsole-Truncated: true` başlığını taşır: daha az satır ya da daha kısa bir `sinceSeconds` isteyin. Hatalar: 404
-`pod_not_found`; 400 `container_not_found`, `not_ready` (container henüz başlamadı) ya da `previous_unavailable`.
+`pod_not_found`; 400 `container_not_found`, `not_ready` (container henüz başlamadı) ya da `previous_unavailable`; 403
+`cluster_forbidden`: OpenConsole'un cluster'daki kendi hesabı pod'u ya da logunu okuyamıyor (ClusterRole'ü).
 
 ## Komut çalıştırma: `POST …/pods/{name}/exec` {#running-a-command-post-podsnameexec}
 
