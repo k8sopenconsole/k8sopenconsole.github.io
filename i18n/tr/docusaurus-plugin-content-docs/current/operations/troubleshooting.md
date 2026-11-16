@@ -172,7 +172,7 @@ metotla gelen istek `Allow` header'ıyla `405` `method_not_allowed` cevabı alı
 | `kubeconfig_unsupported` | 400 | kubeconfig bir program çalıştırıyor ya da dosya okuyor; bkz. [Diğer cevaplar](#other-answers) |
 | `cluster_invalid` | 400, 502 | cluster kaydedilirken ya da aktive edilirken kimlik bilgileri reddedildi ya da API server'ına ulaşılamadı; bkz. [Cluster eklenemiyor](#adding-a-cluster-fails) |
 | `cluster_forbidden`, `cluster_unreachable`, `cluster_timeout`, `not_connected` | 403, 502, 504, 503 | isteği OpenConsole'un izinleri değil, cluster başarısız etti; bkz. [Bir cluster liste yerine hata gösteriyor](#a-cluster-shows-empty-lists-or-503) |
-| `cluster_error` | API server'ın durumu | cluster bir değişikliği reddetti; mesajı `detail`'dedir |
+| `cluster_error` | API server'ın durumu | cluster başka bir hatayla cevap verdi (bir değişikliği reddetti, sunucu hatası); mesajı `detail`'dedir |
 | `pod_not_found` / `container_not_found` | 404 / 400 | (artık) var olmayan bir pod için log ya da komut / pod'da olmayan bir container |
 | `not_ready` / `previous_unavailable` | 400 | container henüz çalışmıyor / önceki logu yok (restart olmadı ya da hiç çalışmadı) |
 | `unavailable` | 502 | cluster logu ya da komutu sunamadı; tekrar deneyin |

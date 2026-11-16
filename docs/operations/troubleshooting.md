@@ -170,7 +170,7 @@ least 8 characters)*. Search this page for the code or the detail. An unknown `/
 | `kubeconfig_unsupported` | 400 | the kubeconfig runs a program or reads a file; see [Other answers](#other-answers) |
 | `cluster_invalid` | 400, 502 | the cluster's credentials were refused or its API server couldn't be reached when saving or activating it; see [Adding a cluster fails](#adding-a-cluster-fails) |
 | `cluster_forbidden`, `cluster_unreachable`, `cluster_timeout`, `not_connected` | 403, 502, 504, 503 | the cluster failed the request, not OpenConsole's permissions; see [A cluster shows errors instead of lists](#a-cluster-shows-empty-lists-or-503) |
-| `cluster_error` | the API server's status | the cluster refused a change; `detail` has its message |
+| `cluster_error` | the API server's status | the cluster answered with another error (it refused a change, a server error); `detail` has its message |
 | `pod_not_found` / `container_not_found` | 404 / 400 | a log or command for a pod that doesn't exist (any more) / a container the pod doesn't have |
 | `not_ready` / `previous_unavailable` | 400 | the container isn't running yet / it has no previous log (it hasn't restarted, or never ran) |
 | `unavailable` | 502 | the cluster couldn't serve the log or the command; try again |
