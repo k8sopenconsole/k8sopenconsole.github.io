@@ -29,7 +29,7 @@ const parts = [
   '---',
   'title: Release notes',
   'slug: /release-notes',
-  'description: What changed in each Kubernetes OpenConsole release.',
+  'description: What changed in each OpenConsole for Kubernetes release.',
   'hide_table_of_contents: false',
   '---',
   '',

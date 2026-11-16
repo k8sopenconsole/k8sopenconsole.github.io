@@ -32,7 +32,7 @@
     "description": "The label of footer link with label=Issues linking to https://github.com/vurulkan/kubernetes-openconsole/issues"
   },
   "copyright": {
-    "message": "Kubernetes OpenConsole. Dokümanlar CC BY 4.0, kod Apache-2.0. Docusaurus ile yapıldı.",
+    "message": "OpenConsole for Kubernetes. Dokümanlar CC BY 4.0, kod Apache-2.0. Docusaurus ile yapıldı.",
     "description": "The footer copyright"
   }
 }

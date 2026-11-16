@@ -27,7 +27,7 @@ p{font-size:26px;line-height:1.4;margin:0;color:#cbd5e1}
 .sub{position:absolute;left:64px;bottom:56px;font-size:20px;color:#a5b4fc;font-weight:600}
 .shot{position:absolute;left:640px;top:96px;width:900px;border-radius:14px;border:1px solid #334155;box-shadow:0 30px 80px rgba(0,0,0,.6)}</style></head>
 <body><div class="wrap"><div class="text"><div class="logo">$logo k8sopenconsole.github.io</div>
-<h1>Kubernetes OpenConsole</h1><p>$text</p></div><img class="shot" src="shot-$L.webp"><div class="sub">$sub</div></div></body></html>
+<h1>OpenConsole for Kubernetes</h1><p>$text</p></div><img class="shot" src="shot-$L.webp"><div class="sub">$sub</div></div></body></html>
 HTML
   "$CHROME" --headless=new --disable-gpu --hide-scrollbars --window-size=1200,630 --virtual-time-budget=5000 \
     --screenshot="$PWD/static/img/og-$L.png" "file://$work/og-$L.html" >/dev/null 2>&1
