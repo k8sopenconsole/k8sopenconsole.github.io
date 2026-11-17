@@ -18,11 +18,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   # the manifests of one release
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.1
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.4
 images:
   # the image of the same release
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.23.1"
+    newTag: "2.23.4"
 patches:
   - patch: |-
       apiVersion: apps/v1
@@ -48,7 +48,7 @@ patches:
 ```
 
 - `?ref=` kaynağı `git` ile çekilir; bu yüzden `kubectl`'ı çalıştıran makinede `git` ve GitHub erişimi olmalıdır.
-- **Sürümü iki yerde de sabitleyin** (`ref=v2.23.1` ve `newTag`). `images:` override'ı olmadan manifest `:latest`
+- **Sürümü iki yerde de sabitleyin** (`ref=v2.23.4` ve `newTag`). `images:` override'ı olmadan manifest `:latest`
   çalıştırır; o zaman bir pod restart'ı sizi haber vermeden yeni sürüme yükseltebilir.
 - **`Recreate`** önemlidir. Varsayılan rolling update'te yeni pod, eskisi veritabanını hâlâ tutarken başlar;
   2.23.0'da bu durum, iki pod'un çakıştığı andan sonra bir sonraki restart'a kadar yapılan yazmaların kaybolmasına
@@ -81,14 +81,14 @@ dosyaları tek tek listeleyin:
 
 ```yaml
 resources:
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/namespace.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/pvc.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/service.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/deployment.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/namespace.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/pvc.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/service.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/deployment.yaml
 ```
 
 [Salt okuma](/installation/connect-cluster#full-or-read-only) bir konsol için dosyaları aynı şekilde listeleyin ve
-`https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/rbac-readonly.yaml` satırını ekleyin.
+`https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/rbac-readonly.yaml` satırını ekleyin.
 Klasörle kurulursa her `kubectl apply -k` tam `rbac.yaml`'ı geri getirir.
 
 ## Neden tam olarak bir replica {#why-exactly-one-replica}
@@ -119,7 +119,7 @@ okunur:
 
 | Değişken | Varsayılan | Anlamı |
 |---|---|---|
-| `TIMEZONE` | `UTC` (manifest `Europe/Istanbul` ayarlar) | arayüzdeki audit zaman damgalarının saat dilimi; saklanan zamanlar UTC'dir |
+| `TIMEZONE` | `UTC` (manifest `Europe/Istanbul` ayarlar) | arayüzdeki audit zaman damgalarının saat dilimi; saklanan zamanlar UTC'dir. Diğer zamanlar tarayıcının saat dilimindedir; her tarih `2026-11-16 23:37:51` biçiminde yazılır |
 | `LOG_RETENTION_DAYS` | `30` | audit olaylarının veritabanında tutulduğu gün sayısı; `0` hiç silmez (2.23.1'den önce 30 demekti) |
 | `BACKUP_ALLOW_DOWNLOAD` | `false` | `true`, adminlerin Yönetim → Yedekler'deki yedekleri indirmesine izin verir |
 | `BACKUP_INTERVAL` / `BACKUP_KEEP` | `24h` / `7` | veritabanının ne sıklıkla `/data/backups`'a kopyalandığı (`0` = zamanlanmış kopya yok) ve kaç kopyanın tutulduğu ([Yedekleme ve geri yükleme](/installation/backup-restore)) |

@@ -1,17 +1,17 @@
 {
- "time": 1794861365061,
+ "time": 1794877599778,
  "sockets": [
   {
-   "path": "/ws/namespaces/shop/pods/catalog-5fc6df4d55-5ppq7/logs",
+   "path": "/ws/namespaces/shop/pods/catalog-68f584847d-t647w/logs",
    "frames": [
     {
-     "s": "{\"t\":\"line\",\"ts\":\"2026-11-16T20:36:01.204204595Z\",\"c\":\"catalog\",\"text\":\"catalog 3.4.1 starting\"}\n"
+     "s": "{\"t\":\"line\",\"ts\":\"2026-11-17T01:06:32.891180730Z\",\"c\":\"catalog\",\"text\":\"catalog 3.4.1 starting\"}\n"
     },
     {
-     "s": "{\"t\":\"line\",\"ts\":\"2026-11-16T20:36:01.204428594Z\",\"c\":\"catalog\",\"text\":\"connecting to postgres:5432\"}\n"
+     "s": "{\"t\":\"line\",\"ts\":\"2026-11-17T01:06:32.892431750Z\",\"c\":\"catalog\",\"text\":\"connecting to postgres:5432\"}\n"
     },
     {
-     "s": "{\"t\":\"line\",\"ts\":\"2026-11-16T20:36:03.209455702Z\",\"c\":\"catalog\",\"text\":\"error: dial tcp postgres:5432: connection refused\"}\n"
+     "s": "{\"t\":\"line\",\"ts\":\"2026-11-17T01:06:34.894836811Z\",\"c\":\"catalog\",\"text\":\"error: dial tcp postgres:5432: connection refused\"}\n"
     },
     {
      "s": "{\"t\":\"end\",\"reason\":\"container_terminated\",\"retry\":true}\n"
@@ -19,10 +19,10 @@
    ]
   },
   {
-   "path": "/ws/namespaces/shop/pods/catalog-5fc6df4d55-5ppq7/logs",
+   "path": "/ws/namespaces/shop/pods/catalog-68f584847d-t647w/logs",
    "frames": [
     {
-     "s": "{\"t\":\"error\",\"reason\":\"previous_unavailable\",\"msg\":\"unable to retrieve container logs for containerd://2322e96962a6740bf0ebbd0a3d4b5dd6b23b1885d948c31d1faa539c5dd60495\"}\n"
+     "s": "{\"t\":\"error\",\"reason\":\"previous_unavailable\",\"msg\":\"unable to retrieve container logs for containerd://1f76a6ca2aef3ab3f819ef2d9be5898b2db80ae8fa734b38f7ee753cccc51505\"}\n"
     }
    ]
   }

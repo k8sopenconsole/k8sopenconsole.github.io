@@ -232,7 +232,7 @@ export const SCENES = [
     run: async (page) => { await row(page, 'alice').waitFor(); }},
   {id: 'admin-session-settings', as: 'admin', path: '/admin', storage: admin('session'),
     run: async (page) => { await page.waitForTimeout(1500); }},
-  {id: 'admin-backups', as: 'admin', path: '/admin', storage: admin('backups'),
+  {id: 'admin-backups', lastGet: true, as: 'admin', path: '/admin', storage: admin('backups'),
     run: async (page) => {
       await page.getByRole('button', {name: L('Back up now')}).click();
       await row(page, '-manual').waitFor();

@@ -36,7 +36,7 @@ patches:
 ```bash
 kubectl apply -k .
 kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | grep 'tracing enabled'
-# {"@timestamp":"2026-11-16T07:17:57.313201Z","log":{"level":"info"},"message":"tracing enabled","service":{"name":"openconsole","version":"2.23.1","environment":"prod"},"ecs":{"version":"8.11.0"},"event":{"dataset":"openconsole.app"}}
+# {"@timestamp":"2026-11-16T07:17:57.313201Z","log":{"level":"info"},"message":"tracing enabled","service":{"name":"openconsole","version":"2.23.4","environment":"prod"},"ecs":{"version":"8.11.0"},"event":{"dataset":"openconsole.app"}}
 ```
 
 Uç, alıcının **OTLP/HTTP** port'udur (genelde 4318); gRPC (4317) değil. OpenConsole `/v1/traces` yolunu

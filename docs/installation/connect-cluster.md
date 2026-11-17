@@ -31,7 +31,7 @@ cluster:
 ```bash
 kubectl --context <cluster> create namespace kubernetes-openconsole
 kubectl --context <cluster> apply -f \
-  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/rbac.yaml
+  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/rbac.yaml
 ```
 
 This creates:
@@ -63,11 +63,11 @@ metadata only, uncomment the rule and grant `secrets:list` / `secrets:get` only.
 `rbac.yaml` lets OpenConsole read Secrets, open shells and change workloads in every namespace, `kube-system`
 included. To allow that only in the namespaces you choose, keep the reads cluster-wide (OpenConsole watches pods,
 Deployments, … across the cluster) and bind the write rights per namespace with
-[`deploy/optional/rbac-namespaced-writes.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.1/deploy/optional/rbac-namespaced-writes.yaml):
+[`deploy/optional/rbac-namespaced-writes.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.4/deploy/optional/rbac-namespaced-writes.yaml):
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/rbac-readonly.yaml
-curl -sL https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/optional/rbac-namespaced-writes.yaml \
+kubectl apply -f https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/rbac-readonly.yaml
+curl -sL https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/optional/rbac-namespaced-writes.yaml \
   | sed 's/namespace: team-a/namespace: payments/' | kubectl apply -f -
 ```
 
@@ -180,7 +180,7 @@ NS=kubernetes-openconsole
 kubectl --context $CTX -n $NS delete serviceaccount openconsole-reader          # its token Secret goes with it
 kubectl --context $CTX -n $NS wait --for=delete secret/openconsole-reader-token --timeout=60s
 kubectl --context $CTX apply -f \
-  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/rbac.yaml
+  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/rbac.yaml
 ```
 
 Deleting and re-creating only the Secret gives you **the same token again**: Kubernetes derives a ServiceAccount

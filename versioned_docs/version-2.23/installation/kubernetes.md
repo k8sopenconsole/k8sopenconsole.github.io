@@ -18,11 +18,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   # the manifests of one release
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.1
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.4
 images:
   # the image of the same release
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.23.1"
+    newTag: "2.23.4"
 patches:
   - patch: |-
       apiVersion: apps/v1
@@ -48,7 +48,7 @@ patches:
 ```
 
 - The `?ref=` resource is fetched with `git`, so the machine running `kubectl` needs `git` and access to GitHub.
-- **Pin the release** in both places (`ref=v2.23.1` and `newTag`). Without the `images:` override the manifest runs
+- **Pin the release** in both places (`ref=v2.23.4` and `newTag`). Without the `images:` override the manifest runs
   `:latest`, and a pod restart could then upgrade you without notice.
 - **`Recreate`** is important. With the default rolling update the new pod starts while the old one still holds
   the database; on 2.23.0 that can lose the writes made after the overlap until the next restart. Upgrades and
@@ -80,14 +80,14 @@ the files instead of the folder:
 
 ```yaml
 resources:
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/namespace.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/pvc.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/service.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/deployment.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/namespace.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/pvc.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/service.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/deployment.yaml
 ```
 
 For a [read-only](/installation/connect-cluster#full-or-read-only) console, list the files the same way and add
-`https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/rbac-readonly.yaml`. Installed with
+`https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/rbac-readonly.yaml`. Installed with
 the folder, every `kubectl apply -k` would put the full `rbac.yaml` back.
 
 ## Why exactly one replica {#why-exactly-one-replica}
@@ -117,7 +117,7 @@ Everything else is configured in the UI and stored in the database. These are re
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `TIMEZONE` | `UTC` (the manifest sets `Europe/Istanbul`) | time zone of audit timestamps in the UI; stored times are UTC |
+| `TIMEZONE` | `UTC` (the manifest sets `Europe/Istanbul`) | time zone of audit timestamps in the UI; stored times are UTC. Other times are in the browser's time zone; every date is written `2026-11-16 23:37:51` |
 | `LOG_RETENTION_DAYS` | `30` | days audit events are kept in the database; `0` keeps them forever (before 2.23.1 it meant 30) |
 | `BACKUP_ALLOW_DOWNLOAD` | `false` | `true` lets admins download the backups in Admin → Backups |
 | `BACKUP_INTERVAL` / `BACKUP_KEEP` | `24h` / `7` | how often the database is copied to `/data/backups` (`0` = no scheduled copy) and how many copies are kept ([Backup and restore](/installation/backup-restore)) |

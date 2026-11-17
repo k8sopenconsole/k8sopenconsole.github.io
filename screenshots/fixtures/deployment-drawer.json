@@ -1,4 +1,9 @@
 {
- "time": 1794861267811,
- "sockets": []
+ "time": 1794877571533,
+ "sockets": [
+  {
+   "path": "/ws/events",
+   "frames": []
+  }
+ ]
 }

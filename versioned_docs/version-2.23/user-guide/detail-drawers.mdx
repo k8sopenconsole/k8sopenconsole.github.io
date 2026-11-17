@@ -34,6 +34,13 @@ on the right; `Esc` closes it.
 - A Deployment also lists its **revisions** with their image and restart time (read only; there is no rollback).
 - Buttons, as your permissions allow: **YAML**, **Scale**, **Restart**, **Logs** (all pods together).
 
+## Events {/* #events */}
+
+The **Events** of both drawers, and the list behind a row's **Events** button, are the last hour's, warnings first,
+and follow the object live: a new event appears as it happens, a repeat updates its count (`×5`) and time, and
+**Live** next to them says the stream is on (**Reconnecting…** while it comes back; the list is read again then).
+They come from the same stream as [Live Events](/user-guide/views-and-events#live-events), limited to this object.
+
 :::info[Can't see it or can't do it?]
 - A button is missing: you lack its permission in this namespace: `pods:logs`, `pods:exec`, `deployments:restart`,
   `deployments:scale` / `statefulsets:scale`, `<kind>:edit` for YAML changes.

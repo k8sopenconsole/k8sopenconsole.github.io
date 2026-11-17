@@ -32,6 +32,9 @@ node screenshots/record.mjs logs && node screenshots/shoot.mjs logs
   of pixels differently from run to run (asynchronous UI timing). `MIN_CHANGE=0` rewrites everything; a scene whose
   background is unstable is clipped to its dialog (`clip` in `scenes.mjs`); terminal, log and chart scenes have a
   larger `tolerance`.
+- Replay answers a repeated request with the first recorded answer. A scene that changes data and reads the same
+  URL again (Admin → Backups: list, back up, list) sets `lastGet`: `record.mjs` keeps only the last answer of each
+  GET, so the page shows the end state.
 - Chrome: `CHROME_PATH` (default: the macOS app). It is started by the scripts with software rendering, which is what
   keeps the pixels identical between runs.
 - The seed is fictitious (shop, payments, alice, bob); no hostnames, real users or real tokens end up in an image.
