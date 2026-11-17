@@ -26,17 +26,17 @@ değişikliklerini beraberinde getirir ve açılışta eksik olanları uygular.
 
 ```yaml title="kustomization.yaml"
 resources:
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.1   # was v2.23.0
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.4   # was v2.23.3
 images:
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.23.1"                                                         # was 2.23.0
+    newTag: "2.23.4"                                                         # was 2.23.3
 ```
 
 ```bash
 kubectl diff -k .      # the image tag, plus whatever the release changed in deploy/
 kubectl apply -k .
 kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole --timeout=5m
-kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.23.1"
+kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.23.4"
 ```
 
 Oturumlar geçerli kalır; giriş yapmış kullanıcılar sayfayı yenileyip kaldıkları yerden devam eder. `Recreate` ile
@@ -69,6 +69,27 @@ cluster'da `deploy/` ile birlikte gelir; bağlı diğer her cluster'da yeni `rba
    kullanıcılar, ayarlar) kaybolur.
 
 ## Sürüme özel notlar {#version-notes}
+
+### 2.23.4'e yükseltme {#upgrading-to-2234}
+
+- İmajı değiştirin: API yollarında, veritabanında ya da manifest'lerde değişiklik yok. 2.23.3'e geri dönmek çalışır.
+- **Olaylar nesneyi canlı izler**: pod ve iş yükü panellerinde ve bir satırın **Olaylar** düğmesinde; bu düğme artık
+  ham JSON yerine aynı listeyi gösterir ([Ayrıntı panelleri](/user-guide/detail-drawers#events)). Kubernetes
+  olaylarının `/ws/events` çerçeveleri `count` taşır.
+
+### 2.23.3'e yükseltme {#upgrading-to-2233}
+
+- İmajı değiştirin: API'de, veritabanında ya da manifest'lerde değişiklik yok. **Loglar** düğmelerinin artık kendi
+  simgesi var (bir metin sayfası); **Shell**'in kullandığı terminal simgesini kullanmıyorlar.
+
+### 2.23.2'ye yükseltme {#upgrading-to-2232}
+
+- İmajı değiştirin: API'de, veritabanında ya da manifest'lerde değişiklik yok. 2.23.1'e geri dönmek çalışır.
+- **Tarihler**, tarayıcının dili ve bölgesi ne olursa olsun her yerde aynı biçimde yazılır: `2026-11-16 23:37:51`
+  (24 saat), tarayıcının saat diliminde; audit log zamanları `TIMEZONE`'u kullanmaya devam eder.
+- **Audit**, `WS_ORIGIN_CHECK=enforce` ile: başka bir siteden açılan log soketi artık `pod.logs` `success` olarak
+  yazılmaz; başka bir siteden açılan shell `pod.exec` `denied`, nedeni `origin_not_allowed` olur ve kayıt bırakmaz.
+- **Tablolar**: işlem düğmeleri ve sütun seçici geniş bir tablonun sağ kenarında kalır.
 
 ### 2.23.1'e yükseltme {#upgrading-to-2231}
 

@@ -26,17 +26,17 @@ Change the version in both places of your `kustomization.yaml` and apply it:
 
 ```yaml title="kustomization.yaml"
 resources:
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.1   # was v2.23.0
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.4   # was v2.23.3
 images:
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.23.1"                                                         # was 2.23.0
+    newTag: "2.23.4"                                                         # was 2.23.3
 ```
 
 ```bash
 kubectl diff -k .      # the image tag, plus whatever the release changed in deploy/
 kubectl apply -k .
 kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole --timeout=5m
-kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.23.1"
+kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.23.4"
 ```
 
 Sessions stay valid, so signed-in users carry on after a page reload. With `Recreate` the console is unavailable
@@ -68,6 +68,27 @@ cluster OpenConsole runs in; on every other connected cluster apply the new `rba
    you took before the upgrade. Everything since the backup (audit events, users, settings) is lost.
 
 ## Version notes {#version-notes}
+
+### Upgrading to 2.23.4 {#upgrading-to-2234}
+
+- Replace the image: no change to the API's paths, the database or the manifests. Rolling back to 2.23.3 works.
+- **Events follow the object live** in the pod and workload drawers and behind a row's **Events** button, which now
+  shows the same list instead of raw JSON ([Detail drawers](/user-guide/detail-drawers#events)). `/ws/events` frames
+  of Kubernetes events carry `count`.
+
+### Upgrading to 2.23.3 {#upgrading-to-2233}
+
+- Replace the image: no change to the API, the database or the manifests. The **Logs** buttons have their own icon
+  (a page of text) instead of the terminal that **Shell** uses.
+
+### Upgrading to 2.23.2 {#upgrading-to-2232}
+
+- Replace the image: no change to the API, the database or the manifests. Rolling back to 2.23.1 works.
+- **Dates** are written the same way everywhere, whatever the browser's language and region: `2026-11-16 23:37:51`
+  (24 h) in the browser's time zone; audit log times keep `TIMEZONE`.
+- **Audit**, with `WS_ORIGIN_CHECK=enforce`: a log socket from another site is no longer audited as `pod.logs`
+  `success`; a shell from another site is `pod.exec` `denied`, reason `origin_not_allowed`, and leaves no recording.
+- **Tables**: the action buttons and the column picker stay at the right edge of a wide table.
 
 ### Upgrading to 2.23.1 {#upgrading-to-2231}
 

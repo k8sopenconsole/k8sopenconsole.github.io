@@ -30,7 +30,7 @@ OpenConsole'un çalıştığı cluster'da [kurulum](/installation/kubernetes) bu
 ```bash
 kubectl --context <cluster> create namespace kubernetes-openconsole
 kubectl --context <cluster> apply -f \
-  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/rbac.yaml
+  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/rbac.yaml
 ```
 
 Bu komut şunları oluşturur:
@@ -63,12 +63,12 @@ ihtiyacınız varsa kuralın yorumunu kaldırın ve yalnızca `secrets:list` / `
 `rbac.yaml`, OpenConsole'un `kube-system` dahil her namespace'te Secret okumasına, shell açmasına ve workload'ları
 değiştirmesine izin verir. Bunu yalnızca seçtiğiniz namespace'lerle sınırlamak için okumaları cluster genelinde
 bırakın (OpenConsole pod'ları, Deployment'ları, … cluster genelinde izler) ve yazma haklarını
-[`deploy/optional/rbac-namespaced-writes.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.1/deploy/optional/rbac-namespaced-writes.yaml) ile namespace
+[`deploy/optional/rbac-namespaced-writes.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.4/deploy/optional/rbac-namespaced-writes.yaml) ile namespace
 başına bağlayın:
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/rbac-readonly.yaml
-curl -sL https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/optional/rbac-namespaced-writes.yaml \
+kubectl apply -f https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/rbac-readonly.yaml
+curl -sL https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/optional/rbac-namespaced-writes.yaml \
   | sed 's/namespace: team-a/namespace: payments/' | kubectl apply -f -
 ```
 
@@ -180,7 +180,7 @@ NS=kubernetes-openconsole
 kubectl --context $CTX -n $NS delete serviceaccount openconsole-reader          # its token Secret goes with it
 kubectl --context $CTX -n $NS wait --for=delete secret/openconsole-reader-token --timeout=60s
 kubectl --context $CTX apply -f \
-  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.1/deploy/rbac.yaml
+  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/deploy/rbac.yaml
 ```
 
 Yalnızca Secret'ı silip yeniden oluşturursanız **aynı token'ı yeniden alırsınız**: Kubernetes ServiceAccount

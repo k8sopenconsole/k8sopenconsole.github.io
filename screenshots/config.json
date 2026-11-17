@@ -1,5 +1,5 @@
 {
-  "version": "2.23.1",
+  "version": "2.23.4",
   "viewport": {"width": 1440, "height": 900},
   "themes": ["light", "dark"],
   "locales": ["en", "tr"]

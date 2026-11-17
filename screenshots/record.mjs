@@ -47,6 +47,12 @@ try {
     for (const e of har.log.entries) {
       e.request.headers = e.request.headers.filter((h) => !/^(authorization|cookie)$/i.test(h.name));
     }
+    // Replay answers a repeated request with the first matching entry. A scene that changes data
+    // and reads it again (`lastGet`) keeps only the last answer of each GET: the page shows the end state.
+    if (scene.lastGet) {
+      const last = new Map(har.log.entries.map((e, i) => [`${e.request.method} ${e.request.url}`, i]));
+      har.log.entries = har.log.entries.filter((e, i) => e.request.method !== 'GET' || last.get(`GET ${e.request.url}`) === i);
+    }
     writeFileSync(harPath, JSON.stringify(har));
     writeFileSync(join(FIXTURES, `${scene.id}.json`), JSON.stringify({time, sockets}, null, 1));
     console.log('recorded', scene.id);

@@ -13,14 +13,14 @@ One container on your machine, enough to look around. For a team, [install it on
 ```bash
 docker run -d --name openconsole -p 8080:8080 \
   -v openconsole-data:/data \
-  ghcr.io/vurulkan/kubernetes-openconsole:2.23.1
+  ghcr.io/vurulkan/kubernetes-openconsole:2.23.4
 ```
 
 | Part | Meaning |
 |---|---|
 | `-p 8080:8080` | the UI and API on http://localhost:8080 |
 | `-v openconsole-data:/data` | the SQLite database and shell recordings, kept across restarts. Leave it out for a throwaway run |
-| `:2.23.1` | the release. Images are `linux/amd64` and `linux/arm64` |
+| `:2.23.4` | the release. Images are `linux/amd64` and `linux/arm64` |
 
 Check that it is up: `curl http://localhost:8080/readyz` answers `ready`.
 
@@ -47,7 +47,7 @@ Desktop, kind, k3d) does not work as is: inside the container that address is th
   docker rm -f openconsole
   docker run -d --name openconsole --network k3d-<name> -p 8080:8080 \
     -v openconsole-data:/data \
-    ghcr.io/vurulkan/kubernetes-openconsole:2.23.1
+    ghcr.io/vurulkan/kubernetes-openconsole:2.23.4
   ```
 
   and use `https://k3d-<name>-server-0:6443` as the API server. [Try it on k3d](/getting-started/try-on-k3d) runs

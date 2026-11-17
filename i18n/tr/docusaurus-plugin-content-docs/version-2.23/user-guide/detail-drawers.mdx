@@ -34,6 +34,14 @@ Ayrıntı paneli sağda açılır; `Esc` kapatır.
 - Deployment ayrıca **revizyonlarını** imajları ve restart zamanlarıyla listeler (salt okuma; rollback yok).
 - İzinlerinizin elverdiği düğmeler: **YAML**, **Ölçekle**, **Yeniden başlat**, **Loglar** (tüm pod'lar birlikte).
 
+## Olaylar {/* #events */}
+
+İki paneldeki **Olaylar** ve bir satırın **Olaylar** düğmesinin açtığı liste son bir saatin olaylarıdır, uyarılar en
+üstte, ve nesneyi canlı izler: yeni bir olay olduğu anda görünür, tekrarlanan bir olayın sayısı (`×5`) ve zamanı
+güncellenir; yanındaki **Canlı** akışın açık olduğunu söyler (geri gelirken **Yeniden bağlanıyor…**; o zaman liste
+yeniden okunur). [Canlı olaylar](/user-guide/views-and-events#live-events) ile aynı akıştan gelir, bu nesneyle
+sınırlıdır.
+
 :::info[Göremiyor ya da yapamıyor musunuz?]
 - Bir düğme yok: bu namespace'te onun izni sizde yok: `pods:logs`, `pods:exec`, `deployments:restart`,
   `deployments:scale` / `statefulsets:scale`, YAML değişiklikleri için `<kind>:edit`.
