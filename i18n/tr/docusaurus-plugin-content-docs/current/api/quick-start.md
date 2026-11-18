@@ -10,6 +10,9 @@ description: "Bir API anahtarı oluşturun ve curl ile ilk çağrıları yapın:
 `curl` ve `jq` gerekir. Örnekler, kod repository'sindeki `hack/k3d/crashlab.yaml` ile oluşturulan `crashlab`
 namespace'ine sahip bir test cluster'ında çalıştırıldı; sizdeki adlar farklı olacaktır.
 
+Bir anahtar [iki adımlı doğrulamadan](../user-guide/two-factor.mdx) etkilenmez: yöneticinin politikası ne olursa olsun hiçbir
+zaman kod istemez ve `/api/me/2fa/*`'yi çağıramaz.
+
 ## 1. Anahtar oluşturun {#1-create-a-key}
 
 OpenConsole'da: adınız (sağ üst) → **API anahtarları** → **Yeni API anahtarı**. Cluster'ı, namespace'leri ve
@@ -132,7 +135,7 @@ yok sayın. `/api/openapi.json` içindeki `info.version` sunucunun sürümüdür
 | 403 | `forbidden` | Anahtarda listelenmiyor ya da o namespace'te sizde yok. |
 | 403 | `api_access_policy` | Web'de sizde var, ama admin'in API erişim politikası anahtarlara vermiyor. |
 | 403 | `api_access_off` | Politika anahtarlarınıza hiçbir şey vermiyor; `/api/auth/me` dahil her çağrı reddedilir. |
-| 403 | `api_key_not_allowed` | Yalnızca web oturumunda yapılabilir (anahtar yönetimi, parola, kayıtlı görünümler). |
+| 403 | `api_key_not_allowed` | Yalnızca web oturumunda yapılabilir (anahtar yönetimi, parola, kayıtlı görünümler, iki adımlı doğrulama). |
 | 403 | `feature_disabled` | Operatör özelliği kapattı (`FEATURE_*=false`). |
 | 403 | `admin_only` | Bir admin ucu ve anahtar bir admin'in Admin API anahtarı değil. |
 | 400 | `invalid_input` | Bir değer kabul edilmedi; hangisi olduğunu `detail` söyler. Örneğin `X-OpenConsole-Cluster` var olmayan bir cluster'ı belirtiyor (anahtarın kapsamadığı biri için `403` `forbidden`). |

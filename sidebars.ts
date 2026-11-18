@@ -36,6 +36,7 @@ const sidebars: SidebarsConfig = {
       label: 'User guide',
       items: [
         'user-guide/signing-in',
+        'user-guide/two-factor',
         'user-guide/cluster-and-namespace',
         'user-guide/dashboard',
         'user-guide/pod-health',

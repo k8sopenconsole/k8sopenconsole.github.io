@@ -28,6 +28,22 @@ export const SCENES = [
   // ── User guide ──────────────────────────────────────────────────────────
   {id: 'login', as: null, path: '/login',
     run: async (page) => { await page.locator('input[type=password]').waitFor(); }},
+  // ops.lead has two-factor authentication on (seed.mjs; the password is seed.mjs PW)
+  {id: 'login-code', as: null, path: '/login',
+    run: async (page) => {
+      await page.locator('input[type=password]').waitFor();
+      await page.locator('input[autocomplete=username]').fill('ops.lead');
+      await page.locator('input[type=password]').fill('Docs-Screens-2026');
+      await page.locator('form button[type=submit]').click();
+      await page.locator('input[autocomplete=one-time-code]').waitFor();
+    }},
+  {id: 'two-factor-enroll', as: 'ayse-enroll', path: '/',
+    run: async (page) => {
+      await page.locator('[role=dialog] img').waitFor();
+      await page.waitForTimeout(500);
+    }},
+  {id: 'two-factor-account', as: 'opslead', path: '/account/two-factor',
+    run: async (page) => { await page.getByText(/10 unused recovery codes|10 kurtarma kodu/).waitFor(); }},
   {id: 'dashboard-pods', as: 'alice', storage: shop('pods'),
     run: async (page) => { await row(page, 'catalog-').waitFor(); }},
   {id: 'dashboard-cards', as: 'alice', storage: {...shop('pods'), dashboardViewMode: 'card'},
@@ -232,6 +248,11 @@ export const SCENES = [
     run: async (page) => { await row(page, 'alice').waitFor(); }},
   {id: 'admin-session-settings', as: 'admin', path: '/admin', storage: admin('session'),
     run: async (page) => { await page.waitForTimeout(1500); }},
+  {id: 'admin-two-factor-policy', as: 'admin', path: '/admin', storage: admin('session'), viewport: {width: 1440, height: 1300},
+    run: async (page) => {
+      await page.locator('input[name=twoFactorPolicy]').first().waitFor();
+      await page.waitForTimeout(1500);
+    }},
   {id: 'admin-backups', lastGet: true, as: 'admin', path: '/admin', storage: admin('backups'),
     run: async (page) => {
       await page.getByRole('button', {name: L('Back up now')}).click();

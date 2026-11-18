@@ -69,6 +69,21 @@ cluster OpenConsole runs in; on every other connected cluster apply the new `rba
 
 ## Version notes {#version-notes}
 
+### Upgrading to 2.24 {#upgrading-to-224}
+
+- **Two-factor authentication** for local and LDAP accounts, and **Require MFA for Azure AD sign-in**. Both are off
+  after the upgrade: the policy starts at *Off*, so sign-in works exactly as before until an admin changes it
+  ([Two-factor authentication](../administration/sessions.mdx#two-factor-authentication),
+  [Azure AD](../administration/azure-ad.mdx#require-mfa)).
+- The first start adds columns to `users`, `session_settings` and `azure_ad_config` and a `recovery_codes` table; no
+  step by hand. The authenticator keys are encrypted like the other stored credentials (with `ENCRYPTION_KEY_FILE`
+  when you use it).
+- New environment variable `TWO_FACTOR_RESET_USER`, for an admin locked out of two-factor authentication
+  ([Troubleshooting](/operations/troubleshooting#sign-in-fails)); leave it unset.
+- The API only grows: `POST /api/auth/login` answers as before while two-factor authentication is off for the
+  account; with it on, it answers `{"twoFactor": "verify", "challenge": "…"}` and the session comes from
+  `POST /api/auth/2fa/verify`. API keys are not affected.
+
 ### Upgrading to 2.23.4 {#upgrading-to-2234}
 
 - Replace the image: no change to the API's paths, the database or the manifests. Rolling back to 2.23.3 works.

@@ -87,6 +87,10 @@ More: [Prometheus](/administration/prometheus).
 | the same message after 5 tries, and `429` `rate_limited` with `Retry-After` from `/api/auth/login` | that user name is locked for 5 minutes from that address, audited as `user.login` `locked` (`too_many_failures`); after 20 failures from any addresses, the name is locked everywhere for 5 minutes. Wait, or sign in from another machine |
 | everyone's sign-ins and sessions show the same address (the ingress pod's), and one person's typos lock others out | `TRUSTED_PROXIES` doesn't cover your ingress, so `X-Forwarded-For` isn't read: set it to the ingress controller's pod network ([Environment variables](/reference/environment-variables)) |
 | **Sign in with Microsoft** answers `403` `sign_in_failed` with the detail `this account can't sign in with this Microsoft account` | `user.login` `failed` with reason `not_azure_account` (a local or LDAP account has that name), `azure_oid_mismatch` (the account belongs to another Entra user, e.g. one deleted and re-created) or `azure_no_oid` ([Azure AD](/administration/azure-ad#how-the-account-is-found)) |
+| `The code is wrong or was used already.` at the code step (`401` `two_factor_invalid`) | `two_factor.verify` `failed`, reason `invalid_code`. Usually the phone's clock: OpenConsole accepts the current code and the one 30 seconds before or after it; set the phone's time automatically. A code works once: wait for the next one. Wrong codes count on the sign-in lock above |
+| `The sign-in took too long. Enter your password again.` (`401` `two_factor_challenge_expired`) | the code step lasts 5 minutes (and doesn't survive a restart of the pod): enter the password again |
+| after **Sign in with Microsoft**: *Multi-factor authentication wasn't done in your Microsoft sign-in. …* | **Require MFA for Azure AD sign-in** is on and the token's `amr` has no `mfa`: `user.login` `denied`, reason `azure_mfa_required`. Require MFA in Entra with Conditional Access; a log line `azure ad sign-in refused: the id_token has no amr claim` means the app registration lacks the optional claim `amr` ([Azure AD](../administration/azure-ad.mdx#require-mfa)) |
+| an admin lost the phone and the recovery codes, and there is no other admin | set `TWO_FACTOR_RESET_USER` to that user name in the Deployment and restart: on start the account's two-factor authentication and recovery codes are removed and its sessions end (log warning `TWO_FACTOR_RESET_USER: two-factor sign-in removed`, audit `two_factor.reset` by `system`). It does this on **every** start while set: remove it afterwards. With another admin: Admin → Users → **Reset 2FA** |
 | `Your session has ended. Please sign in again.` | no activity for the inactivity time (Admin → Sessions, 60 minutes by default), 12 hours since sign-in, or an admin revoked it |
 
 The audit reason doesn't say why an LDAP bind failed; the pod log does. Every failed LDAP sign-in (the first one,
@@ -180,6 +184,11 @@ least 8 characters)*. Search this page for the code or the detail. An unknown `/
 | `sign_in_failed` | 400, 401, 403, 502 | the Microsoft sign-in failed or doesn't match this account; see [Sign-in fails](#sign-in-fails) |
 | `recording_unavailable` | 503 | a shell that must be recorded (API key) can't be right now ([Recordings](/administration/recordings)) |
 | `internal_error` | 500 | OpenConsole failed; the pod log has the cause under the response's `X-Request-Id` |
+| `two_factor_invalid` / `two_factor_challenge_expired` | 401 (400 on the account page) | the two-factor code is wrong or used / the sign-in's code step expired; see [Sign-in fails](#sign-in-fails) |
+| `two_factor_enrollment_required` | 403 | the policy requires two-factor authentication this account hasn't set up: the session can only set it up ([Two-factor authentication](../administration/sessions.mdx#two-factor-authentication)) |
+| `two_factor_required` | 403 | turning two-factor authentication off, when the policy requires it for the account |
+| `two_factor_off` | 409 | two-factor authentication is off on this server (policy *Off*), not set up for the account, or the account signs in with Microsoft |
+| `azure_mfa_required` | (sign-in page) | the Microsoft sign-in had no MFA and the admin requires it; see [Sign-in fails](#sign-in-fails) |
 
 ### 403 reasons {#403-reasons}
 

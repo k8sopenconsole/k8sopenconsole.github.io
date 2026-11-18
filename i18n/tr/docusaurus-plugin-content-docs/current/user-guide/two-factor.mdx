@@ -1,0 +1,82 @@
+---
+title: "İki adımlı doğrulama"
+description: "Parolanızın yanında bir doğrulama uygulamasının koduyla giriş yapın: kurulum, kurtarma kodları, telefon değiştirme."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# İki adımlı doğrulama
+
+**Yapmak istediğiniz:** hesabınızı, parolanız tek başına giriş için yetmeyecek şekilde korumak.
+
+İki adımlı doğrulama açıkken giriş, paroladan sonra telefonunuzdaki bir doğrulama uygulamasının (Microsoft
+Authenticator, Google Authenticator, 1Password, …) 6 haneli kodunu ister. **Yerel** ve **LDAP** hesapları içindir.
+Microsoft ile giriş yapıyorsanız ikinci adımı kurumunuzun Microsoft hesap ayarları belirler.
+
+Sunulup sunulmayacağına ve sizin için zorunlu olup olmadığına yöneticiniz karar verir
+([Yönetim → Oturum](../administration/sessions.mdx#two-factor-authentication)).
+
+## Kurulum {/* #set-it-up */}
+
+Hesap menüsü (sağ üstte adınız) → **İki adımlı doğrulama** → **Kur**. Yöneticiniz zorunlu kıldıysa ve henüz
+kurmadıysanız, OpenConsole girişten hemen sonra **İki adımlı doğrulamayı kurun** penceresini gösterir; kurana kadar
+başka bir şey göstermez (diğer tek düğme **Çıkış**'tır).
+
+{/* shoot first (screenshots/scenes.mjs, 2.24 image), then uncomment: <Screenshot id="two-factor-enroll" alt="İki adımlı doğrulamayı kurun: doğrulama uygulaması için QR kod, Kopyala ile elle girilecek anahtar ve Aç düğmesiyle kod alanı" /> */}
+
+1. **QR kodu** doğrulama uygulamanızla **okutun**. Okutamıyor musunuz? Altında gösterilen anahtarı uygulamaya girin.
+2. Uygulamanın gösterdiği **6 haneli kodu girin** ve **Aç**'a basın.
+3. **Kurtarma kodlarını saklayın.** OpenConsole on **Kurtarma kodları**'nı bir kez gösterir: **Kopyala** ya da
+   **İndir** ile alın, parola yöneticisi gibi güvenli bir yerde saklayın. Sonra **Kaydettim**.
+
+Açmak, diğer tüm tarayıcılardaki oturumlarınızı kapatır; bu tarayıcıdaki açık kalır.
+
+## Kodla giriş {/* #sign-in-with-a-code */}
+
+{/* shoot first (screenshots/scenes.mjs, 2.24 image), then uncomment: <Screenshot id="login-code" alt="Giriş sayfasının kod adımı: İki adımlı doğrulama, Kod alanı, Doğrula, Kurtarma kodu kullan ve Girişe dön" /> */}
+
+Paroladan sonra uygulamadaki 6 haneli kodu girin ve **Doğrula**'ya basın. Bu adım 5 dakika sürer; sonrasında
+(*Giriş çok uzun sürdü. Parolanızı yeniden girin.*) parolayla yeniden başlarsınız. **Girişe dön** adımdan çıkar.
+
+- **Telefonunuz yanınızda değil mi?** **Kurtarma kodu kullan**'a basın, kurtarma kodlarınızdan birini girin ve
+  **Doğrula**'ya basın. Her kod bir kez çalışır. Böyle bir girişten sonra OpenConsole iki adımlı doğrulama sayfanızı
+  açar; sayfa kaç kullanılmamış kod kaldığını söyler.
+- Bir kod **bir kez** çalışır: kullandığınız bir kod hemen ardından reddedilirse uygulamanın bir sonraki kodunu bekleyin.
+- Yanlış kodlar yanlış parola gibi sayılır: birkaç yanlıştan sonra hesap 5 dakika kilitlenir
+  ([Giriş yapma](/user-guide/signing-in#which-account)).
+
+## İki adımlı doğrulama sayfanız {/* #your-two-factor-page */}
+
+{/* shoot first (screenshots/scenes.mjs, 2.24 image), then uncomment: <Screenshot id="two-factor-account" alt="İki adımlı doğrulama sayfası: durum Açık, kullanılmamış 10 kurtarma kodu kaldı, Yeni kurtarma kodları ve Kapat" /> */}
+
+Hesap menüsü → **İki adımlı doğrulama** durumu (**Açık** / **Kapalı**) ve kaç kurtarma kodu kaldığını gösterir.
+
+- **Yeni kurtarma kodları**: uygulamadaki kodu girin; on yeni kod eskilerin yerini alır, eskiler artık çalışmaz. Az kod
+  kaldığında yapın (sayfa iki kod kalınca uyarır).
+- **Kapat**: uygulamadaki kodu ya da bir kurtarma kodunu girin. Yöneticiniz sizin için iki adımlı doğrulamayı zorunlu
+  kıldıysa **Kapat** yoktur (*Yöneticiniz hesabınız için iki adımlı doğrulamayı zorunlu kıldı.*).
+
+## Telefon değiştirme {/* #changing-phones */}
+
+- **Uygulamaların çoğu hesaplarını yeni telefona taşır** (yedekleme, dışa aktarma ya da eşitleme): o zaman
+  OpenConsole'da hiçbir şey değişmez.
+- **Sizin için zorunlu değilse:** eski telefonla ya da bir kurtarma koduyla **Kapat**; sonra yeni telefonla yeniden
+  **Kur**.
+- **Sizin için zorunluysa ve eski telefon yoksa:** bir kurtarma koduyla giriş yapın ve yöneticinizden
+  [iki adımlı doğrulamanızı sıfırlamasını](/administration/users#edit-reset-disable-delete) isteyin; bir sonraki
+  girişinizde yeniden kurarsınız.
+- **Ne telefon ne kurtarma kodu varsa:** yöneticinizden sıfırlamasını isteyin.
+
+## API anahtarları {/* #api-keys */}
+
+[API anahtarları](/user-guide/api-keys) kod istemez: politika ne olursa olsun çalışmaya devam eder. İki adımlı
+doğrulamayı kurmak, değiştirmek ve kapatmak yalnızca tarayıcıdan olur, hiçbir zaman bir API anahtarıyla olmaz.
+
+:::info[Kod kabul edilmiyor mu?]
+- *Kod yanlış ya da daha önce kullanılmış.*: telefonun saatinin otomatik ayarlandığını kontrol edin. OpenConsole o anki
+  kodu ve 30 saniye öncesinin ya da sonrasının kodunu kabul eder; saati bundan fazla kaymış bir telefonun kodları hiç
+  çalışmaz.
+- Hesap menünüzde **İki adımlı doğrulama** yok: yöneticiniz açmadı (politika *Kapalı*) ya da Microsoft ile giriş
+  yapıyorsunuz.
+- Kurtarma kodunuz da kalmadıysa: yöneticiniz Yönetim → Kullanıcılar'dan sıfırlar.
+:::

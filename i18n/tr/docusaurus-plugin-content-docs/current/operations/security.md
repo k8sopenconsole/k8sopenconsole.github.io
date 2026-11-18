@@ -89,6 +89,17 @@ flowchart LR
   ([observability.go#L65-L72](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.4/backend/internal/api/observability.go#L65-L72),
   [router.go#L73-L79](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.4/backend/internal/api/auth_handlers.go#L73-L79)). Her başarısız giriş aynı `401`'i alır;
   cevap, hesabın var olup olmadığını belli etmez ([router.go#L122-L129](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.4/backend/internal/api/auth_handlers.go#L122-L129)).
+- **İki adımlı doğrulama** (yerel ve LDAP hesapları, yöneticinin politikası *Kapalı* değilken): TOTP (RFC 6238: 6 hane,
+  30 saniye, iki yöne birer adım saat kayması). Açıkken doğru parola yalnızca sunucunun belleğinde tutulan 5 dakikalık
+  bir challenge döndürür, oturum değil; oturum koddan sonra başlar
+  ([twofactor.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/twofactor.go)). Bir kod bir kez kabul edilir: sunucu son kullanılan zaman
+  adımını saklar ([totp.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/auth/totp.go)). Yanlış kodlar yanlış parolalarla aynı giriş kilidine
+  sayılır ve kilidi yalnızca tamamlanmış bir giriş temizler. Doğrulama anahtarı diğer kimlik bilgileri gibi
+  şifrelenerek, on kurtarma kodu SHA-256 özeti olarak saklanır; kodlar, anahtarlar ve kurtarma kodları hiçbir zaman
+  audit'e ya da log'a yazılmaz. Politikanın zorunlu tuttuğu ve henüz kurmamış birinin oturumu yalnızca kuruluma
+  erişir (başka yerde `403` `two_factor_enrollment_required`). API anahtarları etkilenmez; iki adımlı doğrulama uçları
+  onları reddeder. Microsoft hesapları Microsoft'un MFA'sını kullanır; OpenConsole bunu zorunlu tutabilir
+  ([Azure AD](../administration/azure-ad.mdx#require-mfa)).
 - **Oturumlar** imzalı token'lardır (JWT, HS256; başka algoritmalar reddedilir); Yönetim → Oturumlar'da ayarlanan
   hareketsizlik süresinden sonra (varsayılan 60 dakika), en geç de girişten 12 saat sonra biterler. Hareket bitişi
   server tarafında ileri alır; bir ekranın otomatik yenilemesi ve kendiliğinden yeniden bağlanan bir WebSocket almaz

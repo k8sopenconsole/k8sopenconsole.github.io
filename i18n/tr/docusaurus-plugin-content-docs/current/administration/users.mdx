@@ -9,9 +9,9 @@ import Screenshot from '@site/src/components/Screenshot';
 
 ## Kullanıcılar {/* #users */}
 
-**Yönetim → Kullanıcılar** her hesabı kaynağı, API erişimi, admin işareti, durumu ve gruplarıyla listeler.
+**Yönetim → Kullanıcılar** her hesabı kaynağı, API erişimi, admin işareti, durumu, iki adımlı doğrulaması (**2FA**: *Açık* / *Kapalı*, Azure AD hesapları için *—*) ve gruplarıyla listeler.
 
-<Screenshot id="admin-users" alt="Yönetim → Kullanıcılar: kaynağı Local, API erişimi Rollere göre olan beş hesap; admin işaretleri, Aktif durumu ve grupları; CSV olarak dışa aktar ve Yeni kullanıcı" />
+<Screenshot id="admin-users" alt="Yönetim → Kullanıcılar: kaynağı Local, API erişimi Rollere göre olan beş hesap; admin işaretleri, Aktif durumu, 2FA ve grupları; CSV olarak dışa aktar ve Yeni kullanıcı" />
 
 | Kaynak | Giriş yöntemi | Parolanın tutulduğu yer |
 |---|---|---|
@@ -44,6 +44,10 @@ değiştirmesini siz söyleyin.
 - **Düzenle** (kalem): aktiflik, admin, gruplar ve kullanıcının [API erişimi](/administration/api-access-policy).
 - **Parola sıfırla** (anahtar simgesi, yalnızca local hesaplar): yeni bir parola belirler; varsayılan olarak bir sonraki
   girişte değiştirilmesi gerekir. Kullanıcının her yerdeki oturumu kapatılır (`user.reset_password`).
+- **2FA'yı sıfırla** (kalkan simgesi, iki adımlı doğrulaması açık hesaplar): hesabın doğrulama anahtarını ve kurtarma
+  kodlarını siler, kullanıcının her yerdeki oturumunu kapatır (`two_factor.reset`).
+  [Politika](./sessions.mdx#two-factor-authentication) zorunlu kılıyorsa kullanıcı bir sonraki girişinde
+  yeniden kurar; değilse isterse kurar. Telefonunu ve kurtarma kodlarını kaybeden biri için.
 - **Devre dışı bırakma** (*Aktif* işaretini kaldırın): oturumları anında iptal edilir ve her isteği, API anahtarları dahil,
   reddedilir; yeni shell ya da log akışı açılmaz (açık olan kapanana kadar sürer). Silmeye tercih edin.
 - **Silme** (çöp kutusu): hesabı ve üyeliklerini kaldırır; hesabın yaptıkları audit log'da kalır.

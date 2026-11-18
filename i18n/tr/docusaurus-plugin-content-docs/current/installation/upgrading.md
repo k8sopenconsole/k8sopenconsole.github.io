@@ -70,6 +70,21 @@ cluster'da `deploy/` ile birlikte gelir; bağlı diğer her cluster'da yeni `rba
 
 ## Sürüme özel notlar {#version-notes}
 
+### 2.24'e yükseltme {#upgrading-to-224}
+
+- Yerel ve LDAP hesapları için **iki adımlı doğrulama** ve **Azure AD girişinde MFA zorunlu**. Yükseltmeden sonra ikisi
+  de kapalıdır: politika *Kapalı* ile başlar, bu yüzden bir yönetici değiştirene kadar giriş tam önceki gibi çalışır
+  ([İki adımlı doğrulama](../administration/sessions.mdx#two-factor-authentication),
+  [Azure AD](../administration/azure-ad.mdx#require-mfa)).
+- İlk açılış `users`, `session_settings` ve `azure_ad_config`'e sütunlar ve bir `recovery_codes` tablosu ekler; elle
+  yapılacak adım yok. Doğrulama anahtarları diğer saklanan kimlik bilgileri gibi şifrelenir (kullanıyorsanız
+  `ENCRYPTION_KEY_FILE` ile).
+- Yeni ortam değişkeni `TWO_FACTOR_RESET_USER`: iki adımlı doğrulamada dışarıda kalmış bir yönetici için
+  ([Sorun giderme](/operations/troubleshooting#sign-in-fails)); ayarlamadan bırakın.
+- API yalnızca büyür: hesapta iki adımlı doğrulama kapalıyken `POST /api/auth/login` önceki gibi cevap verir; açıkken
+  `{"twoFactor": "verify", "challenge": "…"}` döner ve oturum `POST /api/auth/2fa/verify`'dan gelir. API anahtarları
+  etkilenmez.
+
 ### 2.23.4'e yükseltme {#upgrading-to-2234}
 
 - İmajı değiştirin: API yollarında, veritabanında ya da manifest'lerde değişiklik yok. 2.23.3'e geri dönmek çalışır.

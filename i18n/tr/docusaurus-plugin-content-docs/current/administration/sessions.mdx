@@ -37,3 +37,36 @@ iptal edin ya da kullanıcıyı devre dışı bırakın.
   bir sonraki hareketinden itibaren uygulanır.
 - **API anahtarı süresi**: yeni ya da yeniden üretilen bir anahtarın alabileceği en uzun süre ve süresiz anahtarlara
   izin verilip verilmediği ([API erişim politikası](/administration/api-access-policy#expiry-policy)).
+
+## İki adımlı doğrulama {/* #two-factor-authentication */}
+
+**Yapmak istediğiniz:** paroladan başka bir doğrulama uygulamasının kodunu da istemek.
+
+**Yönetim → Oturum → İki adımlı doğrulama**, **yerel ve LDAP** hesapları için politikayı belirler. Azure AD hesapları
+etkilenmez: onlar için MFA'yı Entra'da ve [Azure AD](./azure-ad.mdx#require-mfa) altında zorunlu kılın.
+
+{/* shoot first (screenshots/scenes.mjs, 2.24 image), then uncomment: <Screenshot id="admin-two-factor-policy" alt="Yönetim → Oturum: Kapalı, İsteğe bağlı, Yöneticilere zorunlu ve Herkese zorunlu politikalarıyla İki adımlı doğrulama kartı ve Kaydet" /> */}
+
+| Politika | Ne olur |
+|---|---|
+| **Kapalı** (varsayılan) | Kimseden kod istenmez; hesap menüsünde de sunulmaz. |
+| **İsteğe bağlı** | Kullanıcılar hesap menüsünden kurabilir ([İki adımlı doğrulama](../user-guide/two-factor.mdx)); kuranlardan kod istenir. |
+| **Yöneticilere zorunlu** | Kurmamış yöneticiler bir sonraki girişlerinde kurar; diğerleri isterse kurar. |
+| **Herkese zorunlu** | Kurmamış her yerel ve LDAP kullanıcısı bir sonraki girişinde kurar. |
+
+- Zorunlu bir politika seçmek önce sorar ve kaç hesapta henüz olmadığını söyler (*N hesapta henüz yok: bir sonraki
+  girişlerinde kurmaları gerekecek.*).
+- **Değişiklik her kullanıcının bir sonraki girişinden itibaren geçerlidir.** Açık oturumlar sürer.
+- Politikanın zorunlu tuttuğu ve henüz kurmamış biri, yalnızca kurulum yapabilen bir oturuma girer: engelleyici
+  **İki adımlı doğrulamayı kurun** penceresi; diğer tek çıkış **Çıkış**'tır. Diğer her API çağrısı `403`
+  `two_factor_enrollment_required` cevabı verir. Yöneticinin belirlediği bir parola önce değiştirilir.
+- **Kapatmak kullanıcıların kurduklarını silmez.** Kapalıyken kimseden kod istenmez; tekrar açılınca kurmuş herkes,
+  yeniden kurmadan kullanmaya devam eder.
+- [API anahtarları](/administration/api-access-policy) politikadan etkilenmez.
+- Telefonunu ve kurtarma kodlarını kaybeden kullanıcılar: [2FA'yı sıfırla](/administration/users#edit-reset-disable-delete).
+  Başka yöneticisi olmayan, dışarıda kalmış bir yönetici: `TWO_FACTOR_RESET_USER`
+  ([Sorun giderme](/operations/troubleshooting#sign-in-fails)).
+
+Kaydetmek `settings.update` olarak audit'e yazılır (özette `two_factor_policy` vardır); kurulum, giriş kodları, yeni
+kurtarma kodları, kapatma ve sıfırlamalar `two_factor.*` olarak ([Audit olayları](/reference/audit-events)). Kodlar,
+anahtarlar ve kurtarma kodları hiçbir zaman audit log'una ya da sunucu log'una yazılmaz.

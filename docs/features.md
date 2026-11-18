@@ -37,6 +37,7 @@ Every read and write is an audit event with its own fields: `action` (`deploymen
 - **Multi-cluster, per user**: save N clusters. Every user picks their **own** cluster in the header (or with `c`), and admins set a default for everyone else. Permissions can be scoped per cluster, and audit records the cluster.
 - **Local users** (bcrypt) + **LDAP** (bind-based, searchable + importable) + **Azure AD** single-tenant login — all configurable via UI.
 - **JWT authentication** with forced password change on first login.
+- **Two-factor authentication** (TOTP from an authenticator app, recovery codes) for local and LDAP accounts, off / optional / required for admins / required for everyone; **Require MFA** for Azure AD sign-in.
 - **Session management** (Admin → Sessions): list every active token, revoke individual sessions or every session for a user, change-password revokes everything.
 - **Session recordings** (Admin → Recordings): filter, replay (1x / 2x / 4x, seek, skip idle), download `.cast`, delete; retention, quota and on/off switch editable in the UI.
 - **Login brute-force protection** (5 fails per IP+user → 5-minute lock, audited). Every sign-in is audited as `user.login` with the outcome (`success` / `failed` / `locked`), the method (`login_method`: `local` / `ldap` / `azure`) and, for a failure, the reason.

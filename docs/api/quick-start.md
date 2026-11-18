@@ -10,6 +10,9 @@ description: "Create an API key and make the first calls with curl: who am I, po
 You need `curl` and `jq`. The examples were run against a test cluster with the `crashlab` namespace of the code
 repository's `hack/k3d/crashlab.yaml`; your names will differ.
 
+A key is not affected by [two-factor authentication](../user-guide/two-factor.mdx): it never asks for a code, whatever the
+admin's policy, and it can't call `/api/me/2fa/*`.
+
 ## 1. Create a key {#1-create-a-key}
 
 In OpenConsole: your name (top right) → **API keys** → **New API key**. Pick the cluster, the namespaces and the
@@ -129,7 +132,7 @@ know; `info.version` in `/api/openapi.json` is the server's version. An unknown 
 | 403 | `forbidden` | The key doesn't list it, or you don't hold it in that namespace. |
 | 403 | `api_access_policy` | You hold it on the web, but the admin's API access policy keeps it from keys. |
 | 403 | `api_access_off` | The policy gives your keys nothing; every call is refused, `/api/auth/me` too. |
-| 403 | `api_key_not_allowed` | Web session only (managing keys, password, saved views). |
+| 403 | `api_key_not_allowed` | Web session only (managing keys, password, saved views, two-factor authentication). |
 | 403 | `feature_disabled` | The operator switched the feature off (`FEATURE_*=false`). |
 | 403 | `admin_only` | An admin endpoint, and the key isn't an Admin API key of an admin. |
 | 400 | `invalid_input` | A value isn't accepted; `detail` says which. For example `X-OpenConsole-Cluster` names a cluster that doesn't exist (`403` `forbidden` for one the key doesn't cover). |

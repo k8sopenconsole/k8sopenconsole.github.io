@@ -61,3 +61,20 @@ account and pre-create it again. Accounts that signed in before this check exist
 
 Signing out of OpenConsole doesn't sign the person out of Microsoft. To stop someone, disable their OpenConsole account
 or block them in Entra ID.
+
+## Require MFA {/* #require-mfa */}
+
+OpenConsole doesn't ask Microsoft accounts for its own [two-factor code](./sessions.mdx#two-factor-authentication):
+Microsoft does the second factor. **Require MFA for Azure AD sign-in** (Admin → Azure AD) makes sure it did: a
+sign-in whose ID token doesn't have `mfa` in its `amr` claim is refused.
+
+1. **Require MFA in Entra** with a Conditional Access policy for the app (or for all apps).
+2. **Let the ID token say how the person signed in.** OpenConsole uses the v2.0 endpoints, whose ID tokens carry
+   `amr` only when the app asks for it: App registrations → your app → **Token configuration** → **Add optional
+   claim** → token type **ID** → `amr` → Add.
+3. Tick **Require MFA for Azure AD sign-in** and save.
+
+A refused sign-in goes back to the sign-in page with *Multi-factor authentication wasn't done in your Microsoft
+sign-in. Your administrator must require MFA in Entra with Conditional Access.* It is audited as `user.login`,
+outcome `denied`, reason `azure_mfa_required`, and no account is created. When the token has no `amr` claim at all
+(step 2 is missing), the server log also has a warning `azure ad sign-in refused: the id_token has no amr claim`.

@@ -24,6 +24,10 @@ Your admin tells you how you sign in. The sign-in page is the same for all three
 A failed sign-in always says the same thing, whatever the reason. Five failures in a row for one account from one
 address lock it for five minutes.
 
+With [two-factor authentication](./two-factor.mdx) on for your account, a **Code** step follows the password:
+enter the 6-digit code from your authenticator app, or **Use a recovery code**. If your admin requires it and you
+haven't set it up, OpenConsole asks you to set it up right after you sign in.
+
 ## Your password {/* #your-password */}
 
 - If your admin set or reset your password, change it to one only you know (account menu, below). After a reset
@@ -48,5 +52,8 @@ sign-in page. **Sign out** (top right) ends it at once.
 - *Login failed. Please check your credentials.* also covers a disabled account and a locked one. Wait five minutes after several
   failures, then ask your admin to check that your account is active and that you sign in the right way (local,
   LDAP or Microsoft).
+- *Multi-factor authentication wasn't done in your Microsoft sign-in. …* after **Sign in with Microsoft**: your admin
+  requires MFA for Microsoft sign-ins; it must be required in Entra ([Azure AD](../administration/azure-ad.mdx#require-mfa)).
+- The code isn't accepted: see [Two-factor authentication](./two-factor.mdx) (phone clock, a code works once).
 - You sign in but see no namespaces: you are in no group with a role yet. See [Choosing a cluster and namespace](/user-guide/cluster-and-namespace).
 :::

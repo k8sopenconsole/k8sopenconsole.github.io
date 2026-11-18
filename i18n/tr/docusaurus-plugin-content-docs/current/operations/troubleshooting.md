@@ -89,6 +89,10 @@ Daha fazlası: [Prometheus](/administration/prometheus).
 | 5 denemeden sonra aynı mesaj ve `/api/auth/login`'den `Retry-After` ile `429` `rate_limited` | o kullanıcı adı o adresten 5 dakika kilitli; `user.login` `locked` (`too_many_failures`) olarak audit'e yazılır; herhangi adreslerden 20 başarısız denemeden sonra ad her yerden 5 dakika kilitlenir. Bekleyin ya da başka bir makineden giriş yapın |
 | herkesin girişleri ve oturumları aynı adresi (Ingress pod'unun adresini) gösteriyor, bir kişinin yanlış denemeleri başkalarını kilitliyor | `TRUSTED_PROXIES` Ingress'inizi kapsamıyor, bu yüzden `X-Forwarded-For` okunmuyor: onu Ingress controller'ın pod ağına ayarlayın ([Ortam değişkenleri](/reference/environment-variables)) |
 | **Microsoft ile giriş yap** `this account can't sign in with this Microsoft account` detail'iyle `403` `sign_in_failed` cevabını veriyor | `user.login` `failed`, sebep `not_azure_account` (bu ada sahip local ya da LDAP hesabı var), `azure_oid_mismatch` (hesap başka bir Entra kullanıcısına ait, örn. silinip yeniden oluşturulmuş biri) ya da `azure_no_oid` ([Azure AD](/administration/azure-ad#how-the-account-is-found)) |
+| kod adımında `Kod yanlış ya da daha önce kullanılmış.` (`401` `two_factor_invalid`) | `two_factor.verify` `failed`, sebep `invalid_code`. Çoğu zaman telefonun saati: OpenConsole o anki kodu ve 30 saniye öncesinin ya da sonrasının kodunu kabul eder; telefonun saatini otomatik ayara alın. Bir kod bir kez çalışır: bir sonrakini bekleyin. Yanlış kodlar yukarıdaki giriş kilidine sayılır |
+| `Giriş çok uzun sürdü. Parolanızı yeniden girin.` (`401` `two_factor_challenge_expired`) | kod adımı 5 dakika sürer (pod yeniden başlarsa da biter): parolayı yeniden girin |
+| **Microsoft ile giriş yap**'tan sonra: *Microsoft hesabınızda MFA yapılmadı; …* | **Azure AD girişinde MFA zorunlu** açık ve token'ın `amr`'sinde `mfa` yok: `user.login` `denied`, sebep `azure_mfa_required`. MFA'yı Entra'da Conditional Access ile zorunlu kılın; log'daki `azure ad sign-in refused: the id_token has no amr claim` satırı uygulama kaydında `amr` opsiyonel claim'inin eksik olduğunu gösterir ([Azure AD](../administration/azure-ad.mdx#require-mfa)) |
+| bir yönetici telefonunu ve kurtarma kodlarını kaybetti ve başka yönetici yok | Deployment'ta `TWO_FACTOR_RESET_USER`'ı o kullanıcı adına ayarlayıp yeniden başlatın: açılışta hesabın iki adımlı doğrulaması ve kurtarma kodları silinir, oturumları kapanır (log uyarısı `TWO_FACTOR_RESET_USER: two-factor sign-in removed`, `system` tarafından `two_factor.reset` audit'i). Ayarlı kaldıkça **her** açılışta bunu yapar: sonra kaldırın. Başka bir yönetici varsa: Yönetim → Kullanıcılar → **2FA'yı sıfırla** |
 | `Your session has ended. Please sign in again.` (Türkçe arayüzde: "Oturumun sona erdi. Lütfen tekrar giriş yap.") | hareketsizlik süresi boyunca hiçbir hareket olmadı (Yönetim → Oturumlar, varsayılan 60 dakika), girişin üstünden 12 saat geçti ya da bir yönetici iptal etti |
 
 Denetim sebebi, bir LDAP bind'inin neden başarısız olduğunu söylemez; pod logu söyler. Başarısız her LDAP girişi
@@ -182,6 +186,11 @@ metotla gelen istek `Allow` header'ıyla `405` `method_not_allowed` cevabı alı
 | `sign_in_failed` | 400, 401, 403, 502 | Microsoft girişi başarısız oldu ya da bu hesaba uymuyor; bkz. [Giriş yapılamıyor](#sign-in-fails) |
 | `recording_unavailable` | 503 | kaydedilmesi gereken bir shell (API anahtarı) şu an kaydedilemiyor ([Kayıtlar](/administration/recordings)) |
 | `internal_error` | 500 | OpenConsole hata verdi; sebep, cevabın `X-Request-Id`'siyle pod logundadır |
+| `two_factor_invalid` / `two_factor_challenge_expired` | 401 (hesap sayfasında 400) | iki adımlı doğrulama kodu yanlış ya da kullanılmış / girişin kod adımının süresi doldu; bkz. [Giriş yapılamıyor](#sign-in-fails) |
+| `two_factor_enrollment_required` | 403 | politika bu hesabın kurmadığı iki adımlı doğrulamayı zorunlu tutuyor: oturum yalnızca kurulum yapabilir ([İki adımlı doğrulama](../administration/sessions.mdx#two-factor-authentication)) |
+| `two_factor_required` | 403 | politika hesap için zorunlu tutarken iki adımlı doğrulamayı kapatmak |
+| `two_factor_off` | 409 | bu sunucuda iki adımlı doğrulama kapalı (politika *Kapalı*), hesapta kurulu değil ya da hesap Microsoft ile giriş yapıyor |
+| `azure_mfa_required` | (giriş sayfası) | Microsoft girişinde MFA yoktu ve yönetici zorunlu tutuyor; bkz. [Giriş yapılamıyor](#sign-in-fails) |
 
 ### 403 sebepleri {#403-reasons}
 

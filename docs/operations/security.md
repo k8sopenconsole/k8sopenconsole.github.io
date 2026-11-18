@@ -87,6 +87,16 @@ flowchart LR
   ([observability.go#L65-L72](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.4/backend/internal/api/observability.go#L65-L72),
   [router.go#L73-L79](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.4/backend/internal/api/auth_handlers.go#L73-L79)). Every failed sign-in gets the same `401`, so
   the answer doesn't tell whether the account exists ([router.go#L122-L129](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.4/backend/internal/api/auth_handlers.go#L122-L129)).
+- **Two-factor authentication** (local and LDAP accounts, when the admin's policy isn't *Off*): TOTP (RFC 6238:
+  6 digits, 30 seconds, one step of clock drift either way). With it on, the right password answers only a 5-minute
+  challenge held in the server's memory, not a session; the session starts after the code
+  ([twofactor.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/api/twofactor.go)). A code is accepted once: the server keeps the last time step
+  used ([totp.go](https://github.com/vurulkan/kubernetes-openconsole/blob/dev/backend/internal/auth/totp.go)). Wrong codes count on the same sign-in lock as wrong passwords,
+  and only a complete sign-in clears it. The authenticator key is stored encrypted like the other credentials, the
+  ten recovery codes as SHA-256 digests; codes, keys and recovery codes never go into the audit or the log. A session
+  of someone the policy requires it of, who hasn't set it up, reaches only the set-up (`403`
+  `two_factor_enrollment_required` elsewhere). API keys are not affected; the two-factor endpoints refuse them.
+  Microsoft accounts use Microsoft's MFA, which OpenConsole can require ([Azure AD](../administration/azure-ad.mdx#require-mfa)).
 - **Sessions** are signed tokens (JWT, HS256; other algorithms are refused) that end after the inactivity time set
   in Admin → Sessions (60 minutes by default) and at the latest 12 hours after sign-in. Activity moves the end on the
   server; a screen's automatic refresh and a WebSocket reconnecting on its own don't
