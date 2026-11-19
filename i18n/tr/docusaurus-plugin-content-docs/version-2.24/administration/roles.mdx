@@ -1,0 +1,56 @@
+---
+title: "Roller ve izinler"
+description: "Roller ekranı: şablonlar, toplu izin ekleme, rol kopyalama, izinleri yerinde düzenleme."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Roller ve izinler
+
+**Yapmak istediğiniz:** bir grup insanın neler yapabileceğini cluster ve namespace bazında tanımlamak.
+
+**Yönetim → Roller** rolleri [API erişimleri](/administration/api-access-policy) ve onları kullanan grup sayısıyla
+listeler. Altındaki **Rol İzinleri** seçili rolün verdiklerini gösterir.
+
+<Screenshot id="admin-roles" alt="Yönetim → Roller: API erişimi ve gruplarıyla payments-viewer, shop-developer ve sre; shop-developer'ın izinlerini cluster ve namespace'e göre gruplayan Rol İzinleri paneli" />
+
+## Rol oluşturmak {/* #create-a-role */}
+
+1. **Yeni rol**: bir ad, isteğe bağlı bir açıklama ve anahtarlar için API erişimi (varsayılan *Güvenli salt okuma*).
+2. Rolü **Rol İzinleri**'nde seçin ve **İzin ekle**'ye tıklayın.
+
+## İzin eklemek {/* #add-permissions */}
+
+<Screenshot id="admin-add-permissions" alt="İzin ekle: cluster (ya da tüm cluster'lar), filtreli namespace'ler ve Eşleşen N tanesini seç, şablonlar ve kaynak × aksiyon matrisi" />
+
+- **Cluster**: tek bir cluster ya da **tüm cluster'lar** (sonradan eklenenler de).
+- **Namespace'ler**: bir ya da birden fazla; filtrelemek için yazın, *Eşleşen N tanesini seç* filtrenin gösterdiği her
+  namespace'i seçer. "Bütün namespace'ler" diye bir seçenek yoktur: sonradan oluşturulan namespace'lerin eklenmesi
+  gerekir.
+- **Şablon** seçin ya da hücreleri tek tek işaretleyin:
+
+  | Şablon | Verdiği |
+  |---|---|
+  | Görüntüleyici (sadece okuma) | her türde `list` ve `get`, Secret metadata'sı dahil; **log yok** |
+  | Geliştirici | Görüntüleyici + `pods:logs`, `deployments:restart`, `deployments:scale`, `statefulsets:scale` |
+  | SRE | Geliştirici + `pods:exec`, ayrıca Deployment, StatefulSet ve ConfigMap'lerde `edit` |
+  | Yönetici (her şey) | `secrets:reveal`, `secrets:edit` ve her türde `edit` dahil her aksiyon |
+
+  *Yönetici* şablonu kimseyi admin yapmaz; her aksiyonu **seçilen namespace'lerde** verir.
+- **N izin ekle**, cluster × namespace × işaretli hücre başına bir izin ekler. Zaten var olanlar atlanır.
+
+Bütün aksiyonların listesi: [Uygulama izinleri](/reference/permissions).
+
+## Rolü değiştirmek {/* #change-a-role */}
+
+- İzinler kartlar halinde gösterilir; aynı izinlere sahip namespace'ler aynı kartı paylaşır. Kartı yerinde düzenleyin
+  ya da kaldırın.
+- **Rolden kopyala** başka bir rolün izinlerini bu role kopyalar: *shop-developer*'dan *payments-developer*'ı üretip
+  sonra namespace'i değiştirmenin hızlı yolu.
+- Değişiklikler her üyede bir sonraki tıklamasında geçerli olur. Her değişiklik audit log'a yazılır
+  (`permission.create`, `permission.delete`, izinle birlikte).
+
+## Rolü insanlara bağlamak {/* #attach-it-to-people */}
+
+Roller tek tek kullanıcılara değil, her zaman **gruplara** verilir: Yönetim → Gruplar → **Düzenle** → Roller. Bkz.
+[Kullanıcılar ve gruplar](/administration/users).

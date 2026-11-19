@@ -1,0 +1,77 @@
+---
+title: "Panel"
+description: "Kaynak sekmeleri, liste ve kart görünümü, sütunlar, tüm sütunlarda arama, label filtreleri."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Panel
+
+**Yapmak istediğiniz:** iş yükünüzü bulmak ve sağlıklı olup olmadığını bir bakışta görmek.
+
+Panel, seçili cluster'ınızın bir namespace'ini gösterir ([Cluster ve namespace seçme](/user-guide/cluster-and-namespace)).
+Kendini her 10 saniyede bir yeniler; **Yenile** (ya da `r`) hemen yeniler.
+
+<Screenshot id="dashboard-pods" alt="Panel, shop namespace'inin Pod'lar sekmesinde: beş pod; durumları (Running, Error, OOMKilled), container'ları, restart sayıları, sahibi, CPU, memory ve yaşları" />
+
+## Sekmeler {/* #tabs */}
+
+Pod'lar, Deployment'lar, DaemonSet'ler, StatefulSet'ler, HPA'lar, Servisler, ConfigMap'ler, Secret'lar,
+Ingress'ler, CronJob'lar ve Job'lar; listeleme izniniz olanları görürsünüz. `[` ve `]` önceki ve sonraki sekmeye
+geçer (Türkçe klavyede `ğ` ve `ü`).
+
+Deployment'lar, StatefulSet'ler ve DaemonSet'ler sekmeleri, pod'larından biri crash ediyorsa iş yükünü kırmızı bir
+**N pod hatalı** rozetiyle işaretler:
+
+<Screenshot id="dashboard-deployments" alt="Deployment'lar sekmesi: catalog ve checkout İlerliyor durumunda ve kırmızı '1 pod hatalı' rozeti taşıyor, storefront 2/2 replikayla Hazır" />
+
+## Liste ya da kartlar {/* #list-or-cards */}
+
+Aramanın yanındaki iki düğme tablo ile kartlar arasında geçiş yapar. Tablo herhangi bir sütuna göre sıralanır
+(başlığına tıklayın). Kartlar aynı bilgileri gösterir, aksiyon düğmeleri her kartın üzerindedir:
+
+<Screenshot id="dashboard-cards" alt="Kart olarak Pod'lar sekmesi: her pod durumu, başlangıç zamanı, restart sayısı, sahibi, CPU ve memory ile; Loglar / Olaylar / Shell düğmeleri" />
+
+## Sütunlar {/* #columns */}
+
+Tabloda, başlık satırının sağ ucundaki **⋮**, hangi sütunların görüneceğini sekme sekme seçer. *Ad* her zaman
+kalır; *Varsayılana dön* hepsini yeniden gösterir. Seçim yalnızca bu tarayıcıda saklanır.
+
+<Screenshot id="dashboard-columns" alt="Pod'lar sekmesinde açık sütun menüsü: Durum, Container'lar, Restart, Sahibi, CPU, Memory ve Yaş onay kutuları ve Varsayılana dön" />
+
+## Arama ve label filtreleri {/* #search-and-label-filters */}
+
+`/` tuşuna basın (ya da arama kutusuna tıklayın) ve yazın. Yazdığınız her kelime eşleşmelidir; sıra ve büyük/küçük
+harf fark etmez, kelimenin bir kısmı yeter. Bir kelime adla **ya da herhangi bir sütunun metniyle** eşleşir; gizli
+sütunlar da dahil. Böylece tablo ve kartlar aynı satırları bulur:
+
+| Sekme | Ayrıca eşleşenler |
+|---|---|
+| Pod'lar | durum, container adları, *Sahibi* (tür ve ad) |
+| Deployment'lar, StatefulSet'ler, DaemonSet'ler | durum, replikalar (`2/3`) |
+| Servisler | tip, cluster IP, harici IP'ler, portlar (`80`, `8080/TCP`, hedef port, node port, port adı) |
+| ConfigMap'ler, Secret'lar | anahtar adları, secret tipi |
+| Ingress'ler | host'lar ve path'ler |
+| CronJob'lar, Job'lar | zamanlama, durum |
+| HPA'lar | hedef (`Deployment/web`), min / maks |
+
+Yaş, restart, CPU, memory ve sütun olmayan bilgiler (node, pod IP, imaj) aranmaz.
+
+`label:key=value` o label değerine sahip nesneleri, `label:key` ise o label'ı taşıyan tüm nesneleri bırakır.
+Kelimelerle birlikte kullanabilirsiniz: `label:tier=web storefront`.
+
+<Screenshot id="dashboard-search" alt="Arama kutusunda label:tier=web; geriye iki storefront pod'u kalıyor" />
+
+## Her pod satırında neler var {/* #what-each-pod-row-offers */}
+
+- **Loglar**, **Olaylar** ve izniniz varsa **Shell** ([Loglar](/user-guide/logs), [Pod shell](/user-guide/pod-shell)).
+- Ayrıntılar için satıra tıklayın ya da `Tab` ile pod'un adına gelip `Enter`'a basın
+  ([Ayrıntı panelleri](/user-guide/detail-drawers)). Deployment, StatefulSet ve DaemonSet'lerde de aynısı geçerli.
+- Durum, restart ve container sütunları [Pod sağlığı](/user-guide/pod-health) sayfasında açıklanır.
+
+:::info[Göremiyor ya da yapamıyor musunuz?]
+- **Bir sekme yok**: bu namespace'te `<kind>:list` izniniz yok (ör. `deployments:list`).
+- **Shell düğmesi yok**: `pods:exec` izniniz yok, ya da yönetici shell'leri herkes için kapattı.
+- **CPU / memory yok**: cluster'da metrics-server yok; yöneticinize sorun.
+- **Boş olmaması gereken bir liste boş**: arama kutusunu ve namespace'i kontrol edin.
+:::

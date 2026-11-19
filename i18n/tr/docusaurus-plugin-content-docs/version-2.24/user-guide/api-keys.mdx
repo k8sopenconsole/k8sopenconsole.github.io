@@ -1,0 +1,70 @@
+---
+title: "API anahtarlarınız"
+description: "Kendi script'leriniz ya da AI agent'ınız için anahtar oluşturun, neler yapabileceğini sınırlayın ve durdurun."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# API anahtarlarınız
+
+**Yapmak istediğiniz:** bir script'in ya da bir AI agent'ının (Claude Code, Cursor) OpenConsole'u sizin adınıza,
+kendi yetkinizden daha azıyla kullanmasına izin vermek.
+
+Hesap menüsü (sağ üstte adınız) → **API anahtarları**, ya da `⌘K` → *API anahtarlarına git*.
+
+<Screenshot id="api-keys" alt="API anahtarları sayfası: ci-smoke-test ve claude-code adlı iki anahtar; not, önek, yetkiler, son kullanım ve bitiş" />
+
+## Anahtar oluşturmak {/* #create-one */}
+
+**Yeni API anahtarı**, sonra:
+
+<Screenshot id="api-key-form" alt="Yeni API anahtarı formu: ad ve not, hazır süre seçenekleri, kapsam (cluster'lar ve namespace'ler) ve yetki şablonları" />
+
+1. **Ad ve not**: ad, anahtarın yaptığı her şeyin yanında audit log'da görünür.
+2. **Bitiş**: 7, 30, 60 ya da 90 gün, bir tarih ya da süresiz (yöneticiniz bunu sınırlamış olabilir).
+3. **Kapsam**: bütün cluster'lar ya da biri; bütün namespace'leriniz (sonradan size verilenler dahil) ya da bir seçim.
+4. **Yetki**: bir şablon ya da tek tek hücreler.
+   - *Salt okuma (güvenli)*: list, get ve logs; ConfigMap ve Secret yok, hiçbir şeyi değiştiren bir şey yok.
+   - *Salt okuma (tümü)*: her yerde list, get ve logs; ConfigMap verisi ve secret değerleri dahil.
+   - *Tüm yetkilerim* ya da *Özel*.
+
+   Kendinizde olmayan (*Bu yetki sizde yok*) ya da admin politikasının anahtarlara izin vermediği (*Admin politikası
+   izin vermiyor*) hücreler kapalıdır. Seçtiğiniz namespace'lerin yalnızca bazılarında sahip olduğunuz bir hücre
+   işaretlenir (*5 namespace'in 3 tanesinde*); anahtar onu yalnızca oralarda kullanır. Sunucu da aynı kontrolü yapar ve
+   hiçbirinde sahip olmadığınız bir izni reddeder (400).
+5. **Oluştur** anahtarı (`oc_…`) hazır bir `curl` satırıyla birlikte **yalnızca bir kez** gösterir. Hemen kopyalayın;
+   OpenConsole yalnızca hash'ini saklar.
+
+## Bir anahtar neler yapabilir {/* #what-a-key-can-do */}
+
+En fazla, listelediği **ve** çağrı anında sizde olan izinler kadar. Sizden bir izin alınırsa anahtar da onu hemen
+kaybeder; size yeni izin verilirse anahtar kendiliğinden büyümez (*tüm namespace'lerim* hariç). İzinleriniz ya da
+admin politikası anahtardan bir şey eksilttiğinde liste *"N yetki şu an geçersiz"* uyarısını gösterir.
+
+Bir anahtar, yöneticinin politikası ne olursa olsun hiçbir zaman [iki adımlı doğrulama](./two-factor.mdx) kodu istemez.
+
+Anahtarla açılan shell'ler ve çalıştırılan komutlar her zaman kaydedilir. Her çağrı sizin adınız ve anahtarın adıyla
+audit'e yazılır.
+
+## Anahtarı durdurmak ya da yenilemek {/* #stop-or-replace-one */}
+
+Anahtarın **⋯** menüsünden:
+
+- **Düzenle**: ad, not, kapsam, yetkiler (secret ve bitiş aynı kalır).
+- **Yeniden üret**: yeni bir secret ve yeni bir bitiş; eski secret hemen çalışmaz olur. Süresi dolmuş bir anahtarı da
+  yeniden çalıştırır. İptal edilmiş bir anahtar iptal edilmiş kalır (menü bunu sunmaz): yeni bir anahtar oluşturun.
+- **İptal et**: anahtarı kalıcı olarak durdurur. **Sil** onu listeden kaldırır.
+
+Bir anahtarı `curl`'den ya da bir agent'tan nasıl kullanacağınız: aynı sayfadaki **Dokümantasyon** sekmesi ve
+[API ve agent'lar](/api/overview). Sekmede bir hızlı başlangıç, agent'ınıza vereceğiniz hazır bir metin (anahtar
+içinde değil) ve bir anahtarın çağırabileceği her uç bulunur: etiketlere göre gruplanmış, her biri izni,
+parametreleri, bir `curl` örneği, örnek yanıtı ve hatalarıyla. Şu an hiçbir anahtarınızın çağıramadığı uçlar soluk
+görünür ve nedeni yazar: *Sizde yok*, *Politika izin vermiyor* ya da *Kapalı*. Yalnızca web'de çalışan uçlar
+listelenmez; admin uçlarını yalnızca yöneticiler görür.
+
+:::info[Göremiyor ya da yapamıyor musunuz?]
+- **Menüde API anahtarları yok**: admin API anahtarlarını herkes için kapatmış.
+- **Bütün şablonlar soluk** ya da çağrılar `api_access_off` yanıtı veriyor: admin'in API erişimi politikası
+  anahtarlarınıza hiçbir şey vermiyor; yöneticinize sorun (Yönetim → Roller → *API erişimi*).
+- **Bir çağrı 403 `api_access_policy` yanıtı veriyor**: politika, anahtarın listelediğinden daha azına izin veriyor.
+:::

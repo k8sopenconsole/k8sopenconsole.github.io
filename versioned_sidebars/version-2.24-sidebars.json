@@ -1,0 +1,1154 @@
+{
+  "docs": [
+    "intro",
+    "features",
+    {
+      "type": "category",
+      "label": "Getting started",
+      "collapsed": false,
+      "items": [
+        "getting-started/quick-start",
+        "getting-started/try-on-k3d",
+        "getting-started/first-login"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Installation",
+      "collapsed": false,
+      "items": [
+        "installation/kubernetes",
+        "installation/verify-image",
+        "installation/connect-cluster",
+        "installation/upgrading",
+        "installation/backup-restore",
+        "installation/uninstall",
+        "installation/build-from-source"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "User guide",
+      "items": [
+        "user-guide/signing-in",
+        "user-guide/two-factor",
+        "user-guide/cluster-and-namespace",
+        "user-guide/dashboard",
+        "user-guide/pod-health",
+        "user-guide/detail-drawers",
+        "user-guide/logs",
+        "user-guide/pod-shell",
+        "user-guide/yaml",
+        "user-guide/restart-scale",
+        "user-guide/secrets",
+        "user-guide/views-and-events",
+        "user-guide/keyboard-shortcuts",
+        "user-guide/api-keys"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Administration",
+      "items": [
+        "administration/access-model",
+        "administration/recipes",
+        "administration/roles",
+        "administration/users",
+        "administration/ldap",
+        "administration/azure-ad",
+        "administration/two-factor",
+        "administration/clusters",
+        "administration/prometheus",
+        "administration/overview-and-nodes",
+        "administration/sessions",
+        "administration/recordings",
+        "administration/api-access-policy",
+        "administration/audit-log",
+        "administration/customization-and-flags"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "API & agents",
+      "items": [
+        "api/overview",
+        "api/quick-start",
+        "api/agent-recipes",
+        "api/limits",
+        {
+          "type": "category",
+          "label": "Endpoint reference",
+          "link": {
+            "type": "doc",
+            "id": "api/endpoints/openconsole-api"
+          },
+          "items": [
+            {
+              "type": "category",
+              "label": "Account",
+              "link": {
+                "type": "doc",
+                "id": "api/endpoints/account"
+              },
+              "items": [
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/this-api-description",
+                  "label": "This API description",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/sign-in-with-a-user-name-and-password-web",
+                  "label": "Sign in with a user name and password (web)",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/the-code-step-of-a-sign-in-web",
+                  "label": "The code step of a sign-in (web)",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/sign-in-methods-offered-on-the-login-page",
+                  "label": "Sign-in methods offered on the login page",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/start-an-azure-ad-sign-in-web",
+                  "label": "Start an Azure AD sign-in (web)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/azure-ad-sign-in-callback-web",
+                  "label": "Azure AD sign-in callback (web)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/who-you-are-and-what-your-api-key-reaches",
+                  "label": "Who you are, and what your API key reaches",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/change-your-password-web",
+                  "label": "Change your password (web)",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/the-custom-logo-if-one-was-uploaded",
+                  "label": "The custom logo, if one was uploaded",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/the-cluster-your-requests-go-to",
+                  "label": "The cluster your requests go to",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/switch-your-selected-cluster-web-keys-send-x-open-console-cluster",
+                  "label": "Switch your selected cluster (web; keys send X-OpenConsole-Cluster)",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/clusters-you-can-use",
+                  "label": "Clusters you can use",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/feature-flags-the-operator-set-pod-exec-secrets",
+                  "label": "Feature flags the operator set (pod_exec, secrets, …)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/server-version",
+                  "label": "Server version",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/a-single-use-ticket-for-one-web-socket-path",
+                  "label": "A single-use ticket for one WebSocket path",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/namespaces-you-can-see-on-this-cluster",
+                  "label": "Namespaces you can see on this cluster",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/what-you-may-do-in-a-namespace-resource-→-actions",
+                  "label": "What you may do in a namespace (resource → actions)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/your-saved-dashboard-views",
+                  "label": "Your saved Dashboard views",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/save-a-dashboard-view-web",
+                  "label": "Save a Dashboard view (web)",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/share-or-unshare-a-saved-view-web",
+                  "label": "Share or unshare a saved view (web)",
+                  "className": "api-method put"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/delete-a-saved-view-web",
+                  "label": "Delete a saved view (web)",
+                  "className": "api-method delete"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/start-setting-up-two-factor-sign-in-web",
+                  "label": "Start setting up two-factor sign-in (web)",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/turn-two-factor-sign-in-on-with-a-code-from-the-app-web",
+                  "label": "Turn two-factor sign-in on with a code from the app (web)",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/replace-your-recovery-codes-web",
+                  "label": "Replace your recovery codes (web)",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/turn-two-factor-sign-in-off-web",
+                  "label": "Turn two-factor sign-in off (web)",
+                  "className": "api-method delete"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/your-api-keys-web",
+                  "label": "Your API keys (web)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/create-an-api-key-web",
+                  "label": "Create an API key (web)",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/what-a-key-of-yours-may-be-given-web",
+                  "label": "What a key of yours may be given (web)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/edit-an-api-key-web",
+                  "label": "Edit an API key (web)",
+                  "className": "api-method put"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/delete-an-api-key-web",
+                  "label": "Delete an API key (web)",
+                  "className": "api-method delete"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/new-secret-and-expiry-for-an-api-key-web",
+                  "label": "New secret and expiry for an API key (web)",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/revoke-an-api-key-web",
+                  "label": "Revoke an API key (web)",
+                  "className": "api-method post"
+                }
+              ]
+            },
+            {
+              "type": "category",
+              "label": "Workloads",
+              "link": {
+                "type": "doc",
+                "id": "api/endpoints/workloads"
+              },
+              "items": [
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/list-deployments",
+                  "label": "List Deployments",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/one-deployment",
+                  "label": "One Deployment",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/a-deployment-as-yaml",
+                  "label": "A Deployment as YAML",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/revisions-of-a-deployment-its-replica-sets",
+                  "label": "Revisions of a Deployment (its ReplicaSets)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/kubernetes-events-of-a-deployment-its-pods-events-are-on-the-pods",
+                  "label": "Kubernetes events of a Deployment (its pods' events are on the pods)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/restart-history-of-a-deployments-pods-deleted-pods-included",
+                  "label": "Restart history of a Deployment's pods, deleted pods included",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/cpu-and-memory-history-of-a-deployment",
+                  "label": "CPU and memory history of a Deployment",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/rolling-restart-of-a-deployment",
+                  "label": "Rolling restart of a Deployment",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/scale-a-deployment",
+                  "label": "Scale a Deployment",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/list-stateful-sets",
+                  "label": "List StatefulSets",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/one-stateful-set",
+                  "label": "One StatefulSet",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/a-stateful-set-as-yaml",
+                  "label": "A StatefulSet as YAML",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/kubernetes-events-of-a-stateful-set",
+                  "label": "Kubernetes events of a StatefulSet",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/restart-history-of-a-stateful-sets-pods",
+                  "label": "Restart history of a StatefulSet's pods",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/cpu-and-memory-history-of-a-stateful-set",
+                  "label": "CPU and memory history of a StatefulSet",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/scale-a-stateful-set",
+                  "label": "Scale a StatefulSet",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/list-daemon-sets",
+                  "label": "List DaemonSets",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/one-daemon-set",
+                  "label": "One DaemonSet",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/a-daemon-set-as-yaml",
+                  "label": "A DaemonSet as YAML",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/kubernetes-events-of-a-daemon-set",
+                  "label": "Kubernetes events of a DaemonSet",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/restart-history-of-a-daemon-sets-pods",
+                  "label": "Restart history of a DaemonSet's pods",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/cpu-and-memory-history-of-a-daemon-set",
+                  "label": "CPU and memory history of a DaemonSet",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/list-horizontal-pod-autoscalers",
+                  "label": "List HorizontalPodAutoscalers",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/one-horizontal-pod-autoscaler",
+                  "label": "One HorizontalPodAutoscaler",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/a-horizontal-pod-autoscaler-as-yaml",
+                  "label": "A HorizontalPodAutoscaler as YAML",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/list-jobs",
+                  "label": "List Jobs",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/a-job-as-yaml",
+                  "label": "A Job as YAML",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/list-cron-jobs",
+                  "label": "List CronJobs",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/a-cron-job-as-yaml",
+                  "label": "A CronJob as YAML",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/apply-edited-yaml-to-an-object-dry-run-first",
+                  "label": "Apply edited YAML to an object (dry run first)",
+                  "className": "api-method post"
+                }
+              ]
+            },
+            {
+              "type": "category",
+              "label": "Pods",
+              "link": {
+                "type": "doc",
+                "id": "api/endpoints/pods"
+              },
+              "items": [
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/list-pods",
+                  "label": "List pods",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/one-pod",
+                  "label": "One pod",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/a-pod-as-yaml",
+                  "label": "A pod as YAML",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/kubernetes-events-of-a-pod",
+                  "label": "Kubernetes events of a pod",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/restart-history-of-a-pod-container-exits-exit-codes",
+                  "label": "Restart history of a pod (container exits, exit codes)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/cpu-and-memory-of-the-namespaces-pods-now-metrics-server",
+                  "label": "CPU and memory of the namespace's pods now (metrics-server)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/cpu-and-memory-history-of-a-pod",
+                  "label": "CPU and memory history of a pod",
+                  "className": "api-method get"
+                }
+              ]
+            },
+            {
+              "type": "category",
+              "label": "Logs",
+              "link": {
+                "type": "doc",
+                "id": "api/endpoints/logs"
+              },
+              "items": [
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/the-end-of-a-pods-log-as-text",
+                  "label": "The end of a pod's log, as text",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/follow-a-pods-log-live-web-socket-json-frames",
+                  "label": "Follow a pod's log live (WebSocket, JSON frames)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/follow-the-pods-and-containers-of-a-deployment-web-socket-at-most-20-pods-ready-ones-first",
+                  "label": "Follow the pods and containers of a Deployment (WebSocket; at most 20 pods, ready ones first)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/follow-the-pods-of-a-job-web-socket-at-most-20-pods-ready-ones-first",
+                  "label": "Follow the pods of a Job (WebSocket; at most 20 pods, ready ones first)",
+                  "className": "api-method get"
+                }
+              ]
+            },
+            {
+              "type": "category",
+              "label": "Exec",
+              "link": {
+                "type": "doc",
+                "id": "api/endpoints/exec"
+              },
+              "items": [
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/run-one-command-in-a-container",
+                  "label": "Run one command in a container",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/interactive-shell-web-socket-tty",
+                  "label": "Interactive shell (WebSocket, TTY)",
+                  "className": "api-method get"
+                }
+              ]
+            },
+            {
+              "type": "category",
+              "label": "Config",
+              "link": {
+                "type": "doc",
+                "id": "api/endpoints/config"
+              },
+              "items": [
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/list-services",
+                  "label": "List Services",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/one-service",
+                  "label": "One Service",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/a-service-as-yaml",
+                  "label": "A Service as YAML",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/list-ingresses",
+                  "label": "List Ingresses",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/an-ingress-as-yaml",
+                  "label": "An Ingress as YAML",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/list-config-maps",
+                  "label": "List ConfigMaps",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/one-config-map",
+                  "label": "One ConfigMap",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/a-config-map-as-yaml",
+                  "label": "A ConfigMap as YAML",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/the-data-of-a-config-map",
+                  "label": "The data of a ConfigMap",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/list-secrets-key-names-and-sizes-never-values",
+                  "label": "List Secrets (key names and sizes, never values)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/one-secret-key-names-and-sizes-never-values",
+                  "label": "One Secret (key names and sizes, never values)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/the-value-of-one-secret-key-audited",
+                  "label": "The value of one Secret key (audited)",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/a-secret-as-yaml-values-included-for-editing",
+                  "label": "A Secret as YAML, values included (for editing)",
+                  "className": "api-method get"
+                }
+              ]
+            },
+            {
+              "type": "category",
+              "label": "Events",
+              "link": {
+                "type": "doc",
+                "id": "api/endpoints/events"
+              },
+              "items": [
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/live-kubernetes-events-and-object-changes-web-socket",
+                  "label": "Live Kubernetes events and object changes (WebSocket)",
+                  "className": "api-method get"
+                }
+              ]
+            },
+            {
+              "type": "category",
+              "label": "Admin",
+              "link": {
+                "type": "doc",
+                "id": "api/endpoints/admin"
+              },
+              "items": [
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/cluster-overview-nodes-pods-usage",
+                  "label": "Cluster overview (nodes, pods, usage)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/cluster-usage-history",
+                  "label": "Cluster usage history",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/list-nodes",
+                  "label": "List nodes",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/one-node-with-its-pods",
+                  "label": "One node with its pods",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/node-usage-history",
+                  "label": "Node usage history",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/list-users",
+                  "label": "List users",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/create-a-user",
+                  "label": "Create a user",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/users-as-csv",
+                  "label": "Users as CSV",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/update-a-user-admin-active-api-access-override",
+                  "label": "Update a user (admin, active, API access override)",
+                  "className": "api-method put"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/delete-a-user",
+                  "label": "Delete a user",
+                  "className": "api-method delete"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/a-users-groups",
+                  "label": "A user's groups",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/set-a-users-groups",
+                  "label": "Set a user's groups",
+                  "className": "api-method put"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/reset-a-local-users-password",
+                  "label": "Reset a local user's password",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/remove-a-users-two-factor-sign-in-and-recovery-codes-and-sign-them-out",
+                  "label": "Remove a user's two-factor sign-in and recovery codes, and sign them out",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/sign-a-user-out-everywhere",
+                  "label": "Sign a user out everywhere",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/preview-what-a-users-api-keys-may-get",
+                  "label": "Preview what a user's API keys may get",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/revoke-all-of-a-users-api-keys-web",
+                  "label": "Revoke all of a user's API keys (web)",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/every-users-api-keys-web",
+                  "label": "Every user's API keys (web)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/every-users-api-keys-as-csv-web",
+                  "label": "Every user's API keys as CSV (web)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/revoke-a-users-api-key-web",
+                  "label": "Revoke a user's API key (web)",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/list-groups",
+                  "label": "List groups",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/create-a-group",
+                  "label": "Create a group",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/groups-as-csv",
+                  "label": "Groups as CSV",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/rename-a-group",
+                  "label": "Rename a group",
+                  "className": "api-method put"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/delete-a-group",
+                  "label": "Delete a group",
+                  "className": "api-method delete"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/a-groups-roles",
+                  "label": "A group's roles",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/set-a-groups-roles",
+                  "label": "Set a group's roles",
+                  "className": "api-method put"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/list-roles",
+                  "label": "List roles",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/create-a-role",
+                  "label": "Create a role",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/update-a-role-name-api-access-mode",
+                  "label": "Update a role (name, API access mode)",
+                  "className": "api-method put"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/delete-a-role",
+                  "label": "Delete a role",
+                  "className": "api-method delete"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/a-roles-permissions",
+                  "label": "A role's permissions",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/add-a-permission-to-a-role",
+                  "label": "Add a permission to a role",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/remove-a-permission-from-a-role",
+                  "label": "Remove a permission from a role",
+                  "className": "api-method delete"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/ldap-settings-no-password",
+                  "label": "LDAP settings (no password)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/save-ldap-settings",
+                  "label": "Save LDAP settings",
+                  "className": "api-method put"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/test-the-ldap-connection",
+                  "label": "Test the LDAP connection",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/search-the-directory",
+                  "label": "Search the directory",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/import-directory-users",
+                  "label": "Import directory users",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/azure-ad-settings-no-secret",
+                  "label": "Azure AD settings (no secret)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/save-azure-ad-settings",
+                  "label": "Save Azure AD settings",
+                  "className": "api-method put"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/test-the-azure-ad-settings",
+                  "label": "Test the Azure AD settings",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/session-api-key-expiry-and-two-factor-settings",
+                  "label": "Session, API key expiry and two-factor settings",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/save-session-api-key-expiry-and-two-factor-settings",
+                  "label": "Save session, API key expiry and two-factor settings",
+                  "className": "api-method put"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/web-sessions",
+                  "label": "Web sessions",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/revoke-a-web-session",
+                  "label": "Revoke a web session",
+                  "className": "api-method delete"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/list-clusters",
+                  "label": "List clusters",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/add-a-cluster",
+                  "label": "Add a cluster",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/update-a-cluster",
+                  "label": "Update a cluster",
+                  "className": "api-method put"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/delete-a-cluster",
+                  "label": "Delete a cluster",
+                  "className": "api-method delete"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/make-a-cluster-the-default",
+                  "label": "Make a cluster the default",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/unset-the-default-cluster",
+                  "label": "Unset the default cluster",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/a-clusters-prometheus-settings-no-credentials",
+                  "label": "A cluster's Prometheus settings (no credentials)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/save-a-clusters-prometheus-settings",
+                  "label": "Save a cluster's Prometheus settings",
+                  "className": "api-method put"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/test-prometheus-settings",
+                  "label": "Test Prometheus settings",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/find-a-prometheus-in-the-cluster",
+                  "label": "Find a Prometheus in the cluster",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/the-audit-log-filters-as-query-parameters",
+                  "label": "The audit log (filters as query parameters)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/the-audit-log-as-csv",
+                  "label": "The audit log as CSV",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/values-for-the-audit-log-filters",
+                  "label": "Values for the audit log filters",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/shell-and-command-recordings",
+                  "label": "Shell and command recordings",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/recording-settings",
+                  "label": "Recording settings",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/save-recording-settings",
+                  "label": "Save recording settings",
+                  "className": "api-method put"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/one-recordings-metadata",
+                  "label": "One recording's metadata",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/delete-a-recording",
+                  "label": "Delete a recording",
+                  "className": "api-method delete"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/a-recording-as-an-asciicast-file",
+                  "label": "A recording as an asciicast file",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/database-backups-list-folder-schedule-whether-downloading-is-allowed-backup-allow-download",
+                  "label": "Database backups: list, folder, schedule, whether downloading is allowed (BACKUP_ALLOW_DOWNLOAD)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/make-a-database-backup-now",
+                  "label": "Make a database backup now",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/download-a-backup-403-backup-download-disabled-unless-backup-allow-download-true",
+                  "label": "Download a backup (403 backup_download_disabled unless BACKUP_ALLOW_DOWNLOAD=true)",
+                  "className": "api-method get"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/upload-a-custom-logo",
+                  "label": "Upload a custom logo",
+                  "className": "api-method post"
+                },
+                {
+                  "type": "doc",
+                  "id": "api/endpoints/remove-the-custom-logo",
+                  "label": "Remove the custom logo",
+                  "className": "api-method delete"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Operations",
+      "items": [
+        "operations/logging",
+        "operations/elastic",
+        "operations/metrics",
+        "operations/tracing",
+        "operations/health-probes",
+        "operations/security",
+        "operations/hardening",
+        "operations/air-gapped",
+        "operations/troubleshooting",
+        "operations/faq"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Reference",
+      "items": [
+        "reference/environment-variables",
+        "reference/permissions",
+        "reference/kubernetes-permissions",
+        "reference/audit-events",
+        "reference/metrics",
+        "reference/keyboard-shortcuts"
+      ]
+    },
+    "release-notes"
+  ]
+}

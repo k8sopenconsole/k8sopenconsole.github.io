@@ -1,0 +1,54 @@
+---
+title: "YAML görüntüleme ve düzenleme"
+description: "Her nesnenin YAML'ını okuyun, sunucu tarafı dry-run ve diff ile değiştirin; çakışmanın ne anlama geldiğini öğrenin."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# YAML görüntüleme ve düzenleme
+
+**Yapmak istediğiniz:** nesnenin tamamını görmek ya da düğmesi olmayan bir şeyi değiştirmek (bir ortam değişkeni, bir
+limit, bir ConfigMap değeri).
+
+## Görüntüleme {/* #view */}
+
+Bir satırdaki ya da ayrıntı panelindeki **YAML** nesneyi cluster'ın sakladığı haliyle, salt okuma olarak açar:
+
+<Screenshot id="yaml-view" alt="storefront-config ConfigMap'inin YAML'ı, salt okuma; Yeniden yükle, Düzenle ve Kapat" />
+
+Pod, Deployment, DaemonSet, StatefulSet, HPA, Service, ConfigMap, Ingress, CronJob ve Job'larda vardır; Secret'larda
+da, ama yalnızca `secrets:edit` ile ([Secret'lar](/user-guide/secrets)).
+
+## Düzenleme {/* #edit */}
+
+1. **Düzenle** görünümü editöre çevirir: sağda sizin sürümünüz, solda cluster'ınki.
+2. Gerekeni değiştirin.
+3. **Dry-run** YAML'ı Kubernetes API server'a gönderir; server onu kontrol eder ve varsayılan değerlerini doldurur,
+   ama **saklamaz**. Sağ taraf o zaman nesneyi saklanacağı haliyle gösterir; diff de gerçek değişikliği gösterir:
+
+   <Screenshot id="yaml-diff" alt="Başarılı bir dry-run sonrası düzenleme modu: 'Dry-run başarılı', solda eski YAML, sağda LOG_LEVEL'ı değişmiş server sonucu; Sıfırla, Dry-run, Uygula" />
+
+4. **Uygula** değişikliği saklar. **Sıfırla** değişikliklerinizi atar.
+
+YAML'ı açmak bir okuma olarak audit'e yazılır (`<kind>.get`, ör. `deployment.get`). Her uygulama audit log'a
+yazılır (`<kind>.apply`, `dry_run` ile ve YAML'ın önceki ve sonraki halinin kısa hash'leriyle;
+YAML'ın kendisi asla yazılmaz).
+
+## "Conflict": biri sizden önce değiştirdi {/* #conflict-someone-changed-it-first */}
+
+YAML, nesnenin `resourceVersion` değerini taşır. Siz açtıktan sonra nesne cluster'da değiştiyse (başka bir kullanıcı,
+bir controller, bir deploy pipeline'ı), **Uygula** onların değişikliğinin üzerine yazmak yerine **409 Conflict** yanıtı
+verir. Düzenlemenizi bir yere kopyalayın, **Yeniden yükle**'ye basın, değişikliği güncel YAML üzerinde tekrar yapın ve
+uygulayın.
+
+:::caution
+Buradaki düzenleme doğrudan bir değişikliktir. Nesneyi Helm, Argo CD ya da Flux yönetiyorsa bir sonraki sync onu geri
+alabilir; değişikliği Git'te de yapın.
+:::
+
+:::info[Göremiyor ya da yapamıyor musunuz?]
+- **Düzenle düğmesi yok**: bu namespace'te `<kind>:get` izniniz var ama `<kind>:edit` yok (örneğin `configmaps:edit`).
+- **Düzenle herkes için yok**: admin YAML düzenlemeyi kapatmış (`FEATURE_YAML_EDIT=false`).
+- **Dry-run bir Kubernetes mesajıyla başarısız oluyor** (`invalid`, `forbidden`): mesajı okuyun; API server YAML'ı
+  reddetmiştir ya da cluster bağlantısı bu türü güncelleyemiyordur.
+:::

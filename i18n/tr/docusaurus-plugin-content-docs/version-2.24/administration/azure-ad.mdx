@@ -1,0 +1,81 @@
+---
+title: "Azure AD (Entra ID)"
+description: "Tek tenant'lı Microsoft girişi: uygulama kaydı, ayarlar, önceden oluşturulan hesaplar ve hesapların nasıl eşleştirildiği."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Azure AD (Entra ID)
+
+**Yapmak istediğiniz:** kullanıcıların Microsoft iş hesaplarıyla giriş yapmasını sağlamak.
+
+## 1. Uygulamayı kaydedin {/* #1-register-the-app */}
+
+Azure portal → **Microsoft Entra ID → App registrations → New registration**:
+
+- **Supported account types**: yalnızca bu kuruluş dizinindeki hesaplar (single tenant).
+- **Redirect URI**, platform *Web*: `https://<your OpenConsole host>/api/auth/azure/callback`.
+- **Certificates & secrets → New client secret**; değerini kopyalayın.
+- API izni gerekmez; OpenConsole yalnızca `openid profile email` ister.
+
+Uygulamanın overview sayfasındaki **Directory (tenant) ID** ve **Application (client) ID** değerlerini not edin.
+
+## 2. OpenConsole'u yapılandırın {/* #2-configure-openconsole */}
+
+**Yönetim → Azure AD** (örnek değerler):
+
+<Screenshot id="admin-azure" alt="Yönetim → Azure AD: tenant ID, client ID, redirect URL https://openconsole.example.com/api/auth/azure/callback, client secret, Azure AD ayarlarını kaydet ve Yapılandırmayı test et" />
+
+**Etkin**, **Tenant ID**, **Client ID**, **Client secret** (şifrelenerek saklanır; değiştirmek için **Client secret'ı
+güncelle**'yi işaretleyin), **Redirect URL** (yukarıda kaydettiğiniz URI'nin birebir aynısı). Kaydedin, ardından
+**Yapılandırmayı test et**. Giriş sayfasında artık **Microsoft ile giriş yap** görünür.
+
+US Government ya da China bulutları için `AZURE_AD_AUTHORITY` değişkenini ayarlayın
+([Ortam değişkenleri](/reference/environment-variables)).
+
+## 3. Kişilere erişim verin {/* #3-give-people-access */}
+
+Ya bir kez giriş yapmalarını bekleyin (hesap *Azure AD* kaynağıyla, hiçbir grupta olmadan, token'daki
+`preferred_username` adıyla, o yoksa `email` ya da `upn` ile oluşur) ve sonra onları
+gruplara ekleyin; ya da, daha iyisi, hesaplarını **önceden oluşturun**: Yönetim → Kullanıcılar → Yeni kullanıcı →
+**Azure AD kullanıcısı**, ardından UPN ya da e-posta adresi (`jane@example.com`) ve grupları. İlk Microsoft girişleri bu
+hesabı kullanır ve namespace'lerini hemen görürler.
+
+## Hesap nasıl bulunur {/* #how-the-account-is-found */}
+
+1. Token'daki `preferred_username` ile; bu genellikle UPN'dir.
+2. O tutmazsa, **önceden oluşturulmuş ve henüz kimsenin giriş yapmadığı bir Azure AD hesabı** aranır: adı
+   `preferred_username` ile yalnızca büyük/küçük harf farkıyla eşleşen, ya da token'daki `email` veya `upn` ile eşleşen
+   (UPN `jdoe@corp.onmicrosoft.com` olduğunda önceden oluşturulmuş `jane.doe@corp.com` bulunur).
+3. Hiç hesap yoksa bir hesap oluşturulur (yukarıya bakın).
+
+Microsoft ile yalnızca **Azure AD** hesapları giriş yapar. Aynı adlı local ya da LDAP hesabı asla devralınmaz: giriş
+reddedilir (`403` `sign_in_failed`, detail `this account can't sign in with this Microsoft account`; audit `user.login`, sonuç `failed`, neden
+`not_azure_account`). 2.23.0'a kadar böyle bir hesap Azure AD'ye çevriliyordu; birini local hesaptan Azure AD'ye
+taşımak için hesabı silin ve bir Azure AD hesabı önceden oluşturun. Bir hesap sahiplenildiğinde `user.login` olayı bunu
+kaydeder (`linked_by`, `signed_in_as`). Azure AD hesapları asla parola kabul etmez.
+
+Bir hesap, ona **ilk** giriş yapan Microsoft hesabına aittir; bu, adına göre değil Entra nesne kimliğine (token'daki
+`oid`) göre belirlenir. Sonradan aynı ada sahip olan başka biri (silinip yeniden oluşturulmuş ya da adı değişmiş bir
+Entra kullanıcısı) aynı şekilde reddedilir, neden `azure_oid_mismatch`. Adı yeni kişiye vermek için OpenConsole
+hesabını silip yeniden önceden oluşturun. Bu kontrolden önce giriş yapmış hesaplar bir sonraki girişlerinde bağlanır.
+
+OpenConsole'dan çıkış yapmak kişinin Microsoft oturumunu kapatmaz. Birini durdurmak için OpenConsole hesabını devre dışı
+bırakın ya da Entra ID'de engelleyin.
+
+## MFA zorunluluğu {/* #require-mfa */}
+
+OpenConsole Microsoft hesaplarından kendi [iki adımlı doğrulama kodunu](./two-factor.mdx)
+istemez: ikinci adımı Microsoft yapar. **Azure AD girişinde MFA zorunlu** (Yönetim → Azure AD) bunun yapıldığından emin
+olur: ID token'ının `amr` claim'inde `mfa` olmayan bir giriş reddedilir.
+
+1. **MFA'yı Entra'da zorunlu kılın**: uygulama (ya da tüm uygulamalar) için bir Conditional Access politikasıyla.
+2. **ID token'ın kişinin nasıl giriş yaptığını söylemesini sağlayın.** OpenConsole v2.0 uç noktalarını kullanır; bunların
+   ID token'ları `amr`'yi yalnızca uygulama isterse taşır: App registrations → uygulamanız → **Token configuration** →
+   **Add optional claim** → token türü **ID** → `amr` → Add.
+3. **Azure AD girişinde MFA zorunlu**'yu işaretleyip kaydedin.
+
+Reddedilen giriş, *Microsoft hesabınızda MFA yapılmadı; yöneticiniz Entra'da Conditional Access ile MFA'yı zorunlu
+kılmalı.* mesajıyla giriş sayfasına döner. `user.login`, sonuç `denied`, neden `azure_mfa_required` olarak audit'e
+yazılır ve hesap oluşturulmaz. Token'da hiç `amr` claim'i yoksa (2. adım eksikse) sunucu log'unda ayrıca
+`azure ad sign-in refused: the id_token has no amr claim` uyarısı olur.
