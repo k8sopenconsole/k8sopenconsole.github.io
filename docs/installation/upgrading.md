@@ -73,7 +73,7 @@ cluster OpenConsole runs in; on every other connected cluster apply the new `rba
 
 - **Two-factor authentication** for local and LDAP accounts, and **Require MFA for Azure AD sign-in**. Both are off
   after the upgrade: the policy starts at *Off*, so sign-in works exactly as before until an admin changes it
-  ([Two-factor authentication](../administration/sessions.mdx#two-factor-authentication),
+  ([Two-factor authentication](../administration/two-factor.mdx),
   [Azure AD](../administration/azure-ad.mdx#require-mfa)).
 - The first start adds columns to `users`, `session_settings` and `azure_ad_config` and a `recovery_codes` table; no
   step by hand. The authenticator keys are encrypted like the other stored credentials (with `ENCRYPTION_KEY_FILE`

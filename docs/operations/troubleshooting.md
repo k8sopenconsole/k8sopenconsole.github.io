@@ -186,7 +186,7 @@ least 8 characters)*. Search this page for the code or the detail. An unknown `/
 | `recording_unavailable` | 503 | a shell that must be recorded (API key) can't be right now ([Recordings](/administration/recordings)) |
 | `internal_error` | 500 | OpenConsole failed; the pod log has the cause under the response's `X-Request-Id` |
 | `two_factor_invalid` / `two_factor_challenge_expired` | 401 (400 on the account page) | the two-factor code is wrong or used / the sign-in's code step expired; see [Sign-in fails](#sign-in-fails) |
-| `two_factor_enrollment_required` | 403 | the policy requires two-factor authentication this account hasn't set up: the session can only set it up ([Two-factor authentication](../administration/sessions.mdx#two-factor-authentication)) |
+| `two_factor_enrollment_required` | 403 | the policy requires two-factor authentication this account hasn't set up: the session can only set it up ([Two-factor authentication](../administration/two-factor.mdx)) |
 | `two_factor_required` | 403 | turning two-factor authentication off, when the policy requires it for the account |
 | `two_factor_off` | 409 | two-factor authentication is off on this server (policy *Off*), not set up for the account, or the account signs in with Microsoft |
 | `azure_mfa_required` | (sign-in page) | the Microsoft sign-in had no MFA and the admin requires it; see [Sign-in fails](#sign-in-fails) |

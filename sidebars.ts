@@ -61,6 +61,7 @@ const sidebars: SidebarsConfig = {
         'administration/users',
         'administration/ldap',
         'administration/azure-ad',
+        'administration/two-factor',
         'administration/clusters',
         'administration/prometheus',
         'administration/overview-and-nodes',

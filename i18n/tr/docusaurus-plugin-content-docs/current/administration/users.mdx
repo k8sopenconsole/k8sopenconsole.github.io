@@ -46,7 +46,7 @@ değiştirmesini siz söyleyin.
   girişte değiştirilmesi gerekir. Kullanıcının her yerdeki oturumu kapatılır (`user.reset_password`).
 - **2FA'yı sıfırla** (kalkan simgesi, iki adımlı doğrulaması açık hesaplar): hesabın doğrulama anahtarını ve kurtarma
   kodlarını siler, kullanıcının her yerdeki oturumunu kapatır (`two_factor.reset`).
-  [Politika](./sessions.mdx#two-factor-authentication) zorunlu kılıyorsa kullanıcı bir sonraki girişinde
+  [Politika](./two-factor.mdx) zorunlu kılıyorsa kullanıcı bir sonraki girişinde
   yeniden kurar; değilse isterse kurar. Telefonunu ve kurtarma kodlarını kaybeden biri için.
 - **Devre dışı bırakma** (*Aktif* işaretini kaldırın): oturumları anında iptal edilir ve her isteği, API anahtarları dahil,
   reddedilir; yeni shell ya da log akışı açılmaz (açık olan kapanana kadar sürer). Silmeye tercih edin.

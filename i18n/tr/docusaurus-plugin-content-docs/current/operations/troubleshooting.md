@@ -188,7 +188,7 @@ metotla gelen istek `Allow` header'ıyla `405` `method_not_allowed` cevabı alı
 | `recording_unavailable` | 503 | kaydedilmesi gereken bir shell (API anahtarı) şu an kaydedilemiyor ([Kayıtlar](/administration/recordings)) |
 | `internal_error` | 500 | OpenConsole hata verdi; sebep, cevabın `X-Request-Id`'siyle pod logundadır |
 | `two_factor_invalid` / `two_factor_challenge_expired` | 401 (hesap sayfasında 400) | iki adımlı doğrulama kodu yanlış ya da kullanılmış / girişin kod adımının süresi doldu; bkz. [Giriş yapılamıyor](#sign-in-fails) |
-| `two_factor_enrollment_required` | 403 | politika bu hesabın kurmadığı iki adımlı doğrulamayı zorunlu tutuyor: oturum yalnızca kurulum yapabilir ([İki adımlı doğrulama](../administration/sessions.mdx#two-factor-authentication)) |
+| `two_factor_enrollment_required` | 403 | politika bu hesabın kurmadığı iki adımlı doğrulamayı zorunlu tutuyor: oturum yalnızca kurulum yapabilir ([İki adımlı doğrulama](../administration/two-factor.mdx)) |
 | `two_factor_required` | 403 | politika hesap için zorunlu tutarken iki adımlı doğrulamayı kapatmak |
 | `two_factor_off` | 409 | bu sunucuda iki adımlı doğrulama kapalı (politika *Kapalı*), hesapta kurulu değil ya da hesap Microsoft ile giriş yapıyor |
 | `azure_mfa_required` | (giriş sayfası) | Microsoft girişinde MFA yoktu ve yönetici zorunlu tutuyor; bkz. [Giriş yapılamıyor](#sign-in-fails) |

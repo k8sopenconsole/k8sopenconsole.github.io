@@ -74,7 +74,7 @@ cluster'da `deploy/` ile birlikte gelir; bağlı diğer her cluster'da yeni `rba
 
 - Yerel ve LDAP hesapları için **iki adımlı doğrulama** ve **Azure AD girişinde MFA zorunlu**. Yükseltmeden sonra ikisi
   de kapalıdır: politika *Kapalı* ile başlar, bu yüzden bir yönetici değiştirene kadar giriş tam önceki gibi çalışır
-  ([İki adımlı doğrulama](../administration/sessions.mdx#two-factor-authentication),
+  ([İki adımlı doğrulama](../administration/two-factor.mdx),
   [Azure AD](../administration/azure-ad.mdx#require-mfa)).
 - İlk açılış `users`, `session_settings` ve `azure_ad_config`'e sütunlar ve bir `recovery_codes` tablosu ekler; elle
   yapılacak adım yok. Doğrulama anahtarları diğer saklanan kimlik bilgileri gibi şifrelenir (kullanıyorsanız

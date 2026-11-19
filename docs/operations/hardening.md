@@ -88,9 +88,9 @@ the [Security model](/operations/security).
 
 - **Change the `admin` password at the first sign-in**, then sign in through LDAP or Azure AD for daily work and
   keep one local admin for emergencies ([First login](/getting-started/first-login)).
-- **Two-factor authentication at least for admins**: Admin → Session → *Required for admins* (or *Required for
+- **Two-factor authentication at least for admins**: Admin → Two-factor authentication → *Required for admins* (or *Required for
   everyone*); keep the recovery codes of the break-glass `admin` account offline
-  ([Two-factor authentication](../administration/sessions.mdx#two-factor-authentication)). For Microsoft accounts require
+  ([Two-factor authentication](../administration/two-factor.mdx)). For Microsoft accounts require
   MFA with Conditional Access in Entra and tick **Require MFA for Azure AD sign-in**
   ([Azure AD](../administration/azure-ad.mdx#require-mfa)).
 - **Few admins.** An admin holds every permission on every cluster, including Secrets and shells. Give everyone

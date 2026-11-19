@@ -248,7 +248,7 @@ export const SCENES = [
     run: async (page) => { await row(page, 'alice').waitFor(); }},
   {id: 'admin-session-settings', as: 'admin', path: '/admin', storage: admin('session'),
     run: async (page) => { await page.waitForTimeout(1500); }},
-  {id: 'admin-two-factor-policy', as: 'admin', path: '/admin', storage: admin('session'), viewport: {width: 1440, height: 1300},
+  {id: 'admin-two-factor-policy', as: 'admin', path: '/admin', storage: admin('two-factor'),
     run: async (page) => {
       await page.locator('input[name=twoFactorPolicy]').first().waitFor();
       await page.waitForTimeout(1500);

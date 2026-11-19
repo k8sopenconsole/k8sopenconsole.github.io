@@ -89,9 +89,9 @@ listeyi baştan sona geçin. Her maddenin neden önemli olduğu [Güvenlik model
 
 - **`admin` parolasını ilk girişte değiştirin**; günlük işler için LDAP ya da Azure AD ile giriş yapın, acil durumlar
   için bir yerel yönetici hesabı tutun ([İlk giriş](/getting-started/first-login)).
-- **En azından yöneticiler için iki adımlı doğrulama**: Yönetim → Oturum → *Yöneticilere zorunlu* (ya da *Herkese
+- **En azından yöneticiler için iki adımlı doğrulama**: Yönetim → İki adımlı doğrulama → *Yöneticilere zorunlu* (ya da *Herkese
   zorunlu*); acil durum `admin` hesabının kurtarma kodlarını çevrimdışı saklayın
-  ([İki adımlı doğrulama](../administration/sessions.mdx#two-factor-authentication)). Microsoft hesapları için Entra'da
+  ([İki adımlı doğrulama](../administration/two-factor.mdx)). Microsoft hesapları için Entra'da
   Conditional Access ile MFA'yı zorunlu kılın ve **Azure AD girişinde MFA zorunlu**'yu işaretleyin
   ([Azure AD](../administration/azure-ad.mdx#require-mfa)).
 - **Az sayıda yönetici.** Bir yönetici, Secret'lar ve shell'ler dahil her cluster'da her izne sahiptir. Diğer

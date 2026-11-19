@@ -45,7 +45,7 @@ namespaces. A local user is not forced to change the password you set; tell them
   and signs the user out everywhere (`user.reset_password`).
 - **Reset 2FA** (shield icon, accounts with two-factor authentication on): removes the account's authenticator key and
   recovery codes and signs the user out everywhere (`two_factor.reset`). If the
-  [policy](./sessions.mdx#two-factor-authentication) requires it, the user sets it up again on the next
+  [policy](./two-factor.mdx) requires it, the user sets it up again on the next
   sign-in; otherwise they may. For someone who lost their phone and recovery codes.
 - **Disable** (untick *Active*): their sessions are revoked at once, and every request is refused, API keys
   included; no new shell or log stream opens (one already open runs until it closes). Prefer it to deleting.

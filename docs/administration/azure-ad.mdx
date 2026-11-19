@@ -64,7 +64,7 @@ or block them in Entra ID.
 
 ## Require MFA {/* #require-mfa */}
 
-OpenConsole doesn't ask Microsoft accounts for its own [two-factor code](./sessions.mdx#two-factor-authentication):
+OpenConsole doesn't ask Microsoft accounts for its own [two-factor code](./two-factor.mdx):
 Microsoft does the second factor. **Require MFA for Azure AD sign-in** (Admin → Azure AD) makes sure it did: a
 sign-in whose ID token doesn't have `mfa` in its `amr` claim is refused.
 
