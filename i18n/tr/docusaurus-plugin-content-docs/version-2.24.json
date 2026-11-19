@@ -1,0 +1,38 @@
+{
+  "version.label": {
+    "message": "2.24",
+    "description": "The label for version 2.24"
+  },
+  "sidebar.docs.category.Getting started": {
+    "message": "Başlarken",
+    "description": "The label for category 'Getting started' in sidebar 'docs'"
+  },
+  "sidebar.docs.category.Installation": {
+    "message": "Kurulum",
+    "description": "The label for category 'Installation' in sidebar 'docs'"
+  },
+  "sidebar.docs.category.User guide": {
+    "message": "Kullanım kılavuzu",
+    "description": "The label for category 'User guide' in sidebar 'docs'"
+  },
+  "sidebar.docs.category.Administration": {
+    "message": "Yönetim",
+    "description": "The label for category 'Administration' in sidebar 'docs'"
+  },
+  "sidebar.docs.category.API & agents": {
+    "message": "API ve agent'lar",
+    "description": "The label for category 'API & agents' in sidebar 'docs'"
+  },
+  "sidebar.docs.category.Endpoint reference": {
+    "message": "Uçlar",
+    "description": "The label for category 'Endpoint reference' in sidebar 'docs'"
+  },
+  "sidebar.docs.category.Operations": {
+    "message": "Operasyon",
+    "description": "The label for category 'Operations' in sidebar 'docs'"
+  },
+  "sidebar.docs.category.Reference": {
+    "message": "Referans",
+    "description": "The label for category 'Reference' in sidebar 'docs'"
+  }
+}

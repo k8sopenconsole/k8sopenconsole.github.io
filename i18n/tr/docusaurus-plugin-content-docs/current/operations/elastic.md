@@ -7,7 +7,7 @@ description: "OpenConsole'un denetim olaylarını ve istek loglarını Elasticse
 
 `LOG_FORMAT=ecs` ile (manifest'in ayarı) OpenConsole'un yazdığı her satır, Elastic Common Schema alan adlarıyla tek
 bir JSON nesnesidir ([Loglama](/operations/logging)).
-[`deploy/elk`](https://github.com/vurulkan/kubernetes-openconsole/tree/v2.23.4/deploy/elk) içindeki dosyalar bu
+[`deploy/elk`](https://github.com/vurulkan/kubernetes-openconsole/tree/v2.24.0/deploy/elk) içindeki dosyalar bu
 satırları, alanları tipli iki data stream'e dönüştürür:
 
 | Data stream | İçerik |
@@ -21,7 +21,7 @@ container'ların satırları olduğu gibi geçer. Ayrıştıramadığı bir sat�
 
 Elasticsearch 8.8 ya da üstü gerekir. Bu sayfadaki her komut ve sorgu, OpenConsole 2.22.0 satırlarıyla
 Elasticsearch **8.15.3** ve **9.1.0** üzerinde çalıştırıldı. 8.7 için
-[Elasticsearch 8.7 and older](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.4/deploy/elk/README.md#elasticsearch-87-and-older)
+[Elasticsearch 8.7 and older](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.24.0/deploy/elk/README.md#elasticsearch-87-and-older)
 bölümüne bakın.
 
 ## 1. Pipeline'ı ve template'leri kurun {#1-install-the-pipeline-and-templates}
@@ -29,7 +29,7 @@ bölümüne bakın.
 Kod deposunun, çalıştırdığınız sürüme ait bir checkout'ından:
 
 ```bash
-git clone --depth 1 --branch v2.23.4 https://github.com/vurulkan/kubernetes-openconsole.git
+git clone --depth 1 --branch v2.24.0 https://github.com/vurulkan/kubernetes-openconsole.git
 cd kubernetes-openconsole
 ES_URL=https://elasticsearch.example:9200 ES_API_KEY=<base64 id:key> deploy/elk/install.sh
 # or ES_USER=elastic ES_PASSWORD=…; ES_INSECURE=1 for a self-signed certificate
@@ -46,7 +46,7 @@ API anahtarının `manage_index_templates` ve `manage_pipeline` cluster yetkiler
 tekrar çalıştırmak güvenlidir; örneğin alan ekleyen bir sürüm yükseltmesinden sonra. `logs-kubernetes.container_logs@custom`
 zaten varsa script ona dokunmaz ve içine eklenmesi gereken tek processor'ı yazdırır. Shell erişiminiz yoksa aynı
 dört isteği Kibana → Dev Tools'tan gönderin
-([Without install.sh](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.4/deploy/elk/README.md#without-installsh)).
+([Without install.sh](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.24.0/deploy/elk/README.md#without-installsh)).
 
 ## 2. Satırları gönderin {#2-ship-the-lines}
 
@@ -216,7 +216,7 @@ POST logs-openconsole.app-default/_rollover
 ```
 
 Bir sürüm alan eklerse sürüm notları bunu belirtir (2.22 on alan ekledi). Ayrıntılar:
-[deploy/elk/README.md](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.4/deploy/elk/README.md).
+[deploy/elk/README.md](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.24.0/deploy/elk/README.md).
 
 ## Kaldırma {#remove}
 

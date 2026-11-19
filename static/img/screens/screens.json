@@ -51,6 +51,10 @@
   "width": 1440,
   "height": 900
  },
+ "admin-two-factor-policy": {
+  "width": 1440,
+  "height": 900
+ },
  "admin-user-edit": {
   "width": 1440,
   "height": 900
@@ -103,6 +107,10 @@
   "width": 1440,
   "height": 900
  },
+ "login-code": {
+  "width": 1440,
+  "height": 900
+ },
  "logs": {
   "width": 1440,
   "height": 900
@@ -152,6 +160,14 @@
   "height": 900
  },
  "shortcuts": {
+  "width": 1440,
+  "height": 900
+ },
+ "two-factor-account": {
+  "width": 1440,
+  "height": 900
+ },
+ "two-factor-enroll": {
   "width": 1440,
   "height": 900
  },

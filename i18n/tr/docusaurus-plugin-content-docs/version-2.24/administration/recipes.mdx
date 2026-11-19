@@ -1,0 +1,99 @@
+---
+title: "Tarifler: kim ne alır"
+sidebar_label: "Tarifler"
+description: "Geliştirici ekibi, SRE'ler, denetçiler, dış yüklenici ve geçici erişim için adım adım erişim kurulumları."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Tarifler: kim ne alır
+
+Her tarif bir rol, bir grup ve o gruptaki kullanıcılardan oluşur. Hepsi bir test kurulumunda tam olarak böyle kuruldu
+ve kullanıcı olarak giriş yapılarak kontrol edildi: izin verilenler çalışıyor, izin verilmeyenler 403 yanıtı veriyor ve
+audit log'da `denied` olarak görünüyor. Ekranlar [Roller ve izinler](/administration/roles) ve
+[Kullanıcılar ve gruplar](/administration/users) sayfalarında anlatılıyor.
+
+<Screenshot id="admin-roles" alt="Yönetim → Roller: API erişimleriyle üç rol ve shop-developer'ın cluster ve namespace başına verdiklerini gösteren Rol İzinleri paneli" />
+
+## Geliştirici ekibi: staging'de serbest, production'da salt okuma {/* #a-developer-team-free-on-staging-read-only-on-production */}
+
+*shop ekibi `shop` üzerinde çalışıyor: staging'de log okuyor, shell açıyor, yeniden başlatıyor ve ölçekliyor;
+production'da bakıyor ve log okuyor.*
+
+1. **Yönetim → Roller → Yeni rol** `shop-developer`.
+2. **İzin ekle**: cluster `staging`, namespace `shop`, şablon **Geliştirici** (list, get, logs, restart, scale);
+   sonra `pods:exec`'i işaretleyin.
+3. Yine **İzin ekle**: cluster `prod-eu`, namespace `shop`, şablon **Görüntüleyici**; sonra `pods:logs`'u işaretleyin.
+4. **Yönetim → Gruplar → Yeni grup** `shop-team`, **Düzenle** → Roller → `shop-developer`.
+5. Geliştiricileri `shop-team`'e ekleyin (Yönetim → Kullanıcılar → Düzenle → Gruplar, ya da LDAP'tan doğrudan bu gruba
+   aktarın).
+
+Ne alırlar: namespace listesinde yalnızca `shop`; staging'de shell ve yeniden başlatma çalışır; production'da yeniden
+başlatma 403 yanıtı verir ve audit log `forbidden` gerekçesiyle `deployment.restart` `denied` gösterir.
+
+<Screenshot id="admin-add-permissions" alt="İzin ekle penceresi: cluster, Eşleşen N tanesini seç ile namespace'ler, Görüntüleyici / Geliştirici / SRE / Yönetici şablonları ve kaynak × aksiyon matrisi" />
+
+## SRE'ler: her yerde, yeniden başlatma ve ölçekleme, secret değerleri yok {/* #sres-everywhere-restart-and-scale-no-secret-values */}
+
+*Nöbetçi ekip her cluster'daki her iş yükü namespace'ini okur, yeniden başlatır ve ölçekler; secret değerleri ve
+shell kapalı kalır.*
+
+1. `sre` rolü: cluster **tüm cluster'lar**, iş yükü namespace'leri (`shop`, `payments`, `platform`; filtre ve
+   *Eşleşen N tanesini seç* işinizi kolaylaştırır), şablon **Geliştirici** (list, get, logs, restart, scale) ile
+   **İzin ekle**.
+2. `secrets:reveal`, `secrets:edit` ve `pods:exec`'i kapalı bırakın. Geliştirici şablonu zaten öyle bırakır.
+3. Bu rolle `sre` grubu; SRE'leri ekleyin.
+
+Ne alırlar: her cluster'da yeniden başlatma ve ölçekleme; Secret'lar sekmesi adları ve anahtarları listeler ama **Göster**
+403 yanıtı verir (`secret.reveal` `denied`); `kube-system` gibi sistem namespace'leri görünmez kalır.
+
+*Tüm cluster'lar* sonradan eklenen cluster'ları da kapsar; namespace'ler için bu geçerli değil: yeni bir namespace
+çıktığında onu role ekleyin.
+
+## Denetçiler: salt okuma, secret yok, denetim dışarıdan {/* #auditors-read-only-no-secrets-audit-from-outside */}
+
+*İç denetim neyin nerede çalıştığını ve kimin ne yaptığını gözden geçirir.*
+
+1. `auditor` rolü: tüm cluster'lar, kapsamdaki her namespace, şablon **Görüntüleyici**; sonra `secrets` satırının
+   işaretini kaldırın.
+2. `auditors` grubu; denetçileri ekleyin.
+3. **Denetim logunun kendisi yalnızca adminlere açıktır** (Yönetim → Denetim Logları ve API'si diğerlerine 403
+   `admin_only` yanıtı verir). Denetim kayıtlarını denetçilere OpenConsole dışından verin:
+   - bir admin dışa aktarır: Yönetim → Denetim Logları, filtre, **CSV olarak dışa aktar**; kimde hangi erişimin olduğu
+     için de Kullanıcılar / Gruplar → **CSV olarak dışa aktar**;
+   - ya da sürekli gözden geçirme için daha iyisi: audit satırlarını log platformunuza gönderin ve denetçilere orada
+     erişim verin ([Elastic](/operations/elastic)).
+
+Ne alırlar: kapsamdaki her yerde listeler ve ayrıntılar; loglar, secret'lar, shell'ler ve değişiklikler 403 yanıtı
+verir.
+
+## Dış yüklenici: tek namespace, kayıtlı, bitiş tarihli {/* #an-external-contractor-one-namespace-recorded-with-an-end-date */}
+
+*Bir yüklenicinin üç hafta boyunca staging'de `shop`'a shell erişimine ihtiyacı var.*
+
+1. Shell kaydının açık olduğundan emin olun (Yönetim → Kayıtlar → Kayıt ayarları).
+2. `contractor-shop` rolü: cluster `staging`, namespace `shop`, `secrets` satırı olmadan şablon **Görüntüleyici**,
+   artı `pods:logs` ve `pods:exec`.
+3. `contractors` grubu; o grupta **Yeni kullanıcı** (local bir hesap ya da kişinin dizin hesabı). Belirlediğiniz parolayı
+   değiştirmesini söyleyin.
+4. **Bitiş tarihinde hesabı devre dışı bırakın** (Yönetim → Kullanıcılar → Düzenle → **Aktif** işaretini kaldırın).
+   Bunu silmeye tercih edin: sonraki bir iş için yeniden açılabilir; LDAP'ta *ilk girişte hesap oluşturma* açıksa
+   silinen hesap bir sonraki girişte zaten yeniden oluşturulur. Audit log ve kayıtlar her iki durumda da kalır.
+
+OpenConsole'da hesaplar ya da üyelikler için **bitiş tarihi yoktur**: bitiş tarihini takviminize yazın. LDAP hesaplarında
+dizinin kendi hesap süresi dolumu da girişi durdurur. Devre dışı bırakılan kullanıcı bir sonraki isteğinde hemen
+reddedilir (401) ve tekrar giriş yapamaz; audit log `is_active: false` ile `user.update` gösterir.
+
+Ne alırlar: staging'de `shop`'ta loglar ve shell; her komut adlarıyla kaydedilir (Yönetim → Kayıtlar); secret'lar ve
+diğer namespace'ler 403 yanıtı verir.
+
+## Geçici erişim, sonra geri almak {/* #temporary-access-then-take-it-back */}
+
+*Birinin bu geceki olay için SRE yetkilerine ihtiyacı var.*
+
+1. Yönetim → Kullanıcılar → kullanıcıyı **Düzenle** → `sre` grubunu ekleyin → **Kaydet**. Bir sonraki tıklamasında
+   çalışır.
+2. İş bitince grubu yeniden kaldırın. Bir sonraki isteği reddedilir; başka bir şey gerekmez.
+
+Audit log iki değişikliği de (`changed: groups` ile `user.update`; kullanıcının Yönetim → Kullanıcılar'daki satırı
+grupları gösterir) ve aradaki sürede yaptığı her şeyi saklar.

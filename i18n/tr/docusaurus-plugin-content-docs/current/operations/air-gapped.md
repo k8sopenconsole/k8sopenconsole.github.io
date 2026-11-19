@@ -17,9 +17,9 @@ sonra [crane](https://github.com/google/go-containerregistry/blob/main/cmd/crane
 `skopeo copy --all` ile) kopyalayın. Kopya, multi-arch index'i ve digest'ini korur:
 
 ```bash
-crane copy ghcr.io/vurulkan/kubernetes-openconsole:2.23.4 \
-  registry.example.internal/openconsole/kubernetes-openconsole:2.23.4
-crane digest registry.example.internal/openconsole/kubernetes-openconsole:2.23.4
+crane copy ghcr.io/vurulkan/kubernetes-openconsole:2.24.0 \
+  registry.example.internal/openconsole/kubernetes-openconsole:2.24.0
+crane digest registry.example.internal/openconsole/kubernetes-openconsole:2.24.0
 # sha256:f4d193cf9d2d65aa0c1c863e3221ced13eb0d17cd3d18cff09ecd3cac91935b2
 ```
 
@@ -30,8 +30,8 @@ Digest `ghcr.io`'dakiyle aynıdır; orada doğruladığınız provenance kopyan�
 [Olağan kustomization](/installation/kubernetes) `deploy/` klasörünü GitHub'dan çeker. Bunun yerine bir kez indirin:
 
 ```bash
-curl -sL https://github.com/vurulkan/kubernetes-openconsole/archive/refs/tags/v2.23.4.tar.gz \
-  | tar xz --strip-components=1 kubernetes-openconsole-2.23.4/deploy
+curl -sL https://github.com/vurulkan/kubernetes-openconsole/archive/refs/tags/v2.24.0.tar.gz \
+  | tar xz --strip-components=1 kubernetes-openconsole-2.24.0/deploy
 ```
 
 `deploy/` klasörünü `kustomization.yaml`'ınızın yanında (Git'te) tutun; hem resource'u hem imajı kendi

@@ -25,7 +25,7 @@ ekrana bastığı her şey bulunabilir. Yedekleri şifreli saklayın; erişimi e
 ## Otomatik yedekler {/* #automatic-backups */}
 
 OpenConsole veritabanını SQLite'ın `VACUUM INTO`'su ile, yani çalışmaya devam ederken alınan tutarlı bir kopyayla
-`/data/backups`'a kopyalar ([backup.go](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.4/backend/internal/backup/backup.go)):
+`/data/backups`'a kopyalar ([backup.go](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.24.0/backend/internal/backup/backup.go)):
 
 - her `BACKUP_INTERVAL`'de (varsayılan `24h`; `0` zamanlamayı kapatır), en yeni kopyadan itibaren sayılarak; böylece
   bir restart bir kopyayı ne atlar ne tekrarlar;
@@ -177,7 +177,7 @@ Anahtar veritabanının dışına taşındıktan sonra alınmış bir kopya ayn�
 
 Varsayılan olarak saklanan kimlik bilgilerini şifreleyen anahtar veritabanının içindedir. Bunun yerine onu bir
 Kubernetes Secret'ında tutun; böylece veritabanının bir kopyası (bir yedek, bir snapshot) kimlik bilgilerini tek
-başına açığa çıkarmaz ([keys.go](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.4/backend/internal/store/keys.go)).
+başına açığa çıkarmaz ([keys.go](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.24.0/backend/internal/store/keys.go)).
 
 1. **Anahtarı ve Secret'ı oluşturun.** `openconsole.key`'i cluster'ın dışında da güvenli bir yerde saklayın: o
    olmadan saklanan kimlik bilgileri kaybolur.

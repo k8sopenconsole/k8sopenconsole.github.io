@@ -26,17 +26,17 @@ değişikliklerini beraberinde getirir ve açılışta eksik olanları uygular.
 
 ```yaml title="kustomization.yaml"
 resources:
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.4   # was v2.23.3
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.24.0   # was v2.23.4
 images:
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.23.4"                                                         # was 2.23.3
+    newTag: "2.24.0"                                                         # was 2.23.4
 ```
 
 ```bash
 kubectl diff -k .      # the image tag, plus whatever the release changed in deploy/
 kubectl apply -k .
 kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole --timeout=5m
-kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.23.4"
+kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.24.0"
 ```
 
 Oturumlar geçerli kalır; giriş yapmış kullanıcılar sayfayı yenileyip kaldıkları yerden devam eder. `Recreate` ile
@@ -69,6 +69,21 @@ cluster'da `deploy/` ile birlikte gelir; bağlı diğer her cluster'da yeni `rba
    kullanıcılar, ayarlar) kaybolur.
 
 ## Sürüme özel notlar {#version-notes}
+
+### 2.24'e yükseltme {#upgrading-to-224}
+
+- Yerel ve LDAP hesapları için **iki adımlı doğrulama** ve **Azure AD girişinde MFA zorunlu**. Yükseltmeden sonra ikisi
+  de kapalıdır: politika *Kapalı* ile başlar, bu yüzden bir yönetici değiştirene kadar giriş tam önceki gibi çalışır
+  ([İki adımlı doğrulama](../administration/two-factor.mdx),
+  [Azure AD](../administration/azure-ad.mdx#require-mfa)).
+- İlk açılış `users`, `session_settings` ve `azure_ad_config`'e sütunlar ve bir `recovery_codes` tablosu ekler; elle
+  yapılacak adım yok. Doğrulama anahtarları diğer saklanan kimlik bilgileri gibi şifrelenir (kullanıyorsanız
+  `ENCRYPTION_KEY_FILE` ile).
+- Yeni ortam değişkeni `TWO_FACTOR_RESET_USER`: iki adımlı doğrulamada dışarıda kalmış bir yönetici için
+  ([Sorun giderme](/operations/troubleshooting#sign-in-fails)); ayarlamadan bırakın.
+- API yalnızca büyür: hesapta iki adımlı doğrulama kapalıyken `POST /api/auth/login` önceki gibi cevap verir; açıkken
+  `{"twoFactor": "verify", "challenge": "…"}` döner ve oturum `POST /api/auth/2fa/verify`'dan gelir. API anahtarları
+  etkilenmez.
 
 ### 2.23.4'e yükseltme {#upgrading-to-2234}
 

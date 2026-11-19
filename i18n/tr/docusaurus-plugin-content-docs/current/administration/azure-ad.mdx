@@ -62,3 +62,20 @@ hesabını silip yeniden önceden oluşturun. Bu kontrolden önce giriş yapmı�
 
 OpenConsole'dan çıkış yapmak kişinin Microsoft oturumunu kapatmaz. Birini durdurmak için OpenConsole hesabını devre dışı
 bırakın ya da Entra ID'de engelleyin.
+
+## MFA zorunluluğu {/* #require-mfa */}
+
+OpenConsole Microsoft hesaplarından kendi [iki adımlı doğrulama kodunu](./two-factor.mdx)
+istemez: ikinci adımı Microsoft yapar. **Azure AD girişinde MFA zorunlu** (Yönetim → Azure AD) bunun yapıldığından emin
+olur: ID token'ının `amr` claim'inde `mfa` olmayan bir giriş reddedilir.
+
+1. **MFA'yı Entra'da zorunlu kılın**: uygulama (ya da tüm uygulamalar) için bir Conditional Access politikasıyla.
+2. **ID token'ın kişinin nasıl giriş yaptığını söylemesini sağlayın.** OpenConsole v2.0 uç noktalarını kullanır; bunların
+   ID token'ları `amr`'yi yalnızca uygulama isterse taşır: App registrations → uygulamanız → **Token configuration** →
+   **Add optional claim** → token türü **ID** → `amr` → Add.
+3. **Azure AD girişinde MFA zorunlu**'yu işaretleyip kaydedin.
+
+Reddedilen giriş, *Microsoft hesabınızda MFA yapılmadı; yöneticiniz Entra'da Conditional Access ile MFA'yı zorunlu
+kılmalı.* mesajıyla giriş sayfasına döner. `user.login`, sonuç `denied`, neden `azure_mfa_required` olarak audit'e
+yazılır ve hesap oluşturulmaz. Token'da hiç `amr` claim'i yoksa (2. adım eksikse) sunucu log'unda ayrıca
+`azure ad sign-in refused: the id_token has no amr claim` uyarısı olur.

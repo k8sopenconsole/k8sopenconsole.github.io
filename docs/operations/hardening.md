@@ -44,7 +44,7 @@ the [Security model](/operations/security).
   [Environment variables](/reference/environment-variables)).
 - **A NetworkPolicy** that lets in only your Ingress controller and your Prometheus. `/metrics` has no sign-in;
   don't route it through the Ingress either. The same policy is
-  [`deploy/optional/networkpolicy.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.4/deploy/optional/networkpolicy.yaml). Change the two namespace names to
+  [`deploy/optional/networkpolicy.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.24.0/deploy/optional/networkpolicy.yaml). Change the two namespace names to
   yours:
 
   ```yaml title="networkpolicy.yaml"
@@ -88,6 +88,11 @@ the [Security model](/operations/security).
 
 - **Change the `admin` password at the first sign-in**, then sign in through LDAP or Azure AD for daily work and
   keep one local admin for emergencies ([First login](/getting-started/first-login)).
+- **Two-factor authentication at least for admins**: Admin → Two-factor authentication → *Required for admins* (or *Required for
+  everyone*); keep the recovery codes of the break-glass `admin` account offline
+  ([Two-factor authentication](../administration/two-factor.mdx)). For Microsoft accounts require
+  MFA with Conditional Access in Entra and tick **Require MFA for Azure AD sign-in**
+  ([Azure AD](../administration/azure-ad.mdx#require-mfa)).
 - **Few admins.** An admin holds every permission on every cluster, including Secrets and shells. Give everyone
   else roles ([Access model](/administration/access-model)).
 - **Grant `secrets:reveal`, `secrets:edit` and `pods:exec` narrowly**: per namespace, per cluster, to the roles

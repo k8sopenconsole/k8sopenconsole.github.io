@@ -9,9 +9,9 @@ import Screenshot from '@site/src/components/Screenshot';
 
 ## Users {/* #users */}
 
-**Admin → Users** lists every account with its source, API access, admin flag, status and groups.
+**Admin → Users** lists every account with its source, API access, admin flag, status, two-factor authentication (**2FA**: *On* / *Off*, *—* for Azure AD accounts) and groups.
 
-<Screenshot id="admin-users" alt="Admin → Users: five accounts with source Local, API access By roles, admin flags, Active status and their groups; Export CSV and New user" />
+<Screenshot id="admin-users" alt="Admin → Users: five accounts with source Local, API access By roles, admin flags, Active status, 2FA and their groups; Export CSV and New user" />
 
 | Source | Signs in with | Password lives in |
 |---|---|---|
@@ -43,6 +43,10 @@ namespaces. A local user is not forced to change the password you set; tell them
 - **Edit** (pencil): active, admin, groups, and the user's [API access](/administration/api-access-policy).
 - **Reset password** (key icon, local accounts only): sets a new password, by default to be changed at the next sign-in,
   and signs the user out everywhere (`user.reset_password`).
+- **Reset 2FA** (shield icon, accounts with two-factor authentication on): removes the account's authenticator key and
+  recovery codes and signs the user out everywhere (`two_factor.reset`). If the
+  [policy](./two-factor.mdx) requires it, the user sets it up again on the next
+  sign-in; otherwise they may. For someone who lost their phone and recovery codes.
 - **Disable** (untick *Active*): their sessions are revoked at once, and every request is refused, API keys
   included; no new shell or log stream opens (one already open runs until it closes). Prefer it to deleting.
 - **Delete** (bin): removes the account and its memberships; the audit log keeps what it did.

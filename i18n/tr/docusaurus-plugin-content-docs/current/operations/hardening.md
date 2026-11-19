@@ -45,7 +45,7 @@ listeyi baştan sona geçin. Her maddenin neden önemli olduğu [Güvenlik model
   [Ortam değişkenleri](/reference/environment-variables)).
 - **Yalnızca Ingress controller'ınızı ve Prometheus'unuzu içeri alan bir NetworkPolicy.** `/metrics` giriş istemez;
   onu Ingress üzerinden de yönlendirmeyin. Aynı policy
-  [`deploy/optional/networkpolicy.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.23.4/deploy/optional/networkpolicy.yaml)
+  [`deploy/optional/networkpolicy.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.24.0/deploy/optional/networkpolicy.yaml)
   dosyasında da var. İki namespace adını kendinizinkilerle değiştirin:
 
   ```yaml title="networkpolicy.yaml"
@@ -89,6 +89,11 @@ listeyi baştan sona geçin. Her maddenin neden önemli olduğu [Güvenlik model
 
 - **`admin` parolasını ilk girişte değiştirin**; günlük işler için LDAP ya da Azure AD ile giriş yapın, acil durumlar
   için bir yerel yönetici hesabı tutun ([İlk giriş](/getting-started/first-login)).
+- **En azından yöneticiler için iki adımlı doğrulama**: Yönetim → İki adımlı doğrulama → *Yöneticilere zorunlu* (ya da *Herkese
+  zorunlu*); acil durum `admin` hesabının kurtarma kodlarını çevrimdışı saklayın
+  ([İki adımlı doğrulama](../administration/two-factor.mdx)). Microsoft hesapları için Entra'da
+  Conditional Access ile MFA'yı zorunlu kılın ve **Azure AD girişinde MFA zorunlu**'yu işaretleyin
+  ([Azure AD](../administration/azure-ad.mdx#require-mfa)).
 - **Az sayıda yönetici.** Bir yönetici, Secret'lar ve shell'ler dahil her cluster'da her izne sahiptir. Diğer
   herkese rol verin ([Erişim modeli](/administration/access-model)).
 - **`secrets:reveal`, `secrets:edit` ve `pods:exec`'i dar tutun**: namespace bazında, cluster bazında, yalnızca

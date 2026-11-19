@@ -26,17 +26,17 @@ Change the version in both places of your `kustomization.yaml` and apply it:
 
 ```yaml title="kustomization.yaml"
 resources:
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.4   # was v2.23.3
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.24.0   # was v2.23.4
 images:
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.23.4"                                                         # was 2.23.3
+    newTag: "2.24.0"                                                         # was 2.23.4
 ```
 
 ```bash
 kubectl diff -k .      # the image tag, plus whatever the release changed in deploy/
 kubectl apply -k .
 kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole --timeout=5m
-kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.23.4"
+kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.24.0"
 ```
 
 Sessions stay valid, so signed-in users carry on after a page reload. With `Recreate` the console is unavailable
@@ -68,6 +68,21 @@ cluster OpenConsole runs in; on every other connected cluster apply the new `rba
    you took before the upgrade. Everything since the backup (audit events, users, settings) is lost.
 
 ## Version notes {#version-notes}
+
+### Upgrading to 2.24 {#upgrading-to-224}
+
+- **Two-factor authentication** for local and LDAP accounts, and **Require MFA for Azure AD sign-in**. Both are off
+  after the upgrade: the policy starts at *Off*, so sign-in works exactly as before until an admin changes it
+  ([Two-factor authentication](../administration/two-factor.mdx),
+  [Azure AD](../administration/azure-ad.mdx#require-mfa)).
+- The first start adds columns to `users`, `session_settings` and `azure_ad_config` and a `recovery_codes` table; no
+  step by hand. The authenticator keys are encrypted like the other stored credentials (with `ENCRYPTION_KEY_FILE`
+  when you use it).
+- New environment variable `TWO_FACTOR_RESET_USER`, for an admin locked out of two-factor authentication
+  ([Troubleshooting](/operations/troubleshooting#sign-in-fails)); leave it unset.
+- The API only grows: `POST /api/auth/login` answers as before while two-factor authentication is off for the
+  account; with it on, it answers `{"twoFactor": "verify", "challenge": "…"}` and the session comes from
+  `POST /api/auth/2fa/verify`. API keys are not affected.
 
 ### Upgrading to 2.23.4 {#upgrading-to-2234}
 

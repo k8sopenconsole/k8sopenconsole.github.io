@@ -2,6 +2,7 @@
 // activity the screenshots show. All names are fictitious; passwords are throwaway.
 // Writes .work/state.json (tokens) for record.mjs.
 import {execFileSync} from 'node:child_process';
+import {createHmac} from 'node:crypto';
 import {writeFileSync, mkdirSync} from 'node:fs';
 
 const BASE = process.env.OC_URL || 'http://localhost:18080';
@@ -20,6 +21,16 @@ async function api(token, method, path, body) {
 }
 const list = (x) => (Array.isArray(x) ? x : x?.items ?? []);
 const login = async (u, p) => (await api(null, 'POST', '/api/auth/login', {username: u, password: p})).token;
+// The authenticator app's code for a base32 secret now (RFC 6238: SHA-1, 6 digits, 30 s).
+const totp = (secret) => {
+  const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  const bits = [...secret].map((c) => A.indexOf(c).toString(2).padStart(5, '0')).join('');
+  const key = Buffer.from(bits.match(/.{8}/g).map((b) => parseInt(b, 2)));
+  const msg = Buffer.alloc(8);
+  msg.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30000)));
+  const h = createHmac('sha1', key).update(msg).digest();
+  return String((h.readUInt32BE(h[h.length - 1] & 15) & 0x7fffffff) % 1e6).padStart(6, '0');
+};
 
 // 1. admin password
 let admin;
@@ -127,7 +138,21 @@ await fetch(BASE + '/api/namespaces/shop/deployments/catalog/restart', {method: 
 await fetch(BASE + '/api/namespaces/payments/deployments/payments-api/scale', {method: 'POST', headers: hdr(bob), body: JSON.stringify({replicas: 3})});
 await fetch(BASE + '/api/namespaces/payments/deployments/payments-api/scale', {method: 'POST', headers: hdr(bob), body: JSON.stringify({replicas: 2})});
 
+// 8. two-factor authentication (2.24): optional for everyone, on for ops.lead (account
+// page, the sign-in's code step); ayse's second session started while it was required
+// for everyone, so it shows the blocking set-up dialog.
+await api(admin, 'PUT', '/api/admin/session', {twoFactorPolicy: 'optional'});
+const opsId = list(await api(admin, 'GET', '/api/admin/users')).find((u) => u.username === 'ops.lead').id;
+await api(admin, 'POST', `/api/admin/users/${opsId}/reset-2fa`); // a re-run starts over
+const opsSetup = await login('ops.lead', PW);
+const {secret} = await api(opsSetup, 'POST', '/api/me/2fa/setup');
+const opslead = (await api(opsSetup, 'POST', '/api/me/2fa/confirm', {code: totp(secret)})).token;
+const ayse = await login('ayse.yilmaz', PW);
+await api(admin, 'PUT', '/api/admin/session', {twoFactorPolicy: 'all'});
+const ayseEnroll = await login('ayse.yilmaz', PW);
+await api(admin, 'PUT', '/api/admin/session', {twoFactorPolicy: 'optional'});
+
 mkdirSync(`${dir}.work`, {recursive: true});
 writeFileSync(`${dir}.work/state.json`, JSON.stringify({base: BASE, password: PW, clusters: ids,
-  tokens: {admin, alice, bob, ayse: await login('ayse.yilmaz', PW)}}, null, 2));
+  tokens: {admin, alice, bob, ayse, opslead, 'ayse-enroll': ayseEnroll}}, null, 2));
 console.log('seeded', ids);

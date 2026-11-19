@@ -24,6 +24,10 @@ Nasıl giriş yapacağınızı yöneticiniz söyler. Giriş sayfası üçü içi
 Başarısız bir giriş, nedeni ne olursa olsun hep aynı mesajı verir. Bir hesap için aynı adresten art arda beş
 başarısız deneme, hesabı beş dakika kilitler.
 
+Hesabınızda [iki adımlı doğrulama](./two-factor.mdx) açıksa paroladan sonra bir **Kod** adımı gelir: doğrulama
+uygulamanızdaki 6 haneli kodu girin ya da **Kurtarma kodu kullan**'a basın. Yöneticiniz zorunlu kıldıysa ve henüz
+kurmadıysanız OpenConsole girişten hemen sonra kurmanızı ister.
+
 ## Parolanız {/* #your-password */}
 
 - Parolanızı yöneticiniz belirlediyse ya da sıfırladıysa, onu yalnızca sizin bildiğiniz bir parolayla değiştirin
@@ -50,5 +54,8 @@ dönersiniz. **Çıkış** (sağ üstte) oturumu hemen kapatır.
 - *Giriş başarısız. Lütfen bilgilerini kontrol et.* mesajı devre dışı ya da kilitli hesap için de çıkar. Birkaç
   başarısız denemeden sonra beş dakika bekleyin, sonra yöneticinizden hesabınızın aktif olduğunu ve doğru yoldan
   (yerel, LDAP ya da Microsoft) giriş yaptığınızı kontrol etmesini isteyin.
+- **Microsoft ile giriş yap**'tan sonra *Microsoft hesabınızda MFA yapılmadı; …*: yöneticiniz Microsoft girişlerinde
+  MFA'yı zorunlu tutuyor; MFA'nın Entra'da zorunlu kılınması gerekir ([Azure AD](../administration/azure-ad.mdx#require-mfa)).
+- Kod kabul edilmiyor: bkz. [İki adımlı doğrulama](./two-factor.mdx) (telefon saati, bir kod bir kez çalışır).
 - Giriş yapıyorsunuz ama hiç namespace görmüyorsunuz: henüz rolü olan bir grupta değilsiniz. Bkz. [Cluster ve namespace seçme](/user-guide/cluster-and-namespace).
 :::
