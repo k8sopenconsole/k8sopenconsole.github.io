@@ -43,7 +43,9 @@ leaves it.
   After such a sign-in OpenConsole opens your two-factor page, which says how many unused codes are left.
 - A code works **once**: wait for the app's next one if a code was refused right after you used it.
 - Wrong codes count like wrong passwords: after several the account is locked for 5 minutes
-  ([Signing in](/user-guide/signing-in#which-account)).
+  ([Signing in](/user-guide/signing-in#which-account)). After 10 wrong codes in a row the code step is locked as well:
+  15 minutes the first time, twice as long each time after that, at most 24 hours. The right code, or a reset by your
+  admin, ends it.
 
 ## Your two-factor page {/* #your-two-factor-page */}
 
