@@ -26,7 +26,7 @@ k3s, metrics-server ile birlikte gelir; CPU ve bellek bir dakika sonra görünü
 
 ```bash
 kubectl --context k3d-openconsole-demo apply -k \
-  'https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.4'
+  'https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.24.0'
 kubectl --context k3d-openconsole-demo -n kubernetes-openconsole \
   rollout status deploy/kubernetes-openconsole --timeout=5m
 ```
@@ -41,7 +41,7 @@ dışındaki her kurulumda sürümü sabitlemelisiniz.
 
 ```bash
 kubectl --context k3d-openconsole-demo apply -f \
-  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.23.4/hack/k3d/crashlab.yaml
+  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.24.0/hack/k3d/crashlab.yaml
 ```
 
 `crashlab` namespace'i: sağlıklı Deployment'lar, StatefulSet'ler ve bir DaemonSet; yanlarında OOMKilled olan, crash

@@ -26,17 +26,17 @@ değişikliklerini beraberinde getirir ve açılışta eksik olanları uygular.
 
 ```yaml title="kustomization.yaml"
 resources:
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.4   # was v2.23.3
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.24.0   # was v2.23.4
 images:
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.23.4"                                                         # was 2.23.3
+    newTag: "2.24.0"                                                         # was 2.23.4
 ```
 
 ```bash
 kubectl diff -k .      # the image tag, plus whatever the release changed in deploy/
 kubectl apply -k .
 kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole --timeout=5m
-kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.23.4"
+kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.24.0"
 ```
 
 Oturumlar geçerli kalır; giriş yapmış kullanıcılar sayfayı yenileyip kaldıkları yerden devam eder. `Recreate` ile

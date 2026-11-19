@@ -26,17 +26,17 @@ Change the version in both places of your `kustomization.yaml` and apply it:
 
 ```yaml title="kustomization.yaml"
 resources:
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.23.4   # was v2.23.3
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.24.0   # was v2.23.4
 images:
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.23.4"                                                         # was 2.23.3
+    newTag: "2.24.0"                                                         # was 2.23.4
 ```
 
 ```bash
 kubectl diff -k .      # the image tag, plus whatever the release changed in deploy/
 kubectl apply -k .
 kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole --timeout=5m
-kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.23.4"
+kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.24.0"
 ```
 
 Sessions stay valid, so signed-in users carry on after a page reload. With `Recreate` the console is unavailable
