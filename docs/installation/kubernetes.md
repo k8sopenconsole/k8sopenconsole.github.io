@@ -18,11 +18,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   # the manifests of one release
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.24.0
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.25.0
 images:
   # the image of the same release
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.24.0"
+    newTag: "2.25.0"
 patches:
   - patch: |-
       apiVersion: apps/v1
@@ -48,7 +48,7 @@ patches:
 ```
 
 - The `?ref=` resource is fetched with `git`, so the machine running `kubectl` needs `git` and access to GitHub.
-- **Pin the release** in both places (`ref=v2.24.0` and `newTag`). Without the `images:` override the manifest runs
+- **Pin the release** in both places (`ref=v2.25.0` and `newTag`). Without the `images:` override the manifest runs
   `:latest`, and a pod restart could then upgrade you without notice.
 - **`Recreate`** is important. With the default rolling update the new pod starts while the old one still holds
   the database; on 2.23.0 that can lose the writes made after the overlap until the next restart. Upgrades and
@@ -80,14 +80,14 @@ the files instead of the folder:
 
 ```yaml
 resources:
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.24.0/deploy/namespace.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.24.0/deploy/pvc.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.24.0/deploy/service.yaml
-  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.24.0/deploy/deployment.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.25.0/deploy/namespace.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.25.0/deploy/pvc.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.25.0/deploy/service.yaml
+  - https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.25.0/deploy/deployment.yaml
 ```
 
 For a [read-only](/installation/connect-cluster#full-or-read-only) console, list the files the same way and add
-`https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.24.0/deploy/rbac-readonly.yaml`. Installed with
+`https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.25.0/deploy/rbac-readonly.yaml`. Installed with
 the folder, every `kubectl apply -k` would put the full `rbac.yaml` back.
 
 ## Why exactly one replica {#why-exactly-one-replica}

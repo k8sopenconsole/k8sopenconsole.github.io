@@ -1,0 +1,68 @@
+---
+title: "Cluster'lar"
+description: "Cluster bağlantılarını ekleme, düzenleme ve silme; varsayılan cluster, her kullanıcının kendi cluster'ı ve cluster başına Prometheus."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Cluster'lar
+
+**Yapmak istediğiniz:** bir cluster bağlamak, kullanıcıların nerede başlayacağını seçmek ya da bir token'ı değiştirmek.
+
+**Yönetim → Cluster'lar** bağlantıları listeler; yeni bağlantı ekleme formu da buradadır.
+
+<Screenshot id="admin-clusters" alt="Yönetim → Cluster'lar: her birinin başında sürükleme tutamacıyla prod-eu (Varsayılan) ve staging; Varsayılan yap / Varsayılanı kaldır, Düzenle, Prometheus ve Sil; altta Cluster Ekle formu (ad, açıklama, yöntem, kubeconfig dosyası)" />
+
+## Cluster ekleme {/* #add-a-cluster */}
+
+Ad (cluster seçicide ve her audit olayında görünür), isteğe bağlı bir açıklama ve kimlik bilgileri:
+**ServiceAccount Token** (API server + token + CA) ya da **Kubeconfig** (form Kubeconfig seçili açılır). **Cluster'ı
+kaydet**, bağlantıyı gerçek bir namespace listesiyle dener ve ancak bu başarılı olursa şifreleyerek saklar. Bir
+kubeconfig kimlik bilgilerini satır içi taşımalıdır; exec plugin, `auth-provider` ya da dosya yolu içeren kubeconfig
+reddedilir (`kubeconfig_unsupported`). ServiceAccount'u oluşturma ve token'ını okuma:
+[Cluster bağlama](/installation/connect-cluster).
+
+Aynı cluster, iki farklı kimlikle iki ayrı adla iki kez eklenebilir; örneğin çoğu kişi için salt okuma bir bağlantı.
+İzinler her cluster kaydı için ayrı tanımlanır.
+
+## Varsayılan cluster ve her kullanıcının cluster'ı {/* #the-default-cluster-and-each-users-cluster */}
+
+- **Varsayılan yap**, herkesin başka bir cluster seçene kadar başladığı cluster'ı belirler.
+- Her kullanıcı üst bardan (ya da `c` ile) **kendi** cluster'ını seçer; seçim kullanıcı başına saklanır. Seçici
+  yalnızca kullanıcının izinlerinin kapsadığı cluster'ları listeler; yöneticiler hepsini görür. Her tarayıcı sekmesi
+  gösterdiği cluster'ı her istekle gönderir; bu yüzden bir sekmedeki seçim başka bir sekmenin işlemlerini taşımaz.
+- Bir cluster'ı seçmek ya da varsayılan yapmak cluster'a bir kez sorar: API server'ına ulaşılamayan ya da token'ı
+  reddeden bir cluster orada `cannot connect to cluster: …` ile başarısız olur.
+- Kullanıcının cluster'ı silinirse ya da o cluster'daki tüm izinlerini kaybederse, varsayılan cluster'a geçirilir.
+- Her audit olayı, aksiyonun çalıştığı cluster'ı kaydeder.
+
+## Cluster'ların sırası {/* #the-order-of-the-clusters */}
+
+Yönetim → Cluster'lar'daki liste, tüm cluster listelerinin sırasıdır: üst bardaki seçici, `c` paleti ve API anahtarının
+cluster seçimi; bir kullanıcı erişebildiği cluster'ları aynı sırayla görür. Bir satırı tutamacından (⠿) sürükleyin ya da
+tutamağa odaklanıp ↑ / ↓ tuşlarına basın; her hareket hemen kaydedilir ve audit'e yazılır (`cluster.update`, ad
+`order`). Varsayılan cluster başa taşınmaz: istediğiniz yere koyun. Yeni bir cluster sona eklenir. (API:
+`PUT /api/admin/clusters/order`, yeni sırayla tüm cluster id'leri.)
+
+## Düzenleme, kimlik bilgilerini değiştirme, silme {/* #edit-replace-credentials-delete */}
+
+- **Düzenle**: ad ve açıklama. Yeni bir token yapıştırmak ya da yeni bir kubeconfig yüklemek için **Credential'ları
+  değiştir**'i işaretleyin. [Token rotasyonundan](/installation/connect-cluster#rotate-the-token) sonra gereklidir.
+  Kayıtlı CA'yı korumak için **CA Sertifikası** alanını boş bırakın; **Kayıtlı CA'yı kaldır**'ı yalnız API sunucusunun
+  sertifikası artık herkesçe güvenilen bir CA'dan geliyorsa işaretleyin. Yeni kimlik bilgileri çalışmazsa hata açık
+  kalan dialog'un içinde görünür.
+- **Sil** bağlantıyı kaldırır. Bu cluster'ı seçmiş kullanıcılar varsayılan cluster'a geçer.
+
+## Prometheus {/* #prometheus */}
+
+Bir cluster'daki **Prometheus**, daha uzun kullanım geçmişinin nereden geleceğini belirler (bellekteki 24 saat yerine
+7 güne kadar); Kubernetes API server üzerinden ya da doğrudan bir URL ile. **Bağlantıyı test et** hangi adımın
+başarısız olduğunu söyler. Bkz. [Prometheus](/administration/prometheus).
+
+## OpenConsole her cluster'dan ne ister {/* #what-openconsole-needs-from-each-cluster */}
+
+OpenConsole açılışta her cluster'a bağlanır ve onu bellekteki bir önbellekte (informer'lar) tutar; böylece listeler API
+server'ı sürekli sorgulamaz. Neyin çalışacağına bağlantının ClusterRole'ü karar verir:
+[Cluster bağlama](/installation/connect-cluster#what-each-clusterrole-rule-is-for) sayfasındaki tablo her kuralı, neyi
+açtığını ve olmadığında neyin kaybolduğunu listeler. `GET /metrics`, her cluster için
+`openconsole_cluster_connected{cluster}` raporlar.

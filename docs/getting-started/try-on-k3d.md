@@ -25,7 +25,7 @@ k3s ships metrics-server, so CPU and memory show up after a minute.
 
 ```bash
 kubectl --context k3d-openconsole-demo apply -k \
-  'https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.24.0'
+  'https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.25.0'
 kubectl --context k3d-openconsole-demo -n kubernetes-openconsole \
   rollout status deploy/kubernetes-openconsole --timeout=5m
 ```
@@ -39,7 +39,7 @@ to pin the version, which you should do for anything but a demo.
 
 ```bash
 kubectl --context k3d-openconsole-demo apply -f \
-  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.24.0/hack/k3d/crashlab.yaml
+  https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.25.0/hack/k3d/crashlab.yaml
 ```
 
 Namespace `crashlab`: healthy Deployments, StatefulSets and a DaemonSet next to pods that are OOMKilled, crash

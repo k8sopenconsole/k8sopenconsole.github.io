@@ -58,8 +58,10 @@ other). A pasted text that holds no certificate is refused when you save. Up to 
 
 **Import**: Admin → Users → New user → **Import from LDAP…** (or below the settings on Admin → LDAP). Type part of a
 name and search: the user filter runs with `%s` replaced by what you typed, up to 100 results per base DN. For prefix
-search use `(sAMAccountName=%s*)` as the filter. Pick the people and the **groups** they join, and import. Existing
-accounts are listed apart and skipped. Each import is audited (`user.import`).
+search use `(sAMAccountName=%s*)` as the filter. Tick people in the results: they go into **Selected** and stay there
+when you search again, so you can collect people from several searches (× takes one out). Pick the **groups** they
+join and import; the result is listed per person (*added*, *skipped* with the reason, *not added*). People who already
+have an account are shown as *Already in OpenConsole* and can't be ticked. Each import is audited (`user.import`).
 
 **On first sign-in** (off by default): tick *Create an account on a user's first sign-in*, pick the **groups for new
 accounts**, save. Then:

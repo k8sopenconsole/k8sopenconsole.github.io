@@ -26,12 +26,13 @@ audit event `user.login` records the real reason.
 ### Create {/* #create */}
 
 **New user** creates a local account: username, first password, groups, and **Grant admin privileges** for an
-admin. With LDAP or Azure AD turned on, the arrow next to it opens a menu:
+admin. With LDAP or Azure AD turned on, **New user** opens a menu (click or ↓; Esc closes it):
 
 - **Local user**: as above.
 - **Import from LDAP…**: search the directory and import people straight into groups ([LDAP](/administration/ldap)).
 - **Azure AD user**: pre-create an account by UPN or e-mail (`jane@example.com`) with its groups, so the person sees
-  something on their first Microsoft sign-in ([Azure AD](/administration/azure-ad)).
+  something on their first Microsoft sign-in; with the directory search on, search Entra ID and import one or more
+  people instead ([Azure AD](./azure-ad.mdx#directory-search)).
 
 New accounts, created or imported, are listed first with a **New** badge for a moment. A user in no group sees no
 namespaces. A local user is not forced to change the password you set; tell them to.

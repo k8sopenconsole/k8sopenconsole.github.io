@@ -18,10 +18,11 @@ Account menu (your name, top right) → **API keys**, or `⌘K` → *Go to API k
 
 **New API key**, then:
 
-<Screenshot id="api-key-form" alt="The New API key form: name and note, expiry presets, scope (clusters and namespaces) and the permission templates" />
+<Screenshot id="api-key-form" alt="The New API key form: name and note, expiry presets with Custom date and its date box, the latest date the admin allows, scope (clusters and namespaces) and the permission templates" />
 
 1. **Name and note**: the name appears in the audit log next to everything the key does.
-2. **Expiry**: 7, 30, 60 or 90 days, a date, or none (your admin may limit this).
+2. **Expiry**: 7, 30, 60 or 90 days, a **Custom date** (type it or pick it in the calendar), or none. Your admin sets
+   the longest lifetime: the form says the latest date, and days after it are struck through.
 3. **Scope**: all clusters or one; all your namespaces (including ones you get later) or a selection.
 4. **Permissions**: a template or single cells.
    - *Read-only (safe)*: list, get and logs, no ConfigMaps or Secrets, nothing that changes anything.

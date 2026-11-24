@@ -26,12 +26,13 @@ vermez. Gerçek nedeni `user.login` audit olayı kaydeder.
 ### Oluşturma {/* #create */}
 
 **Yeni kullanıcı** local bir hesap oluşturur: kullanıcı adı, ilk parola, gruplar ve admin için **Admin yetkisi ver**.
-LDAP ya da Azure AD açıksa yanındaki ok bir menü açar:
+LDAP ya da Azure AD açıksa **Yeni kullanıcı** bir menü açar (tıklayın ya da ↓; Esc kapatır):
 
 - **Yerel kullanıcı**: yukarıdaki gibi.
 - **LDAP'tan içe aktar…**: dizinde arayın ve kişileri doğrudan gruplara aktarın ([LDAP](/administration/ldap)).
 - **Azure AD kullanıcısı**: bir hesabı UPN ya da e-posta (`jane@example.com`) ve gruplarıyla önceden oluşturun; kişi ilk
-  Microsoft girişinde bir şeyler görsün ([Azure AD](/administration/azure-ad)).
+  Microsoft girişinde bir şeyler görsün. Dizin araması açıksa bunun yerine Entra ID'de arayıp bir ya da birkaç kişiyi
+  içe aktarın ([Azure AD](./azure-ad.mdx#directory-search)).
 
 Oluşturulan ya da içe aktarılan yeni hesaplar bir süre listenin başında, **Yeni** etiketiyle görünür. Hiçbir grupta
 olmayan kullanıcı hiç namespace görmez. Local bir kullanıcı belirlediğiniz parolayı değiştirmeye zorlanmaz;

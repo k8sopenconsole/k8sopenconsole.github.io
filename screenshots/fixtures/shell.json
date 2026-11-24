@@ -1,38 +1,23 @@
 {
- "time": 1795075486694,
+ "time": 1795531429624,
  "sockets": [
   {
-   "path": "/ws/namespaces/shop/pods/storefront-84fc6d7d6c-5drxl/exec",
+   "path": "/ws/namespaces/shop/pods/storefront-84fc6d7d6c-4pg86/exec",
    "frames": [
     {
      "s": "{\"type\":\"session\",\"idleTimeoutSeconds\":300}"
     },
     {
-     "s": "{\"type\":\"recording\",\"enabled\":true,\"sessionId\":\"a691b56d-5970-48de-881d-612c131d8544\"}"
+     "s": "{\"type\":\"recording\",\"enabled\":true,\"sessionId\":\"e4b21e8c-41fb-47a0-a21c-b7b35d488c88\"}"
     },
     {
-     "b": "DQo="
+     "b": "DQpob3N0bmFtZSAmJiBscyAvDQo="
     },
     {
-     "b": "cm9vdEBzdG9yZWZyb250LTg0ZmM2ZDdkNmMtNWRyeGw6LyMgDQo="
+     "b": "cm9vdEBzdG9yZWZyb250LTg0ZmM2ZDdkNmMtNHBnODY6LyMgDQo="
     },
     {
-     "b": "cm9vdEBzdG9yZWZyb250LTg0ZmM2ZDdkNmMtNWRyeGw6LyMg"
-    },
-    {
-     "b": "aG9zdA=="
-    },
-    {
-     "b": "bmFt"
-    },
-    {
-     "b": "ZSAmJiBscyAvDQo="
-    },
-    {
-     "b": "c3RvcmVmcm9udC04NGZjNmQ3ZDZjLTVkcnhsDQo="
-    },
-    {
-     "b": "G1sxOzM0bWJpbhtbbSAgICAbWzE7MzRtZGV2G1ttICAgIBtbMTszNG1ldGMbW20gICAgG1sxOzM0bWhvbWUbW20gICAbWzE7MzRtbGliG1ttICAgIBtbMTszNm1saWI2NBtbbSAgG1sxOzM0bXByb2MbW20gICAbWzE7MzRtcm9vdBtbbSAgIBtbMTszNG1zeXMbW20gICAgG1sxOzM0bXRtcBtbbSAgICAbWzE7MzRtdXNyG1ttICAgIBtbMTszNG12YXIbW20NCnJvb3RAc3RvcmVmcm9udC04NGZjNmQ3ZDZjLTVkcnhsOi8jIA=="
+     "b": "cm9vdEBzdG9yZWZyb250LTg0ZmM2ZDdkNmMtNHBnODY6LyMgaG9zdG5hbWUgJiYgbHMgLw0K"
     }
    ]
   }

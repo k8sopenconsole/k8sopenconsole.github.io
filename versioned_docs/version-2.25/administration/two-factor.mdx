@@ -1,0 +1,39 @@
+---
+title: "Two-factor authentication"
+description: "Require a code from an authenticator app at sign-in for local and LDAP accounts."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Two-factor authentication
+
+**You want to:** require a code from an authenticator app as well as the password.
+
+**Admin → Two-factor authentication** sets the policy for **local and LDAP** accounts. Azure AD accounts are
+not affected: require MFA for them in Entra and under [Azure AD](./azure-ad.mdx#require-mfa).
+
+<Screenshot id="admin-two-factor-policy" alt="Admin → Two-factor authentication: the card with the policy Off, Optional, Required for admins and Required for everyone, and Save" />
+
+| Policy | What happens |
+|---|---|
+| **Off** (the default) | Nobody is asked for a code, and the account menu doesn't offer it. |
+| **Optional** | Users may set it up from the account menu ([Two-factor authentication](../user-guide/two-factor.mdx)); those who did are asked for a code. |
+| **Required for admins** | Admins without it set it up on their next sign-in; others may. |
+| **Required for everyone** | Every local and LDAP user without it sets it up on their next sign-in. |
+
+- Choosing a required policy asks first and says how many accounts don't have it yet (*N accounts don't have it yet:
+  they will have to set it up on their next sign-in.*).
+- **A change applies from each user's next sign-in.** Open sessions go on.
+- Someone the policy requires it of and who hasn't set it up signs in to a session that can only set it up: the
+  blocking **Set up two-factor authentication** dialog, with **Sign out** as the only other way out. Every other API
+  call answers `403` `two_factor_enrollment_required`. A password your admin set is changed first.
+- **Turning it off keeps what users set up.** Nobody is asked for a code while it is off; back on, everyone who had
+  it set up uses it again, without setting it up again.
+- [API keys](/administration/api-access-policy) are not affected by the policy.
+- Users who lost their phone and recovery codes: [Reset 2FA](/administration/users#edit-reset-disable-delete). A
+  locked-out admin with no other admin: `TWO_FACTOR_RESET_USER`
+  ([Troubleshooting](/operations/troubleshooting#sign-in-fails)).
+
+Saving is audited as `settings.update` (the summary has `two_factor_policy`); setting up, sign-in codes, new recovery
+codes, turning off and resets as `two_factor.*` ([Audit events](/reference/audit-events)). Codes, keys and recovery
+codes are never written to the audit log or the server log.

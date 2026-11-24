@@ -17,9 +17,9 @@ then copy it with [crane](https://github.com/google/go-containerregistry/blob/ma
 `skopeo copy --all`). A copy keeps the multi-arch index and its digest:
 
 ```bash
-crane copy ghcr.io/vurulkan/kubernetes-openconsole:2.24.0 \
-  registry.example.internal/openconsole/kubernetes-openconsole:2.24.0
-crane digest registry.example.internal/openconsole/kubernetes-openconsole:2.24.0
+crane copy ghcr.io/vurulkan/kubernetes-openconsole:2.25.0 \
+  registry.example.internal/openconsole/kubernetes-openconsole:2.25.0
+crane digest registry.example.internal/openconsole/kubernetes-openconsole:2.25.0
 # sha256:f4d193cf9d2d65aa0c1c863e3221ced13eb0d17cd3d18cff09ecd3cac91935b2
 ```
 
@@ -30,8 +30,8 @@ The digest is the same as on `ghcr.io`, so the provenance you verified there hol
 The [usual kustomization](/installation/kubernetes) fetches `deploy/` from GitHub. Download it once instead:
 
 ```bash
-curl -sL https://github.com/vurulkan/kubernetes-openconsole/archive/refs/tags/v2.24.0.tar.gz \
-  | tar xz --strip-components=1 kubernetes-openconsole-2.24.0/deploy
+curl -sL https://github.com/vurulkan/kubernetes-openconsole/archive/refs/tags/v2.25.0.tar.gz \
+  | tar xz --strip-components=1 kubernetes-openconsole-2.25.0/deploy
 ```
 
 Keep the `deploy/` folder next to your `kustomization.yaml` (in Git), and point both the resource and the image at

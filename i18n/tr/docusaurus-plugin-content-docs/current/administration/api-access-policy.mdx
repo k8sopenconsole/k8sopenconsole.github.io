@@ -51,9 +51,10 @@ ekleyemez. İşaretli **Admin API** kutusu da aynı şekilde kalır; işareti ka
 
 ## Süre politikası {/* #expiry-policy */}
 
-Yönetim → Oturum → **API anahtarı süresi**: gün cinsinden **en uzun süre** (boş = sınır yok) ve **Süresiz anahtarlara
-izin ver**. Form tarihi sınırla kısıtlar, sınırı aşan hazır seçenekleri gizler ve izin verilmiyorsa *Süresiz* seçeneğini de
-gizler; sunucu da oluşturmayı ve yeniden üretmeyi kontrol eder (400). Sınırı
+Yönetim → Oturum → **API anahtarı süresi**: gün cinsinden **en uzun süre** (zorunlu, 1 ile 3650; 2.25 boş sınırı 365
+yaptı) ve **Süresiz anahtarlara izin ver**. Form sınırı aşan hazır seçenekleri gizler, takvimde sınırdan sonraki günlerin
+üstünü çizer, en geç tarihi söyler ve izin verilmiyorsa *Süresiz* seçeneğini gizler; sunucu da oluşturmayı ve yeniden
+üretmeyi kontrol eder (400). Sınırı
 düşürmek mevcut anahtarlara dokunmaz, böylece agent'lar habersiz kesilmez; bu anahtarları Yönetim → API anahtarları →
 *Süre politikası dışında* altında bulursunuz.
 

@@ -1,5 +1,5 @@
 {
   "repo": "vurulkan/kubernetes-openconsole",
-  "ref": "v2.24.0",
+  "ref": "v2.25.0",
   "note": "The code repo ref the generated reference is copied from (npm run reference:sync): the release tag of the newest frozen docs version. Bump it to the new tag when a release ships, then freeze (npm run docs:freeze -- X.Y)."
 }

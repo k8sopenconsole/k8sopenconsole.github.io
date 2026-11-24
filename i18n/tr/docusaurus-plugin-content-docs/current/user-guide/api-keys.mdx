@@ -18,10 +18,11 @@ Hesap menüsü (sağ üstte adınız) → **API anahtarları**, ya da `⌘K` →
 
 **Yeni API anahtarı**, sonra:
 
-<Screenshot id="api-key-form" alt="Yeni API anahtarı formu: ad ve not, hazır süre seçenekleri, kapsam (cluster'lar ve namespace'ler) ve yetki şablonları" />
+<Screenshot id="api-key-form" alt="Yeni API anahtarı formu: ad ve not, Özel tarih ve tarih kutusuyla hazır süre seçenekleri, yöneticinin izin verdiği en geç tarih, kapsam (cluster'lar ve namespace'ler) ve yetki şablonları" />
 
 1. **Ad ve not**: ad, anahtarın yaptığı her şeyin yanında audit log'da görünür.
-2. **Bitiş**: 7, 30, 60 ya da 90 gün, bir tarih ya da süresiz (yöneticiniz bunu sınırlamış olabilir).
+2. **Bitiş**: 7, 30, 60 ya da 90 gün, bir **Özel tarih** (yazın ya da takvimden seçin) ya da süresiz. En uzun süreyi
+   yöneticiniz belirler: form en geç tarihi söyler, ondan sonraki günlerin üstü çizilidir.
 3. **Kapsam**: bütün cluster'lar ya da biri; bütün namespace'leriniz (sonradan size verilenler dahil) ya da bir seçim.
 4. **Yetki**: bir şablon ya da tek tek hücreler.
    - *Salt okuma (güvenli)*: list, get ve logs; ConfigMap ve Secret yok, hiçbir şeyi değiştiren bir şey yok.

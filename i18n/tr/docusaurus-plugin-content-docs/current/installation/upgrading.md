@@ -26,17 +26,17 @@ değişikliklerini beraberinde getirir ve açılışta eksik olanları uygular.
 
 ```yaml title="kustomization.yaml"
 resources:
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.24.0   # was v2.23.4
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.25.0   # was v2.24.0
 images:
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.24.0"                                                         # was 2.23.4
+    newTag: "2.25.0"                                                         # was 2.24.0
 ```
 
 ```bash
 kubectl diff -k .      # the image tag, plus whatever the release changed in deploy/
 kubectl apply -k .
 kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole --timeout=5m
-kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.24.0"
+kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.25.0"
 ```
 
 Oturumlar geçerli kalır; giriş yapmış kullanıcılar sayfayı yenileyip kaldıkları yerden devam eder. `Recreate` ile
@@ -69,6 +69,21 @@ cluster'da `deploy/` ile birlikte gelir; bağlı diğer her cluster'da yeni `rba
    kullanıcılar, ayarlar) kaybolur.
 
 ## Sürüme özel notlar {#version-notes}
+
+### 2.25'e yükseltme {#upgrading-to-225}
+
+- **API anahtarı süresi zorunlu.** En uzun süre (Yönetim → Oturum → API anahtarı süresi) artık 1 ile 3650 gün arasında.
+  İlk açılış boş (sınırsız) bir sınırı **365**, daha uzun olanı 3650 yapar; mevcut anahtarlara dokunulmaz.
+  `PUT /api/admin/session`, `apiKeyMaxDays` 0 ya da 3650'den büyükse 400 `invalid_input` döner: 0 gönderen otomasyonu
+  güncelleyin.
+- **Cluster sırası**: ilk açılış cluster'ları bugün göründükleri sırayla numaralar (önce varsayılan, sonra ada göre), yani
+  hiçbir şey yer değiştirmez; bundan sonra sırayı Yönetim → Cluster'lar belirler ([Cluster'lar](../administration/clusters.mdx#the-order-of-the-clusters)).
+- **Azure AD dizin araması** kapalı gelir. Kullanmak için uygulama kaydına Microsoft Graph Application iznini
+  `User.Read.All` yönetici onayıyla verin ([Azure AD](../administration/azure-ad.mdx#directory-search)). Azure AD girişi
+  artık hesabı önce Entra nesne kimliğiyle bulur.
+- İlk açılış `clusters` ve `azure_ad_config`'e sütun ekler; elle yapılacak adım yok. Yeni ortam değişkeni yok.
+- 2.24'e geri dönmek aynı veritabanıyla çalışır: cluster'lar o zaman önce varsayılan, sonra ada göre listelenir ve 365
+  günlük sınır kalır.
 
 ### 2.24'e yükseltme {#upgrading-to-224}
 

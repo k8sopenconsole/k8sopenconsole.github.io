@@ -12,7 +12,7 @@ Apple silicon) için yayınlanır; runtime doğru olanı kendisi seçer. İmajla
 
 | Tag | Neyi gösterir | Değişir mi? |
 |---|---|---|
-| `X.Y.Z` (ör. `2.24.0`) | o sürümü | hayır: **production'da bunu kullanın** |
+| `X.Y.Z` (ör. `2.25.0`) | o sürümü | hayır: **production'da bunu kullanın** |
 | `latest` | en yeni sürümü; o sürümün `X.Y.Z` tag'iyle aynı imaj (aynı digest) | evet, her sürümde |
 | `dev-<number>`, `dev-latest` | yayınlanmamış branch'lerin test build'leri | bunları asla production'da çalıştırmayın |
 
@@ -26,8 +26,8 @@ gibi sabitleyin (`images:` → `newTag`). Bire bir aynı byte'ları sabitlemek i
 
 ```bash
 # the digest of a tag, after pulling it
-docker pull ghcr.io/vurulkan/kubernetes-openconsole:2.24.0
-docker inspect --format '{{index .RepoDigests 0}}' ghcr.io/vurulkan/kubernetes-openconsole:2.24.0
+docker pull ghcr.io/vurulkan/kubernetes-openconsole:2.25.0
+docker inspect --format '{{index .RepoDigests 0}}' ghcr.io/vurulkan/kubernetes-openconsole:2.25.0
 # → ghcr.io/vurulkan/kubernetes-openconsole@sha256:f4d193cf9d2d65aa0c1c863e3221ced13eb0d17cd3d18cff09ecd3cac91935b2
 
 # or the digest your cluster is running
@@ -38,7 +38,7 @@ kubectl -n kubernetes-openconsole get pod -l app=kubernetes-openconsole \
 ```yaml title="kustomization.yaml"
 images:
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    digest: sha256:80afd95558454609d9234b48433047bf9167d90031ab0188b8f573cdfaa1ca35   # 2.24.0
+    digest: sha256:fb601e321bc36fd70fad2af018d0103623ba1aaf3fb31045584c1b5333bedf6b   # 2.25.0
 ```
 
 ## Provenance ve SBOM {#provenance-and-sbom}
@@ -51,16 +51,16 @@ workflow'un ve commit'in build ettiği) ve bir SPDX **SBOM** (imajdaki tüm pake
 
 ```bash
 # Built by this repository's CI workflow (exit code 0 = verified)
-gh attestation verify oci://ghcr.io/vurulkan/kubernetes-openconsole:2.24.0 \
+gh attestation verify oci://ghcr.io/vurulkan/kubernetes-openconsole:2.25.0 \
   --repo vurulkan/kubernetes-openconsole \
   --signer-workflow vurulkan/kubernetes-openconsole/.github/workflows/ci.yml
 echo $?   # in a script nothing may be printed; 0 = verified
 
 # Download the SBOM (SPDX 2.3 JSON)
-gh attestation verify oci://ghcr.io/vurulkan/kubernetes-openconsole:2.24.0 \
+gh attestation verify oci://ghcr.io/vurulkan/kubernetes-openconsole:2.25.0 \
   --repo vurulkan/kubernetes-openconsole \
   --predicate-type https://spdx.dev/Document/v2.3 --format json \
-  --jq '.[0].verificationResult.statement.predicate' > openconsole-2.24.0.spdx.json
+  --jq '.[0].verificationResult.statement.predicate' > openconsole-2.25.0.spdx.json
 ```
 
 Bu repository'nin build etmediği bir imaj, ilk komutta sıfırdan farklı bir exit koduyla başarısız olur. SBOM'u

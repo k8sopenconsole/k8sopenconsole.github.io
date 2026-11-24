@@ -1,13 +1,9 @@
 {
- "time": 1795075479609,
+ "time": 1795531419287,
  "sockets": [
   {
    "path": "/ws/events",
-   "frames": [
-    {
-     "s": "{\"verb\":\"updated\",\"kind\":\"HorizontalPodAutoscaler\",\"namespace\":\"shop\",\"name\":\"storefront\",\"at\":\"2026-11-19T08:04:41.200967259Z\"}\n"
-    }
-   ]
+   "frames": []
   }
  ]
 }

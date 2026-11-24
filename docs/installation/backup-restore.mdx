@@ -25,7 +25,7 @@ shell. Store backups encrypted, with access as tight as the clusters themselves.
 ## Automatic backups {/* #automatic-backups */}
 
 OpenConsole copies its database into `/data/backups` with SQLite's `VACUUM INTO`, a consistent copy made while it
-keeps running ([backup.go](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.24.0/backend/internal/backup/backup.go)):
+keeps running ([backup.go](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.25.0/backend/internal/backup/backup.go)):
 
 - every `BACKUP_INTERVAL` (default `24h`; `0` turns the schedule off), counted from the newest copy, so a restart
   neither skips nor repeats one;
@@ -175,7 +175,7 @@ A copy made after the key was moved out of the database needs the same `ENCRYPTI
 
 By default the key that encrypts the stored credentials is in the database itself. Keep it in a Kubernetes Secret
 instead, so that a copy of the database (a backup, a snapshot) doesn't reveal the credentials on its own
-([keys.go](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.24.0/backend/internal/store/keys.go)).
+([keys.go](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.25.0/backend/internal/store/keys.go)).
 
 1. **Create the key and the Secret.** Keep `openconsole.key` somewhere safe outside the cluster too: without it
    the stored credentials are lost.

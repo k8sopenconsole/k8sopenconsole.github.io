@@ -1,0 +1,103 @@
+---
+title: "Azure AD (Entra ID)"
+description: "Single-tenant Microsoft sign-in: app registration, settings, pre-created accounts and how accounts are matched."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Azure AD (Entra ID)
+
+**You want to:** let people sign in with their Microsoft work account.
+
+## 1. Register the app {/* #1-register-the-app */}
+
+Azure portal → **Microsoft Entra ID → App registrations → New registration**:
+
+- **Supported account types**: accounts in this organizational directory only (single tenant).
+- **Redirect URI**, platform *Web*: `https://<your OpenConsole host>/api/auth/azure/callback`.
+- **Certificates & secrets → New client secret**; copy its value.
+- No API permissions are needed for sign-in; OpenConsole asks only for `openid profile email`. The optional
+  [directory search](#directory-search) needs one Microsoft Graph permission.
+
+Note the **Directory (tenant) ID** and **Application (client) ID** on the app's overview page.
+
+## 2. Configure OpenConsole {/* #2-configure-openconsole */}
+
+**Admin → Azure AD** (example values):
+
+<Screenshot id="admin-azure" alt="Admin → Azure AD: tenant ID, client ID, redirect URL https://openconsole.example.com/api/auth/azure/callback, client secret, Save and Test configuration, and below it the Directory search (Microsoft Graph) card" />
+
+**Enabled**, **Tenant ID**, **Client ID**, **Client secret** (stored encrypted; tick **Update Client Secret** to
+change it), **Redirect URL** (exactly the URI registered above). Save, then **Test configuration**. The sign-in page now
+shows **Sign in with Microsoft**.
+
+For US Government or China clouds set `AZURE_AD_AUTHORITY` ([Environment variables](/reference/environment-variables)).
+
+## 3. Give people access {/* #3-give-people-access */}
+
+Either let them sign in once (the account is created with source *Azure AD*, in no group, named after the token's
+`preferred_username`, or `email` / `upn` when that is missing) and then add them to groups,
+or, better, **pre-create** them: Admin → Users → New user → **Azure AD user**, their UPN or e-mail
+(`jane@example.com`) and their groups. Their first Microsoft sign-in uses that account and they see their namespaces
+at once. With the [directory search](#directory-search) on, you search Entra ID instead of typing the name.
+
+## Directory search (Microsoft Graph) {/* #directory-search */}
+
+Off by default. When it's on, New user → **Azure AD user** searches Microsoft Entra ID by name, e-mail or UPN; you
+tick one or more people (they stay ticked across searches), give them groups and import them. Each account is
+created bound to the person's Entra object ID, so it is theirs from the start; a guest (`#EXT#` in the UPN) is
+created under their e-mail address. People who already have an account are shown as *Already in OpenConsole* and
+skipped. The import is audited (`user.import`, `account_source: azure`); searches aren't.
+
+1. Azure portal → your app registration → **API permissions → Add a permission → Microsoft Graph → Application
+   permissions → `User.Read.All`**, then **Grant admin consent**. It lets the app read the user directory with its
+   own client secret; nothing else is needed.
+2. Admin → Azure AD → **Directory search (Microsoft Graph)**: **Test directory search**, then tick *Search Microsoft
+   Entra ID when adding Azure AD users* (saved at once).
+
+When Graph can't be used, the search says why and offers to enter the name by hand: `graph_forbidden` (the
+permission or its admin consent is missing), `graph_invalid_client` (Microsoft refused the client secret: wrong or
+expired), `graph_unreachable` (network or timeout). The Graph address follows `AZURE_AD_AUTHORITY` (global, US
+Government L4, China); Azure AD B2C has no directory search. Switching it off keeps the accounts.
+
+## How the account is found {/* #how-the-account-is-found */}
+
+1. By the token's Entra object ID (`oid`): an Azure AD account already bound to this person (imported through the
+   directory search, or signed in before). A changed UPN keeps its account; the `user.login` event says
+   `linked_by: oid`. A disabled one stays refused.
+2. By the token's `preferred_username`, usually the UPN.
+3. Otherwise, a **pre-created Azure AD account nobody has signed in to yet** whose name matches `preferred_username`
+   in another letter case, or the token's `email` or `upn` (a pre-created `jane.doe@corp.com` is found when the UPN
+   is `jdoe@corp.onmicrosoft.com`).
+4. No account at all: one is created (see above).
+
+Only **Azure AD** accounts sign in with Microsoft. A local or LDAP account with the same name is never taken over: the
+sign-in is refused (`403` `sign_in_failed`, detail `this account can't sign in with this Microsoft account`; audit `user.login`, outcome
+`failed`, reason `not_azure_account`). Up to 2.23.0 such an account was switched to Azure AD; to move someone from a
+local account to Azure AD, delete it and pre-create an Azure AD account. The `user.login` event notes when an account
+was claimed (`linked_by`, `signed_in_as`). Azure AD accounts never accept a password.
+
+An account belongs to the Microsoft account that **first** signs in to it, by its Entra object ID (`oid` in the
+token), not by its name. Someone else who later has the same name (a deleted and re-created, or renamed, Entra user)
+is refused the same way, reason `azure_oid_mismatch`. To hand the name to the new person, delete the OpenConsole
+account and pre-create it again. Accounts that signed in before this check existed are bound at their next sign-in.
+
+Signing out of OpenConsole doesn't sign the person out of Microsoft. To stop someone, disable their OpenConsole account
+or block them in Entra ID.
+
+## Require MFA {/* #require-mfa */}
+
+OpenConsole doesn't ask Microsoft accounts for its own [two-factor code](./two-factor.mdx):
+Microsoft does the second factor. **Require MFA for Azure AD sign-in** (Admin → Azure AD) makes sure it did: a
+sign-in whose ID token doesn't have `mfa` in its `amr` claim is refused.
+
+1. **Require MFA in Entra** with a Conditional Access policy for the app (or for all apps).
+2. **Let the ID token say how the person signed in.** OpenConsole uses the v2.0 endpoints, whose ID tokens carry
+   `amr` only when the app asks for it: App registrations → your app → **Token configuration** → **Add optional
+   claim** → token type **ID** → `amr` → Add.
+3. Tick **Require MFA for Azure AD sign-in** and save.
+
+A refused sign-in goes back to the sign-in page with *Multi-factor authentication wasn't done in your Microsoft
+sign-in. Your administrator must require MFA in Entra with Conditional Access.* It is audited as `user.login`,
+outcome `denied`, reason `azure_mfa_required`, and no account is created. When the token has no `amr` claim at all
+(step 2 is missing), the server log also has a warning `azure ad sign-in refused: the id_token has no amr claim`.

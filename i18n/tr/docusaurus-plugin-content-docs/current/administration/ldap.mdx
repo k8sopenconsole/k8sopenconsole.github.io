@@ -59,9 +59,11 @@ yalnızca *TLS sertifika doğrulamasını atla* işaretliyken bağlanıyordu ve 
 
 **İçe aktarma**: Yönetim → Kullanıcılar → Yeni kullanıcı → **LDAP'tan içe aktar…** (ya da Yönetim → LDAP'ta ayarların
 altından). Adın bir kısmını yazıp arayın: kullanıcı filtresi, `%s` yerine yazdığınız değer konarak çalışır; base DN
-başına en fazla 100 sonuç gelir. Önek araması için filtreye `(sAMAccountName=%s*)` yazın. Kişileri ve katılacakları
-**grupları** seçip içe aktarın. Zaten var olan hesaplar ayrı listelenir ve atlanır. Her içe aktarma audit'e yazılır
-(`user.import`).
+başına en fazla 100 sonuç gelir. Önek araması için filtreye `(sAMAccountName=%s*)` yazın. Sonuçlarda kişileri
+işaretleyin: **Seçilenler**'e girerler ve yeniden aradığınızda orada kalırlar, böylece birkaç aramadan kişi
+toplayabilirsiniz (× ile birini çıkarırsınız). Katılacakları **grupları** seçip içe aktarın; sonuç kişi kişi listelenir
+(*eklendi*, nedeniyle *atlandı*, *eklenemedi*). Zaten hesabı olanlar *Zaten OpenConsole'da* olarak görünür ve
+işaretlenemez. Her içe aktarma audit'e yazılır (`user.import`).
 
 **İlk girişte** (varsayılan olarak kapalı): *Kullanıcının ilk girişinde hesabını oluştur* seçeneğini işaretleyin,
 **Yeni hesapları şu gruplara ekle** alanında grupları seçin ve kaydedin. Bundan sonra:

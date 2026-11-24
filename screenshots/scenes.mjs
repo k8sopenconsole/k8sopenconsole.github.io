@@ -5,7 +5,7 @@ const TR = {
   'Back up now': 'Şimdi yedekle', 'Columns': 'Sütunlar', 'Logs': 'Loglar', 'Shell': 'Shell', 'Before last restart': 'Son restart öncesi',
   'YAML': 'YAML', 'Edit': 'Düzenle', 'Dry-run': 'Dry-run', 'Restart': 'Yeniden başlat', 'Scale': 'Ölçekle',
   'Keys': 'Anahtarlar', 'Show': 'Göster', 'Details': 'Ayrıntılar', 'LDAP Configuration': 'LDAP Yapılandırması',
-  'Azure AD Configuration': 'Azure AD Yapılandırması', 'User Base DN (single)': 'Kullanıcı Base DN (tek)',
+  'Azure AD Configuration': 'Azure AD Yapılandırması', 'Custom date': 'Özel tarih', 'User Base DN (single)': 'Kullanıcı Base DN (tek)',
   'User Filter': 'Kullanıcı filtresi', 'Add permissions': 'İzin ekle', 'Revisions': 'Revizyonlar',
   'pod.* = all': 'pod.* = hepsi',
 };
@@ -178,6 +178,7 @@ export const SCENES = [
     run: async (page) => {
       await page.locator('input').first().waitFor();
       await page.locator('input').first().fill('grafana-alerts');
+      await page.getByRole('button', {name: L('Custom date')}).click(); // 2.25: the date box in the chip row
       await page.waitForTimeout(1500);
     }},
 
@@ -226,7 +227,7 @@ export const SCENES = [
       await toTop(page);
       await page.waitForTimeout(500);
     }},
-  {id: 'admin-azure', as: 'admin', path: '/admin', storage: admin('azure-ad'),
+  {id: 'admin-azure', as: 'admin', path: '/admin', storage: admin('azure-ad'), viewport: {width: 1440, height: 1250}, // + Directory search card
     run: async (page) => {
       await page.getByText(L('Azure AD Configuration')).waitFor();
       await page.waitForTimeout(2000);

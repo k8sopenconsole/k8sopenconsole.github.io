@@ -25,7 +25,7 @@ Geride kalanlar:
 
 | Ne | Nerede | Nasıl kaldırılır |
 |---|---|---|
-| Bağladığınız **diğer** her cluster'daki ServiceAccount, token'ı ve ClusterRole | o cluster'lar | `kubectl --context <cluster> delete -f https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.24.0/deploy/rbac.yaml`, ardından `kubectl --context <cluster> delete namespace kubernetes-openconsole` |
+| Bağladığınız **diğer** her cluster'daki ServiceAccount, token'ı ve ClusterRole | o cluster'lar | `kubectl --context <cluster> delete -f https://raw.githubusercontent.com/vurulkan/kubernetes-openconsole/v2.25.0/deploy/rbac.yaml`, ardından `kubectl --context <cluster> delete namespace kubernetes-openconsole` |
 | Kustomization dışında oluşturduysanız Ingress'iniz ve TLS Secret'ı | namespace (onunla birlikte silinir) ya da onları koyduğunuz yer | `kubectl delete -f ingress.yaml` |
 | Log platformunuza gönderilmiş audit satırları | Elasticsearch, Loki, … | platformunuzun saklama süresi |
 | `deploy/elk/install.sh`'ın kurduğu Elasticsearch pipeline'ı ve template'leri | Elasticsearch | [`deploy/elk/README.md` → Remove](https://github.com/vurulkan/kubernetes-openconsole/blob/main/deploy/elk/README.md#remove) |
