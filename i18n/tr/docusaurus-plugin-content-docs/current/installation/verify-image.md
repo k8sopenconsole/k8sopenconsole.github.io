@@ -38,7 +38,7 @@ kubectl -n kubernetes-openconsole get pod -l app=kubernetes-openconsole \
 ```yaml title="kustomization.yaml"
 images:
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    digest: sha256:80afd95558454609d9234b48433047bf9167d90031ab0188b8f573cdfaa1ca35   # 2.25.0
+    digest: sha256:fb601e321bc36fd70fad2af018d0103623ba1aaf3fb31045584c1b5333bedf6b   # 2.25.0
 ```
 
 ## Provenance ve SBOM {#provenance-and-sbom}
