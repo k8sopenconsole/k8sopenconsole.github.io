@@ -178,6 +178,7 @@ export const SCENES = [
     run: async (page) => {
       await page.locator('input').first().waitFor();
       await page.locator('input').first().fill('grafana-alerts');
+      await page.getByRole('button', {name: 'Custom date'}).click(); // 2.25: the date box in the chip row
       await page.waitForTimeout(1500);
     }},
 
@@ -226,7 +227,7 @@ export const SCENES = [
       await toTop(page);
       await page.waitForTimeout(500);
     }},
-  {id: 'admin-azure', as: 'admin', path: '/admin', storage: admin('azure-ad'),
+  {id: 'admin-azure', as: 'admin', path: '/admin', storage: admin('azure-ad'), viewport: {width: 1440, height: 1250}, // + Directory search card
     run: async (page) => {
       await page.getByText(L('Azure AD Configuration')).waitFor();
       await page.waitForTimeout(2000);

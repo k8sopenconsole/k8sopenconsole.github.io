@@ -11,7 +11,7 @@ import Screenshot from '@site/src/components/Screenshot';
 
 **Yönetim → Cluster'lar** bağlantıları listeler; yeni bağlantı ekleme formu da buradadır.
 
-<Screenshot id="admin-clusters" alt="Yönetim → Cluster'lar: prod-eu (Varsayılan) ve staging; Varsayılan yap / Varsayılanı kaldır, Düzenle, Prometheus ve Sil; altta Cluster Ekle formu (ad, açıklama, yöntem, kubeconfig dosyası)" />
+<Screenshot id="admin-clusters" alt="Yönetim → Cluster'lar: her birinin başında sürükleme tutamacıyla prod-eu (Varsayılan) ve staging; Varsayılan yap / Varsayılanı kaldır, Düzenle, Prometheus ve Sil; altta Cluster Ekle formu (ad, açıklama, yöntem, kubeconfig dosyası)" />
 
 ## Cluster ekleme {/* #add-a-cluster */}
 
@@ -35,6 +35,14 @@ Aynı cluster, iki farklı kimlikle iki ayrı adla iki kez eklenebilir; örneği
   reddeden bir cluster orada `cannot connect to cluster: …` ile başarısız olur.
 - Kullanıcının cluster'ı silinirse ya da o cluster'daki tüm izinlerini kaybederse, varsayılan cluster'a geçirilir.
 - Her audit olayı, aksiyonun çalıştığı cluster'ı kaydeder.
+
+## Cluster'ların sırası {/* #the-order-of-the-clusters */}
+
+Yönetim → Cluster'lar'daki liste, tüm cluster listelerinin sırasıdır: üst bardaki seçici, `c` paleti ve API anahtarının
+cluster seçimi; bir kullanıcı erişebildiği cluster'ları aynı sırayla görür. Bir satırı tutamacından (⠿) sürükleyin ya da
+tutamağa odaklanıp ↑ / ↓ tuşlarına basın; her hareket hemen kaydedilir ve audit'e yazılır (`cluster.update`, ad
+`order`). Varsayılan cluster başa taşınmaz: istediğiniz yere koyun. Yeni bir cluster sona eklenir. (API:
+`PUT /api/admin/clusters/order`, yeni sırayla tüm cluster id'leri.)
 
 ## Düzenleme, kimlik bilgilerini değiştirme, silme {/* #edit-replace-credentials-delete */}
 

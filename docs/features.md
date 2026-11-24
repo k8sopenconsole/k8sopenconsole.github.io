@@ -34,8 +34,8 @@ Every read and write is an audit event with its own fields: `action` (`deploymen
 ## Access & identity {#access--identity}
 - **User → Groups → Roles → per-cluster, per-namespace permissions** (application-level RBAC, no Kubernetes RBAC for end users).
 - **Namespace discovery is permission-based** (no leakage of names you can't access).
-- **Multi-cluster, per user**: save N clusters. Every user picks their **own** cluster in the header (or with `c`), and admins set a default for everyone else. Permissions can be scoped per cluster, and audit records the cluster.
-- **Local users** (bcrypt) + **LDAP** (bind-based, searchable + importable) + **Azure AD** single-tenant login — all configurable via UI.
+- **Multi-cluster, per user**: save N clusters. Every user picks their **own** cluster in the header (or with `c`), and admins set a default for everyone else and the order every cluster list uses. Permissions can be scoped per cluster, and audit records the cluster.
+- **Local users** (bcrypt) + **LDAP** (bind-based, searchable + importable) + **Azure AD** single-tenant login (optional Entra ID directory search through Microsoft Graph to import people) — all configurable via UI.
 - **JWT authentication** with forced password change on first login.
 - **Two-factor authentication** (TOTP from an authenticator app, recovery codes) for local and LDAP accounts, off / optional / required for admins / required for everyone; **Require MFA** for Azure AD sign-in.
 - **Session management** (Admin → Sessions): list every active token, revoke individual sessions or every session for a user, change-password revokes everything.

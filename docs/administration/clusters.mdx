@@ -11,7 +11,7 @@ import Screenshot from '@site/src/components/Screenshot';
 
 **Admin → Clusters** lists the connections and has the form to add one.
 
-<Screenshot id="admin-clusters" alt="Admin → Clusters: prod-eu (Default) and staging with Set / Unset default, Edit, Prometheus and Delete, and the Add Cluster form (name, description, method, kubeconfig file)" />
+<Screenshot id="admin-clusters" alt="Admin → Clusters: prod-eu (Default) and staging, each with a drag handle, and Set / Unset default, Edit, Prometheus and Delete, and the Add Cluster form (name, description, method, kubeconfig file)" />
 
 ## Add a cluster {/* #add-a-cluster */}
 
@@ -34,6 +34,14 @@ people. Permissions are per cluster entry.
   refuses the token fails there with `cannot connect to cluster: …`.
 - If a user's cluster is deleted, or they lose every permission on it, they are moved to the default.
 - Every audit event records the cluster the action ran on.
+
+## The order of the clusters {/* #the-order-of-the-clusters */}
+
+The list on Admin → Clusters is the order every cluster list uses: the header switcher, the `c` palette and the
+cluster picker of an API key; a user sees the clusters they have access to in the same order. Drag a row by its
+handle (⠿) to move it, or focus the handle and press ↑ / ↓; each move is saved at once and audited
+(`cluster.update`, name `order`). The default cluster isn't moved to the top: put it where you want it. A new cluster
+goes to the end. (API: `PUT /api/admin/clusters/order` with every cluster id in the new order.)
 
 ## Edit, replace credentials, delete {/* #edit-replace-credentials-delete */}
 

@@ -44,7 +44,7 @@ the [Security model](/operations/security).
   [Environment variables](/reference/environment-variables)).
 - **A NetworkPolicy** that lets in only your Ingress controller and your Prometheus. `/metrics` has no sign-in;
   don't route it through the Ingress either. The same policy is
-  [`deploy/optional/networkpolicy.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.24.0/deploy/optional/networkpolicy.yaml). Change the two namespace names to
+  [`deploy/optional/networkpolicy.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.25.0/deploy/optional/networkpolicy.yaml). Change the two namespace names to
   yours:
 
   ```yaml title="networkpolicy.yaml"

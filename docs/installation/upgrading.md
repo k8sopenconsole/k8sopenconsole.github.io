@@ -26,17 +26,17 @@ Change the version in both places of your `kustomization.yaml` and apply it:
 
 ```yaml title="kustomization.yaml"
 resources:
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.24.0   # was v2.23.4
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.25.0   # was v2.24.0
 images:
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.24.0"                                                         # was 2.23.4
+    newTag: "2.25.0"                                                         # was 2.24.0
 ```
 
 ```bash
 kubectl diff -k .      # the image tag, plus whatever the release changed in deploy/
 kubectl apply -k .
 kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole --timeout=5m
-kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.24.0"
+kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.25.0"
 ```
 
 Sessions stay valid, so signed-in users carry on after a page reload. With `Recreate` the console is unavailable
@@ -68,6 +68,21 @@ cluster OpenConsole runs in; on every other connected cluster apply the new `rba
    you took before the upgrade. Everything since the backup (audit events, users, settings) is lost.
 
 ## Version notes {#version-notes}
+
+### Upgrading to 2.25 {#upgrading-to-225}
+
+- **API key lifetime is required.** The longest lifetime (Admin → Session → API key expiry) is now 1 to 3650 days.
+  The first start sets an empty (unlimited) limit to **365** and a longer one to 3650; existing keys are not touched.
+  `PUT /api/admin/session` answers 400 `invalid_input` for `apiKeyMaxDays` 0 or above 3650: update automation that
+  sends 0.
+- **Cluster order**: the first start numbers the clusters in the order they are shown today (default first, then by
+  name), so nothing moves; from then on Admin → Clusters sets it ([Clusters](../administration/clusters.mdx#the-order-of-the-clusters)).
+- **Azure AD directory search** is off. To use it, give the app registration the Microsoft Graph Application
+  permission `User.Read.All` with admin consent ([Azure AD](../administration/azure-ad.mdx#directory-search)). Azure AD
+  sign-in now finds an account by its Entra object ID first.
+- The first start adds columns to `clusters` and `azure_ad_config`; no step by hand. No new environment variable.
+- Going back to 2.24 works with the same database: the clusters are then listed default first, then by name, and the
+  365-day limit stays.
 
 ### Upgrading to 2.24 {#upgrading-to-224}
 

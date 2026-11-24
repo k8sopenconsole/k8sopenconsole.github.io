@@ -34,8 +34,8 @@ Her okuma ve yazma, kendi alanları olan bir audit olayıdır: `action` (`deploy
 ## Erişim ve kimlik {#access--identity}
 - **Kullanıcı → Gruplar → Roller → cluster ve namespace bazında izinler** (uygulama düzeyinde RBAC; son kullanıcılar için Kubernetes RBAC yok).
 - **Namespace keşfi izne dayalıdır** (erişemediğiniz namespace'lerin adları sızmaz).
-- **Çoklu cluster, kullanıcı başına**: N tane cluster kaydedin. Her kullanıcı **kendi** cluster'ını header'dan (ya da `c` ile) seçer; yöneticiler diğer herkes için bir varsayılan belirler. İzinler cluster bazında sınırlanabilir ve audit cluster'ı kaydeder.
-- **Yerel kullanıcılar** (bcrypt) + **LDAP** (bind tabanlı, aranabilir + içe aktarılabilir) + **Azure AD** single-tenant giriş — hepsi arayüzden yapılandırılır.
+- **Çoklu cluster, kullanıcı başına**: N tane cluster kaydedin. Her kullanıcı **kendi** cluster'ını header'dan (ya da `c` ile) seçer; yöneticiler diğer herkes için bir varsayılan ve tüm cluster listelerinin sırasını belirler. İzinler cluster bazında sınırlanabilir ve audit cluster'ı kaydeder.
+- **Yerel kullanıcılar** (bcrypt) + **LDAP** (bind tabanlı, aranabilir + içe aktarılabilir) + **Azure AD** single-tenant giriş (kişileri içe aktarmak için isteğe bağlı, Microsoft Graph üzerinden Entra ID dizin araması) — hepsi arayüzden yapılandırılır.
 - **JWT kimlik doğrulama**; ilk girişte parola değişikliği zorunludur.
 - Yerel ve LDAP hesapları için **iki adımlı doğrulama** (doğrulama uygulamasından TOTP, kurtarma kodları): kapalı / isteğe bağlı / yöneticilere zorunlu / herkese zorunlu; Azure AD girişi için **MFA zorunluluğu**.
 - **Oturum yönetimi** (Yönetim → Oturumlar): tüm aktif token'ları listeleyin, oturumları tek tek ya da bir kullanıcının tüm oturumlarını birden iptal edin; parola değişikliği hepsini iptal eder.

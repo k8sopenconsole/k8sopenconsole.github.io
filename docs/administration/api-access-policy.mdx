@@ -49,9 +49,10 @@ Editing a key keeps its cells outside the policy, struck through: the user can r
 
 ## Expiry policy {/* #expiry-policy */}
 
-Admin → Session → **API key expiry**: the **longest lifetime** in days (empty = no limit) and **Allow keys that never
-expire**. The form caps the date at the limit, hides presets beyond it and hides *No expiry* when it isn't allowed; the
-server checks create and regenerate too (400). Lowering the limit
+Admin → Session → **API key expiry**: the **longest lifetime** in days (required, 1 to 3650; 2.25 set an empty limit to
+365) and **Allow keys that never expire**. The form hides presets beyond the limit, strikes through the days after it
+in the calendar, says the latest date, and hides *No expiry* when it isn't allowed; the server checks create and
+regenerate too (400). Lowering the limit
 doesn't touch existing keys, so agents aren't cut off without notice; find them under Admin → API keys → *Outside the
 expiry policy*.
 

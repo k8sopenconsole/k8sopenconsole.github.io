@@ -45,7 +45,7 @@ listeyi baştan sona geçin. Her maddenin neden önemli olduğu [Güvenlik model
   [Ortam değişkenleri](/reference/environment-variables)).
 - **Yalnızca Ingress controller'ınızı ve Prometheus'unuzu içeri alan bir NetworkPolicy.** `/metrics` giriş istemez;
   onu Ingress üzerinden de yönlendirmeyin. Aynı policy
-  [`deploy/optional/networkpolicy.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.24.0/deploy/optional/networkpolicy.yaml)
+  [`deploy/optional/networkpolicy.yaml`](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.25.0/deploy/optional/networkpolicy.yaml)
   dosyasında da var. İki namespace adını kendinizinkilerle değiştirin:
 
   ```yaml title="networkpolicy.yaml"
