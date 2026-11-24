@@ -1,0 +1,45 @@
+---
+title: "Cluster ve namespace seçme"
+sidebar_label: "Cluster ve namespace"
+description: "Üzerinde çalıştığınız cluster'ı ve baktığınız namespace'i seçin; neden yalnızca bazılarını gördüğünüzü öğrenin."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Cluster ve namespace seçme
+
+**Yapmak istediğiniz:** başka bir cluster'a ya da başka bir namespace'e bakmak.
+
+## Cluster'ınız {/* #your-cluster */}
+
+Üzerinde çalıştığınız cluster üst çubukta yazar. Üzerine tıklayın ya da `c` tuşuna basın:
+
+<Screenshot id="cluster-switcher" alt="Üst çubukta açık cluster seçici: prod-eu (varsayılan) ve staging listeleniyor, staging seçili" />
+
+- Listede izinlerinizin kapsadığı cluster'lar vardır. **varsayılan** işaretli olan, siz başka birini seçene kadar
+  başladığınız cluster'dır.
+- Cluster seçmek **yalnızca sizi** değiştirir. OpenConsole seçiminizi hatırlar; giriş yaptığınız her cihazda.
+- Her tarayıcı sekmesi gösterdiği cluster üzerinde çalışmaya devam eder. İkinci bir sekmede başka bir cluster
+  seçerseniz ilk sekme bunu söyler (*Başka bir sekmede staging seçildi. Bu sekme hâlâ prod-eu üzerinde çalışıyor.*)
+  ve işlemleri yine prod-eu'ya gider; **staging cluster'ına geç** ona geçer, **prod-eu üzerinde kal** notu kapatır.
+  Yenilenen bir sekme son seçiminizle açılır.
+- Açık listede `1`–`9` sıradaki yerine göre seçer, `↑` / `↓` gezinir, `Enter` seçer.
+- Yaptığınız her işlem, çalıştığı cluster ile birlikte kaydedilir.
+
+Cluster'ınız kaldırılırsa ya da üzerindeki tüm izinlerinizi kaybederseniz varsayılana geri alınırsınız (o cluster'da
+açık kalan bir sekme, yenileyene kadar hata gösterir).
+
+## Namespace'leriniz {/* #your-namespaces */}
+
+Soldaki panel, seçili cluster'ın **en az bir izniniz olan** namespace'lerini listeler. Diğerleri hiç gösterilmez,
+adları bile. Listeyi daraltmak için üstündeki filtreye yazın (ya da `n` tuşuna basın). OpenConsole seçtiğiniz
+namespace'i hatırlar.
+
+Panel'in üstündeki sekmeler (Pod'lar, Deployment'lar, …, Secret'lar) de izinlerinize göre değişir: bir sekmeyi
+yalnızca bu namespace'te o tür nesneleri listeleme izniniz varsa görürsünüz.
+
+:::info[Bir cluster'ı, namespace'i ya da sekmeyi göremiyor musunuz?]
+Üçünü de izinleriniz belirler. Yöneticinizden ihtiyacınız olan şey için `list` izni veren bir rol isteyin; cluster'ı
+ve namespace'i belirtin, örneğin *"`prod-eu` üzerinde `shop` içinde `pods:list` ve `pods:logs`"*. Değişiklikler bir
+sonraki tıklamanızda geçerli olur; yeniden giriş yapmanız gerekmez.
+:::

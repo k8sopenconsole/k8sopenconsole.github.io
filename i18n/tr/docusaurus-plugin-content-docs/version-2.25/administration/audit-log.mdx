@@ -1,0 +1,69 @@
+---
+title: "Denetim logu"
+description: "Kimin ne yaptığını bulun: filtreler, bir olayın alanları, CSV ve bir olayı istek loguyla eşleştirme."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Denetim logu
+
+**Yapmak istediğiniz:** "bunu kim, ne zaman restart etti, reddedilen biri oldu mu?" sorusunu yanıtlamak.
+
+Her aksiyon ve her okuma bir olaydır: kim, nereden, ne, hangi cluster, namespace ve nesne üzerinde, sonuç ne. Olaylar
+`LOG_RETENTION_DAYS` boyunca **Yönetim → Denetim Logları**'nda durur (varsayılan 30 gün; API anahtarlarıyla yapılan
+başarılı okumalar için `API_KEY_READ_RETENTION_DAYS`, 7). Ayrıca log platformunuz için her biri stdout'a tek bir JSON
+satırı olarak yazılır ([Elastic](/operations/elastic)).
+
+<Screenshot id="admin-audit" alt="deployment.* ile filtrelenmiş Yönetim → Denetim Logları: bob'un scale ve restart olayları, ve alice'in reddedilen deployment.restart olayı açılmış; neden forbidden, kaynak IP, hesap kaynağı, istek ID ve user agent görünüyor" />
+
+## Filtreler {/* #filters */}
+
+- **Kullanıcı**, **Aksiyon** ve **Namespace** siz yazdıkça kayıtlarda geçen değerleri önerir; yazılan metin herhangi
+  bir yerde eşleşir. Bir aksiyon seçerseniz birebir eşleşir; `pod.*` ya da `deployment.*` gibi bir aile, ailenin tüm
+  aksiyonlarını kapsar.
+- **Sonuç** (`success`, `denied`, `failed`, `rate_limited`, `locked`), **İşlem türü** (`list`, `restart`, `exec`, …),
+  **Kaynak türü**, **Cluster**, **Kaynak** (web ya da API anahtarı, ve anahtarın adı) ve bir tarih aralığı.
+- *Reddedilen her şey*: Sonuç = `denied`. *Okunan her secret değeri*: Aksiyon = `secret.reveal`.
+
+## Bir olayı okuma {/* #reading-an-event */}
+
+| Alan | Örnek | Anlamı |
+|---|---|---|
+| aksiyon | `deployment.restart` | `<resource type>.<verb>` |
+| sonuç, neden | `denied`, `forbidden` | ne olduğu ve neden reddedildiği ya da başarısız olduğu (`forbidden`, `feature_disabled`, `admin_only`, `k8s_forbidden`, `not_found`, `conflict`, `invalid`, `api_access_policy`, …) |
+| kullanıcı, hesap kaynağı | `alice`, `local` | kim, ve hesabın nereden giriş yaptığı |
+| cluster, namespace, kaynak | `prod-eu`, `shop`, `deployment storefront` | hedef; cluster, aksiyonun **çalıştığı** cluster'dır |
+| ayrıntılar | `replicas_from: 3`, `replicas_to: 2` | aksiyona özgü, tipli bilgiler; asla bir secret değeri ya da YAML gövdesi içermez |
+| kaynak IP, user agent, istek ID | `10.0.0.5`, `curl/8.7.1`, `oFvL68…` | nereden |
+| API anahtarı | `claude-code` | aksiyon bir API anahtarıyla yapıldıysa dolu |
+
+Bir satırdaki **Ayrıntılar** bunları gösterir. Tüm alanlar ve tüm ayrıntı anahtarları:
+[Denetim olayları](/reference/audit-events).
+
+Kullanıcılar, gruplar, roller, rol izinleri ve LDAP, Azure AD, oturum ve logo ayarlarındaki yönetici değişiklikleri
+her cevap için bir olay yazar: `success`, `denied` (yönetici olmayan biri, neden `admin_only`) ya da neden olarak
+cevabın kodunu taşıyan `failed` (`not_found`, `invalid_id`, `weak_password`, …); yani reddedilen ya da başarısız
+olan bir değişiklik de logda olur. İsteğin kendisi hatalı olduğu için reddedilen bir cluster değişikliği (aralık dışı
+replika sayısı, ayrıştırılamayan ya da başka bir nesneyi adlandıran YAML, boş komut, anahtar adı olmadan
+`secret.reveal`) `failed` olur, nedeni `invalid`. Bir nesnenin YAML'ını açmak bir okumadır (`pod.get`, `deployment.get`,
+`configmap.get`, …). Hesap hâlâ parolasını değiştirmek zorunda olduğu için reddedilen bir istek `denied` olur.
+
+Audit'e yazılmayanlar: UI'nin kendiliğinden çektiği listeler (Panel'in 10 saniyelik yenilemesi, komut paletinin ve rol
+düzenleyicisinin arkasındaki namespace listesi; bunlar `X-OpenConsole-Refresh: auto` gönderir. API anahtarıyla bu başlık
+yok sayılır, yani anahtarla yapılan her okuma audit'e yazılır) ve hiçbir cluster
+kaynağı okumayan çağrılar (`/api/auth/me`, `/api/features`, …). Stdout'taki istek logunda yine de her istek bulunur.
+
+## Bir olaydan istek loguna {/* #from-an-event-to-the-request-log */}
+
+Her HTTP yanıtı bir `X-Request-Id` header'ı taşır. Aynı ID olayın *istek ID*'sidir ve OpenConsole'un stdout'undaki
+`http.request` satırında da geçer (tracing açıksa `trace_id` de). HTTP durumunu, süreyi ve aynı isteğin diğer
+satırlarını görmek için log platformunuzda bu ID'yi arayın.
+
+## CSV {/* #csv */}
+
+**CSV olarak dışa aktar**, filtrelerin gösterdiğini en yeniden başlayarak en fazla 50 000 satır olarak dışa aktarır; her alan bir sütundur (ayrıntılar JSON olarak, artı
+`api_key_name`); daha eskileri için filtreleri daraltın. Her dışa aktarma da audit'e yazılır. Erişim gözden geçirmeleri için Kullanıcılar ve Gruplar'ın CSV'sini
+de ekleyin ([Kullanıcılar ve gruplar](/administration/users#access-reviews)).
+
+Denetim logu yalnızca yöneticilere açıktır; yönetici olmayanlara açmak için bkz.
+[Tarifler → Denetçiler](/administration/recipes#auditors-read-only-no-secrets-audit-from-outside).

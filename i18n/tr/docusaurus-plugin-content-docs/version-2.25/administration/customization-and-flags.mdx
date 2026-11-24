@@ -1,0 +1,48 @@
+---
+title: "Özelleştirme ve özellik bayrakları"
+description: "Giriş sayfasında ve üst barda kendi logonuz; FEATURE_* değişkenleriyle bir özelliği herkes için kapatma."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Özelleştirme ve özellik bayrakları
+
+## Logo {/* #logo */}
+
+**Yönetim → Özelleştirme**: **Logo seç**, ardından **Logo yükle** (PNG ya da SVG, 5 MB'a kadar). Giriş sayfasında
+görünür. **Logoyu kaldır** varsayılana döner.
+
+<Screenshot id="admin-customization" alt="Yönetim → Özelleştirme: Logo seç, Logo yükle ve Logoyu kaldır düğmeleriyle Giriş Logosu" />
+
+## Özellik bayrakları {/* #feature-flags */}
+
+**Yapmak istediğiniz:** bir özelliği bir süre, roller ne derse desin herkese kapalı tutmak; örneğin bir inceleme
+bitene kadar production'da pod shell açılmasın.
+
+Deployment'ta değişkeni `false` (ya da `0` / `no`) yapın ve pod'u restart edin; değişken tanımlı değilse ya da başka
+bir değerdeyse özellik açık kalır.
+
+| Değişken | Kapattığı özellik (yöneticiler dahil herkes için) |
+|---|---|
+| `FEATURE_POD_EXEC` | pod shell ve tek komutluk exec (`pods:exec`) |
+| `FEATURE_YAML_EDIT` | Secret'lar dışındaki her türde YAML düzenleme / uygulama (`{kind}:edit`) |
+| `FEATURE_WORKLOAD_ACTIONS` | Deployment restart ve scale, StatefulSet scale |
+| `FEATURE_SECRETS` | Secret'lar sekmesinin tamamı (tüm `secrets:*`) |
+| `FEATURE_SECRET_REVEAL` | secret değerlerini gösterme (`secrets:reveal`) |
+| `FEATURE_SECRET_EDIT` | Secret düzenleme (`secrets:edit`) |
+| `FEATURE_API_KEYS` | API anahtarları: sayfa, uçları ve anahtarla giriş (401) |
+
+Kapatılan bir özellik UI'den kaybolur; uçları 403 `feature_disabled` döner ve `denied` bir audit olayı yazar.
+`GET /api/features` güncel durumu gösterir; açılış logu da nelerin kapalı olduğunu listeler.
+
+[Kubernetes'e kurulum](/installation/kubernetes) sayfasındaki kustomization'da değişkeni patch'in `env:` listesine
+ekleyin:
+
+```yaml
+env:
+  - name: FEATURE_POD_EXEC
+    value: "false"
+```
+
+Bayraklar kaba bir araçtır. Bir şeyi yalnızca bazı kişilere kapatmak için [rolleri](/administration/roles),
+script'leri ve agent'ları sınırlamak için [API erişim politikasını](/administration/api-access-policy) kullanın.
