@@ -182,7 +182,7 @@ least 8 characters)*. Search this page for the code or the detail. An unknown `/
 | `exec_failed` | 502 | the command could not be started in the container (no such program) |
 | `connection_failed` | 400 | an LDAP / Azure AD **Test connection** or LDAP search failed; `detail` has the directory's message |
 | `not_configured` | 400, 503 | not set up on this server (Azure AD, backups) |
-| `graph_forbidden` / `graph_invalid_client` / `graph_unreachable` | 502 | the Azure AD [directory search](/administration/azure-ad#directory-search) couldn't use Microsoft Graph: the permission `User.Read.All` (Application) or its admin consent is missing / Microsoft refused the client secret (wrong or expired) / network or timeout; `detail` has Microsoft's message |
+| `graph_forbidden` / `graph_invalid_client` / `graph_unreachable` | 502 | the Azure AD [directory search](../administration/azure-ad.mdx#directory-search) couldn't use Microsoft Graph: the permission `User.Read.All` (Application) or its admin consent is missing / Microsoft refused the client secret (wrong or expired) / network or timeout; `detail` has Microsoft's message |
 | `sign_in_failed` | 400, 401, 403, 502 | the Microsoft sign-in failed or doesn't match this account; see [Sign-in fails](#sign-in-fails) |
 | `recording_unavailable` | 503 | a shell that must be recorded (API key) can't be right now ([Recordings](/administration/recordings)) |
 | `internal_error` | 500 | OpenConsole failed; the pod log has the cause under the response's `X-Request-Id` |

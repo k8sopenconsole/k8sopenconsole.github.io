@@ -184,7 +184,7 @@ metotla gelen istek `Allow` header'ıyla `405` `method_not_allowed` cevabı alı
 | `exec_failed` | 502 | komut container'da başlatılamadı (böyle bir program yok) |
 | `connection_failed` | 400 | bir LDAP / Azure AD **Bağlantıyı test et** ya da LDAP araması başarısız oldu; dizinin mesajı `detail`'dedir |
 | `not_configured` | 400, 503 | bu sunucuda ayarlanmamış (Azure AD, yedekler) |
-| `graph_forbidden` / `graph_invalid_client` / `graph_unreachable` | 502 | Azure AD [dizin araması](/administration/azure-ad#directory-search) Microsoft Graph'ı kullanamadı: `User.Read.All` (Application) izni ya da yönetici onayı eksik / Microsoft client secret'ı reddetti (yanlış ya da süresi dolmuş) / ağ ya da zaman aşımı; Microsoft'un mesajı `detail`'dedir |
+| `graph_forbidden` / `graph_invalid_client` / `graph_unreachable` | 502 | Azure AD [dizin araması](../administration/azure-ad.mdx#directory-search) Microsoft Graph'ı kullanamadı: `User.Read.All` (Application) izni ya da yönetici onayı eksik / Microsoft client secret'ı reddetti (yanlış ya da süresi dolmuş) / ağ ya da zaman aşımı; Microsoft'un mesajı `detail`'dedir |
 | `sign_in_failed` | 400, 401, 403, 502 | Microsoft girişi başarısız oldu ya da bu hesaba uymuyor; bkz. [Giriş yapılamıyor](#sign-in-fails) |
 | `recording_unavailable` | 503 | kaydedilmesi gereken bir shell (API anahtarı) şu an kaydedilemiyor ([Kayıtlar](/administration/recordings)) |
 | `internal_error` | 500 | OpenConsole hata verdi; sebep, cevabın `X-Request-Id`'siyle pod logundadır |
