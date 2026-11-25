@@ -18,7 +18,7 @@ description: "Everything OpenConsole does, in one list."
 - **OpenTelemetry tracing** (opt-in): one span per API request, named after its route, with the Kubernetes API calls it made as child spans. Exported over OTLP/HTTP to any collector (Jaeger, Tempo, Elastic APM, …). See [Tracing](/operations/tracing).
 
 ## Workloads shown in the Dashboard {#workloads-shown-in-the-dashboard}
-Pods, Deployments, **DaemonSets**, **StatefulSets**, **HorizontalPodAutoscalers (v2)**, Services, ConfigMaps, **Secrets**, Ingresses, CronJobs, Jobs — card view, list view, label filters, saved views.
+Pods, Deployments, **DaemonSets**, **StatefulSets**, **HorizontalPodAutoscalers (v2)**, Services, ConfigMaps, **Secrets**, Ingresses, CronJobs, Jobs — card view, list view with a column picker (Pod IP off by default, a Service's LoadBalancer IP), label filters, saved views.
 
 ## Write operations (opt-in per role, per namespace) {#write-operations-opt-in-per-role-per-namespace}
 - **Deployment restart** (`deployments:restart`)
@@ -53,6 +53,7 @@ See [API and agents](/api/overview).
 ## UX {#ux}
 - **Light / Dark / System theme** (persisted; respects OS).
 - **Internationalization — English & Turkish** (locale switcher next to the theme toggle; defaults to browser language, persists user override). TR covers nav, Dashboard, Admin, audit, keyboard cheat sheet.
+- **`⌘K` resource search** — the command palette finds Pods, Deployments, StatefulSets, DaemonSets, Services, Ingresses, ConfigMaps, Jobs, CronJobs, HPAs (and nodes, for admins) of the selected cluster by name or by IP (pod, Service, node), narrowed with kubectl short names (`svc web`) and `ns:<name>`; `Enter` opens the drawer or the tab; recently opened resources on top. Only what you may list, never Secrets, read from the informer cache and not audited (`GET /api/search`).
 - **Keyboard-first navigation**: `⌘K` / `Ctrl+K` command palette, `?` cheat sheet, chord shortcuts for nav/theme, `c` cluster switcher, `v` saved views, `e` live events panel, `n` namespace filter focus. TR keyboard positions (`ğ` / `ü` / `.`) are mapped to the US `[` / `]` / `/` by physical key, so the shortcuts don't break on a TR Q layout.
 - **Saved views** — store (cluster, namespace, tab, search, view mode) under a name on the server, so they follow you to any browser; **share** a view with every user.
 - **Keyboard table navigation** — `j` / `k` move through rows of the admin tables, `Enter` opens, `d` deletes (with confirmation), `n` / `p` change page.

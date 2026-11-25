@@ -1,0 +1,68 @@
+---
+title: "Klavye kısayolları"
+description: "Bütün klavye kısayolları, komut paleti ve kaynak araması, Türkçe klavye düzeni."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Klavye kısayolları
+
+**Yapmak istediğiniz:** fare kullanmadan çalışmak.
+
+Uygulamada `?` tam listeyi açar; `⌘K` (Mac) ya da `Ctrl+K` komut paletini açar. Paletten yazarak sayfa, tema,
+namespace ve kaynak bulursunuz ([aşağıda](#find-a-resource)).
+
+"`g` sonra `o`" şu demek: `g`'ye basın, bir saniye içinde de `o`'ya. Bir metin alanına yazarken kısayollar hiç
+tetiklenmez (2.23.0'da YAML editörü bunun istisnası: orada `e` yazmak Canlı olaylar'ı açar).
+
+En çok kullanılanlar:
+
+| Tuşlar | Ne yapar |
+|---|---|
+| `⌘K` / `Ctrl+K` | komut paleti |
+| `g` sonra `d` / `o` / `n` / `a` | Panel / Genel bakış / Node'lar / Yönetim |
+| `[` ve `]` | önceki / sonraki sekme (Panel) ya da bölüm (Yönetim) |
+| `/`, `n` | arama kutusuna, namespace filtresine odaklanır |
+| `e`, `c`, `v` | Canlı olaylar, cluster değiştirici, kayıtlı görünümler |
+| `j` / `k`, `Enter` | tabloda gezinir, satırı açar |
+
+Uygulamanın `?` altında listelediği bütün kısayollar: [Klavye kısayolları referansı](/reference/keyboard-shortcuts).
+
+**Türkçe Q klavye:** kısayollar harfe değil tuşun yerine bakar. Bu yüzden `[` `]` `/`, Türkçe düzende `ğ` `ü` `.`
+tuşlarıdır ve düzen değiştirmeden çalışır.
+
+<Screenshot id="shortcuts" alt="? ile açılan klavye kısayolları listesi" />
+
+## Kaynak bulmak {/* #find-a-resource */}
+
+Palette bir adın en az iki harfini yazın. Sayfa ve namespace'lerin yanında, seçili cluster'ınızda eşleşen kaynakları
+**Kaynaklar** altında listeler: Pod, Deployment, StatefulSet, DaemonSet, Service, Ingress, ConfigMap, Job, CronJob ve
+HPA'lar; admin'ler için node'lar da. Yazdığınızla başlayan adlar önce gelir. Her satırda tür, ad, namespace ve durum
+görünür. `Enter` satırı açar:
+
+- pod, Deployment, StatefulSet ya da DaemonSet, Panel'de ayrıntılarıyla açılır;
+- diğer türler kendi sekmelerinde, arama kutusunda adıyla açılır;
+- node, Node'lar sayfasında açılır.
+
+<Screenshot id="palette-search" alt="ns: shop chip'i ve store metniyle komut paleti: Kaynaklar altında durumlarıyla storefront pod'ları, storefront Deployment'ı, Service'i, Ingress'i, ConfigMap'i ve HPA'sı; Secret yok" />
+
+- **Daraltmak:** önce bir tür ve boşluk yazın: kubectl'in kısa adı (`po`, `deploy`, `sts`, `ds`, `svc`, `cm`, `ing`,
+  `job`, `cj`, `hpa`, node'lar için `no`, namespace'ler için `ns`) ya da türün adı (`service`, `pods`). `svc:web` de
+  olur. `ns:<ad>` ve boşluk, adı bununla başlayan namespace'leri bırakır. Her biri kutuda bir chip olur; ×'i ya da boş
+  kutuda `Backspace` onu kaldırır. `svc-gateway` gibi bir kelime yalnızca addır.
+- **IP ile:** en az bir nokta içeren rakamlar (`10.42.0.7`, `10.42.3.`) IP arar: pod IP'leri; Service'in cluster IP'si,
+  harici IP'leri ve LoadBalancer IP'si; admin'ler için node'ların iç ve dış IP'leri de. Tam IP önce gelir, sonra
+  Service'ler, node'lar ve pod'lar. Noktasız bir sayı (`10`) addır. Artık olmayan bir pod eski IP'siyle bulunmaz.
+- **Son açılanlar:** kutu boşken paletten açtığınız son beş kaynak en üsttedir. Cluster başına, yalnızca bu tarayıcıda
+  tutulur; **Temizle** listeyi boşaltır.
+
+Yalnızca listeleyebildiğinizi bulursunuz: `<kind>:list` izniniz olmayan namespace'ler ve türler dışarıda kalır.
+Secret'lar hiç listelenmez, adları bile; node'lar yalnızca admin'lere. Arama OpenConsole'un cluster kopyasını okur ve
+audit log'a yazılmaz; bir sonucu açmak diğer okumalar gibi audit'e düşer. En çok 30 sonuç görünür: daraltmak için adın
+daha fazlasını yazın. Script'ler ve agent'lar aynı aramayı kullanır: [`GET /api/search`](/api/endpoints/find-resources-by-name-or-ip-on-this-cluster).
+
+:::info[Bulamıyor musunuz?]
+- **Bir kaynak yok**: o namespace'te `<kind>:list` izniniz yok (örn. `services:list`) ya da o bir Secret.
+- **Node yok**: node'ları yalnızca admin'ler bulur.
+- **OpenConsole yeni başladıysa**: bir tür, cluster kopyası yüklenene kadar dışarıda kalır.
+:::

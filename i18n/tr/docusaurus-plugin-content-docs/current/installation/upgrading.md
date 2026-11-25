@@ -26,17 +26,17 @@ değişikliklerini beraberinde getirir ve açılışta eksik olanları uygular.
 
 ```yaml title="kustomization.yaml"
 resources:
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.25.0   # was v2.24.0
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.26.0   # was v2.25.0
 images:
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.25.0"                                                         # was 2.24.0
+    newTag: "2.26.0"                                                         # was 2.25.0
 ```
 
 ```bash
 kubectl diff -k .      # the image tag, plus whatever the release changed in deploy/
 kubectl apply -k .
 kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole --timeout=5m
-kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.25.0"
+kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.26.0"
 ```
 
 Oturumlar geçerli kalır; giriş yapmış kullanıcılar sayfayı yenileyip kaldıkları yerden devam eder. `Recreate` ile
@@ -69,6 +69,16 @@ cluster'da `deploy/` ile birlikte gelir; bağlı diğer her cluster'da yeni `rba
    kullanıcılar, ayarlar) kaybolur.
 
 ## Sürüme özel notlar {#version-notes}
+
+### 2.26'ya yükseltme {#upgrading-to-226}
+
+- Veritabanı değişikliği, yeni ortam değişkeni ya da yeni ClusterRole kuralı yok: yalnızca imaj değişir. Aynı
+  veritabanıyla 2.25'e geri dönmek çalışır.
+- Secret listesi (`GET /api/namespaces/{namespace}/secrets`) artık Helm release Secret'larını (`helm.sh/release.v1`)
+  yalnızca metadata ile okur: `release` anahtarları **`size` olmadan** gelir. Tek bir Secret'ın okuması
+  (`GET …/secrets/{name}`) boyutu hâlâ verir. Boyutu listeden okuyan otomasyonu güncelleyin.
+- Yeni: `GET /api/search` (`⌘K` kaynak araması; [Kaynak bulmak](/user-guide/keyboard-shortcuts#find-a-resource)).
+  Yeni bir izin gerektirmez.
 
 ### 2.25'e yükseltme {#upgrading-to-225}
 

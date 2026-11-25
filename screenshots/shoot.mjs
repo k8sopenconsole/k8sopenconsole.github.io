@@ -51,8 +51,13 @@ try {
       for (const theme of CONFIG.themes) {
         const context = await browser.newContext({viewport: scene.viewport || CONFIG.viewport, reducedMotion: 'reduce', colorScheme: theme});
         await context.routeFromHAR(har, {url: /\/api\//, notFound: 'abort'});
+        // the n-th socket opened on a path gets the n-th recording of it (live log, then the previous
+        // container's), the first one if there are fewer
+        const opened = {};
         await context.routeWebSocket(/\/ws\//, (ws) => {
-          const rec = sockets.find((s) => s.path === new URL(ws.url()).pathname);
+          const path = new URL(ws.url()).pathname;
+          const same = sockets.filter((s) => s.path === path);
+          const rec = same[(opened[path] = (opened[path] ?? -1) + 1)] ?? same[0];
           for (const f of rec?.frames ?? []) ws.send(f.s ?? Buffer.from(f.b, 'base64'));
         });
         await preparePage(context, initStorage({token: scene.as && 'replay', theme, locale, extra: scene.storage}));

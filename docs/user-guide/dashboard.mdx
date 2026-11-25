@@ -34,9 +34,14 @@ header). Cards show the same facts with the action buttons on each card:
 ## Columns {/* #columns */}
 
 In the table, the **⋮** at the right end of the header row chooses which columns show, per tab. *Name* always
-stays; *Reset to default* shows all of them again. The choice is kept in this browser only.
+stays; *Reset to default* goes back to the default columns. The choice is kept in this browser only.
 
-<Screenshot id="dashboard-columns" alt="The column menu open on the Pods tab: checkboxes for Status, Containers, Restarts, Controlled By, CPU, Memory and Age, and Reset to default" />
+- **Pods → Pod IP** is off by default: turn it on here. A dual-stack pod shows both IPs, a pod without one yet `—`.
+  On cards the pod IP is always shown.
+- **Services → LoadBalancer IP** shows the address a LoadBalancer Service got (an IP, or the hostname some clouds
+  give), *Pending* while it has none yet, and `—` for the other types. Cards of LoadBalancer Services show it too.
+
+<Screenshot id="dashboard-columns" alt="The column menu open on the Pods tab: checkboxes for Status, Containers, Restarts, Controlled By, Pod IP (off), CPU, Memory and Age, and Reset to default" />
 
 ## Search and label filters {/* #search-and-label-filters */}
 
@@ -46,15 +51,19 @@ the cards find the same rows:
 
 | Tab | Also matched |
 |---|---|
-| Pods | status, container names, *Controlled By* (kind and name) |
+| Pods | status, container names, *Controlled By* (kind and name), the pod IP while it shows (below) |
 | Deployments, StatefulSets, DaemonSets | status, replicas (`2/3`) |
-| Services | type, cluster IP, external IPs, ports (`80`, `8080/TCP`, target port, node port, port name) |
+| Services | type, cluster IP, LoadBalancer IP, external IPs, ports (`80`, `8080/TCP`, target port, node port, port name) |
 | ConfigMaps, Secrets | key names, secret type |
 | Ingresses | hosts and paths |
 | CronJobs, Jobs | schedule, status |
 | HPAs | target (`Deployment/web`), min / max |
 
-Ages, restarts, CPU, memory and things that aren't columns (node, pod IP, image) are not searched.
+Ages, restarts, CPU, memory and things that aren't columns (node, image) are not searched. The pod IP is searched
+only where you see it: always on cards, in the table while the *Pod IP* column is on. So `10` doesn't match every
+pod, and with the column off the table and the cards can find different rows.
+
+To find something in another namespace, use `⌘K` ([Find a resource](/user-guide/keyboard-shortcuts#find-a-resource)).
 
 `label:key=value` keeps the objects with that label value, `label:key` the ones that have the label at all. Combine
 them with words: `label:tier=web storefront`.

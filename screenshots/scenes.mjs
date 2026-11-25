@@ -62,6 +62,14 @@ export const SCENES = [
       await page.keyboard.type('label:tier=web');
       await page.waitForTimeout(300);
     }},
+  {id: 'palette-search', as: 'alice', storage: shop('pods'),
+    run: async (page) => {
+      await row(page, 'catalog-').waitFor();
+      await page.keyboard.press('Control+k');
+      await page.keyboard.type('ns:shop store');
+      await dialog(page).getByText('storefront-config', {exact: true}).waitFor();
+      await page.waitForTimeout(300);
+    }},
   {id: 'cluster-switcher', as: 'alice', storage: shop('pods'),
     run: async (page) => {
       await row(page, 'catalog-').waitFor();

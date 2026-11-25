@@ -1,23 +1,50 @@
 {
- "time": 1795531429624,
+ "time": 1795605216151,
  "sockets": [
   {
-   "path": "/ws/namespaces/shop/pods/storefront-84fc6d7d6c-4pg86/exec",
+   "path": "/ws/namespaces/shop/pods/storefront-84fc6d7d6c-5gn92/exec",
    "frames": [
     {
      "s": "{\"type\":\"session\",\"idleTimeoutSeconds\":300}"
     },
     {
-     "s": "{\"type\":\"recording\",\"enabled\":true,\"sessionId\":\"e4b21e8c-41fb-47a0-a21c-b7b35d488c88\"}"
+     "s": "{\"type\":\"recording\",\"enabled\":true,\"sessionId\":\"8f4931d5-679e-4aa4-87bf-c7617bc10994\"}"
     },
     {
-     "b": "DQpob3N0bmFtZSAmJiBscyAvDQo="
+     "b": "DQo="
     },
     {
-     "b": "cm9vdEBzdG9yZWZyb250LTg0ZmM2ZDdkNmMtNHBnODY6LyMgDQo="
+     "b": "cm9vdEBzdG9yZWZyb250LTg0ZmM2ZDdkNmMtNWduOTI6LyMgDQo="
     },
     {
-     "b": "cm9vdEBzdG9yZWZyb250LTg0ZmM2ZDdkNmMtNHBnODY6LyMgaG9zdG5hbWUgJiYgbHMgLw0K"
+     "b": "cm9vdEBzdG9yZWZyb250LTg0ZmM2ZDdkNmMtNWduOTI6LyMg"
+    },
+    {
+     "b": "aA=="
+    },
+    {
+     "b": "bw=="
+    },
+    {
+     "b": "c3Q="
+    },
+    {
+     "b": "bg=="
+    },
+    {
+     "b": "YW1lIA=="
+    },
+    {
+     "b": "JiYgbHMgLw0K"
+    },
+    {
+     "b": "c3RvcmVmcm9udC04NGZjNmQ3ZDZjLTVnbjkyDQo="
+    },
+    {
+     "b": "G1sxOzM0bWJpbhtbbSAgICAbWzE7MzRtZGV2G1ttICAgIBtbMTszNG1ldGMbW20gICAgG1sxOzM0bWhvbWUbW20gICAbWzE7MzRtbGliG1ttICAgIBtbMTszNm1saWI2NBtbbSAgG1sxOzM0bXByb2MbW20gICAbWzE7MzRtcm9vdBtbbSAgIBtbMTszNG1zeXMbW20gICAgG1sxOzM0bXRtcBtbbSAgICAbWzE7MzRtdXNyG1ttICAgIBtbMTszNG12YXIbW20NCg=="
+    },
+    {
+     "b": "cm9vdEBzdG9yZWZyb250LTg0ZmM2ZDdkNmMtNWduOTI6LyMg"
     }
    ]
   }

@@ -35,9 +35,14 @@ Aramanın yanındaki iki düğme tablo ile kartlar arasında geçiş yapar. Tabl
 ## Sütunlar {/* #columns */}
 
 Tabloda, başlık satırının sağ ucundaki **⋮**, hangi sütunların görüneceğini sekme sekme seçer. *Ad* her zaman
-kalır; *Varsayılana dön* hepsini yeniden gösterir. Seçim yalnızca bu tarayıcıda saklanır.
+kalır; *Varsayılana dön* varsayılan sütunlara döner. Seçim yalnızca bu tarayıcıda saklanır.
 
-<Screenshot id="dashboard-columns" alt="Pod'lar sekmesinde açık sütun menüsü: Durum, Container'lar, Restart, Sahibi, CPU, Memory ve Yaş onay kutuları ve Varsayılana dön" />
+- **Pod'lar → Pod IP** varsayılan olarak kapalıdır: buradan açın. Çift yığınlı (dual-stack) bir pod iki IP'yi de
+  gösterir, henüz IP'si olmayan bir pod `—`. Kartlarda pod IP'si her zaman görünür.
+- **Servisler → LoadBalancer IP**, bir LoadBalancer Service'in aldığı adresi gösterir (IP ya da bazı bulutların
+  verdiği hostname); henüz yoksa *Bekliyor*, diğer tiplerde `—`. LoadBalancer Service'lerin kartlarında da görünür.
+
+<Screenshot id="dashboard-columns" alt="Pod'lar sekmesinde açık sütun menüsü: Durum, Container'lar, Restart, Sahibi, Pod IP (kapalı), CPU, Memory ve Yaş onay kutuları ve Varsayılana dön" />
 
 ## Arama ve label filtreleri {/* #search-and-label-filters */}
 
@@ -47,15 +52,19 @@ sütunlar da dahil. Böylece tablo ve kartlar aynı satırları bulur:
 
 | Sekme | Ayrıca eşleşenler |
 |---|---|
-| Pod'lar | durum, container adları, *Sahibi* (tür ve ad) |
+| Pod'lar | durum, container adları, *Sahibi* (tür ve ad), görünürken pod IP'si (aşağıda) |
 | Deployment'lar, StatefulSet'ler, DaemonSet'ler | durum, replikalar (`2/3`) |
-| Servisler | tip, cluster IP, harici IP'ler, portlar (`80`, `8080/TCP`, hedef port, node port, port adı) |
+| Servisler | tip, cluster IP, LoadBalancer IP, harici IP'ler, portlar (`80`, `8080/TCP`, hedef port, node port, port adı) |
 | ConfigMap'ler, Secret'lar | anahtar adları, secret tipi |
 | Ingress'ler | host'lar ve path'ler |
 | CronJob'lar, Job'lar | zamanlama, durum |
 | HPA'lar | hedef (`Deployment/web`), min / maks |
 
-Yaş, restart, CPU, memory ve sütun olmayan bilgiler (node, pod IP, imaj) aranmaz.
+Yaş, restart, CPU, memory ve sütun olmayan bilgiler (node, imaj) aranmaz. Pod IP'si yalnızca göründüğü yerde aranır:
+kartlarda her zaman, tabloda *Pod IP* sütunu açıkken. Böylece `10` her pod'la eşleşmez; sütun kapalıyken tablo ve
+kartlar farklı satırlar bulabilir.
+
+Başka bir namespace'te bir şey bulmak için `⌘K` kullanın ([Kaynak bulmak](/user-guide/keyboard-shortcuts#find-a-resource)).
 
 `label:key=value` o label değerine sahip nesneleri, `label:key` ise o label'ı taşıyan tüm nesneleri bırakır.
 Kelimelerle birlikte kullanabilirsiniz: `label:tier=web storefront`.

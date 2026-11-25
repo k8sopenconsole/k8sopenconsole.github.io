@@ -56,6 +56,9 @@ Navigation and screens (UI path separators stay `→`):
 | Recordings / Session recordings / Recording settings | Kayıtlar / Oturum kayıtları / Kayıt ayarları |
 | Keyboard shortcuts | Klavye kısayolları |
 | Command palette | Komut paleti |
+| Resources / Recently opened (palette groups) | Kaynaklar / Son açılanlar |
+| Clear (recently opened) | Temizle |
+| Pod IP / LoadBalancer IP (columns) | Pod IP / LoadBalancer IP |
 | Live events | Canlı olaylar |
 | Saved views / Views | Kayıtlı görünümler / Görünümler |
 | Restart history | Restart geçmişi |

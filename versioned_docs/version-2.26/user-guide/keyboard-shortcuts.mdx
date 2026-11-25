@@ -1,0 +1,69 @@
+---
+title: "Keyboard shortcuts"
+description: "Every keyboard shortcut, the command palette and its resource search, and the Turkish keyboard layout."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Keyboard shortcuts
+
+**You want to:** work without the mouse.
+
+`?` opens the full list in the app; `⌘K` (Mac) or `Ctrl+K` opens the command palette, which finds pages, themes,
+namespaces and resources by typing ([below](#find-a-resource)).
+
+"`g` then `o`" means: press `g`, then `o` within a second. Shortcuts never fire while you type in a text field (in 2.23.0 the YAML editor is the exception: typing `e` there
+opens Live Events instead).
+
+The most used ones:
+
+| Keys | Does |
+|---|---|
+| `⌘K` / `Ctrl+K` | command palette |
+| `g` then `d` / `o` / `n` / `a` | Dashboard / Overview / Nodes / Admin |
+| `[` and `]` | previous / next tab (Dashboard) or section (Admin) |
+| `/`, `n` | focus the search box, the namespace filter |
+| `e`, `c`, `v` | Live Events, cluster switcher, saved views |
+| `j` / `k`, `Enter` | move in a table, open the row |
+
+Every shortcut, as the app lists it under `?`: [Keyboard shortcuts reference](/reference/keyboard-shortcuts).
+
+**Turkish Q keyboard:** the shortcuts follow the key's position, not its letter, so `[` `]` `/` are the keys `ğ` `ü`
+`.` on a Turkish layout, and they work without switching layouts.
+
+<Screenshot id="shortcuts" alt="The keyboard shortcut list opened with ?" />
+
+## Find a resource {/* #find-a-resource */}
+
+Type two or more letters of a name in the palette. Besides pages and namespaces it lists the matching resources of
+your current cluster under **Resources**: Pods, Deployments, StatefulSets, DaemonSets, Services, Ingresses,
+ConfigMaps, Jobs, CronJobs and HPAs, and nodes for admins. Names that start with what you typed come first. Each row
+shows the kind, the name, the namespace and the status. `Enter` opens the row:
+
+- a pod, Deployment, StatefulSet or DaemonSet opens its details on the Dashboard;
+- the other kinds open their tab with the name in the search box;
+- a node opens on the Nodes page.
+
+<Screenshot id="palette-search" alt="The command palette with the chip ns: shop and the text store: under Resources the storefront pods with their status, the storefront Deployment, Service, Ingress, ConfigMap and HPA, and no Secret" />
+
+- **Narrow it down:** start with a kind and a space: kubectl's short name (`po`, `deploy`, `sts`, `ds`, `svc`, `cm`,
+  `ing`, `job`, `cj`, `hpa`, `no` for nodes, `ns` for namespaces) or the kind's name (`service`, `pods`). `svc:web`
+  works too. `ns:<name>` and a space keeps the namespaces whose name starts with it. Each becomes a chip in the box;
+  its × or `Backspace` in the empty box removes it. A word like `svc-gateway` is just a name.
+- **By IP:** digits with at least one dot (`10.42.0.7`, `10.42.3.`) search IPs: pod IPs; a Service's cluster IP,
+  external IPs and LoadBalancer IP; for admins also the nodes' internal and external IPs. The exact IP comes first,
+  then Services, nodes and pods. A number without a dot (`10`) is a name. A pod that no longer exists isn't found by
+  its old IP.
+- **Recently opened:** while the box is empty, the last five resources you opened from the palette are on top. They
+  are kept per cluster, in this browser only; **Clear** empties the list.
+
+You find only what you may list: namespaces and kinds where you don't hold `<kind>:list` stay out. Secrets are never
+listed, not even their names, and nodes only for admins. The search reads OpenConsole's copy of the cluster and is
+not written to the audit log; opening a result is audited like any other read. At most 30 results show: type more of
+the name to narrow them down. Scripts and agents use the same search: [`GET /api/search`](/api/endpoints/find-resources-by-name-or-ip-on-this-cluster).
+
+:::info[Can't find it?]
+- **A resource is missing**: you don't hold `<kind>:list` in its namespace (e.g. `services:list`), or it is a Secret.
+- **No nodes**: only admins find nodes.
+- **Right after OpenConsole started**: a kind is left out until its copy of the cluster has loaded.
+:::
