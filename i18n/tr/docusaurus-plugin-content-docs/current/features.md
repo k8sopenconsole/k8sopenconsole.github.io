@@ -18,7 +18,7 @@ description: "OpenConsole'un yaptığı her şey, tek listede."
 - **OpenTelemetry tracing** (isteğe bağlı açılır): her API isteği için, route'unun adını taşıyan bir span; isteğin yaptığı Kubernetes API çağrıları da alt span olarak. OTLP/HTTP üzerinden herhangi bir collector'a (Jaeger, Tempo, Elastic APM, …) gönderilir. Bkz. [Tracing](/operations/tracing).
 
 ## Panel'de gösterilen iş yükleri {#workloads-shown-in-the-dashboard}
-Pod'lar, Deployment'lar, **DaemonSet'ler**, **StatefulSet'ler**, **HorizontalPodAutoscaler'lar (v2)**, Service'ler, ConfigMap'ler, **Secret'lar**, Ingress'ler, CronJob'lar, Job'lar — kart görünümü, liste görünümü, label filtreleri, kayıtlı görünümler.
+Pod'lar, Deployment'lar, **DaemonSet'ler**, **StatefulSet'ler**, **HorizontalPodAutoscaler'lar (v2)**, Service'ler, ConfigMap'ler, **Secret'lar**, Ingress'ler, CronJob'lar, Job'lar — sütun seçicili (Pod IP varsayılan kapalı, Service'in LoadBalancer IP'si) liste görünümü, kart görünümü, liste görünümü, label filtreleri, kayıtlı görünümler.
 
 ## Yazma işlemleri (rol ve namespace bazında, yalnızca verilirse) {#write-operations-opt-in-per-role-per-namespace}
 - **Deployment restart** (`deployments:restart`)
@@ -53,6 +53,7 @@ Bkz. [API ve agent'lar](/api/overview).
 ## Kullanıcı deneyimi {#ux}
 - **Açık / Koyu / Sistem teması** (kalıcı; işletim sistemine uyar).
 - **Çoklu dil — İngilizce ve Türkçe** (dil seçici, tema düğmesinin yanında; varsayılan tarayıcı dilidir, kullanıcının seçimi saklanır). TR; navigasyonu, Panel'i, Yönetim'i, audit'i ve klavye kısayolları listesini kapsar.
+- **`⌘K` kaynak araması** — komut paleti, seçili cluster'daki Pod, Deployment, StatefulSet, DaemonSet, Service, Ingress, ConfigMap, Job, CronJob ve HPA'ları (admin'ler için node'ları da) adla ya da IP ile (pod, Service, node) bulur; kubectl kısa adlarıyla (`svc web`) ve `ns:<ad>` ile daraltılır; `Enter` paneli ya da sekmeyi açar; son açılan kaynaklar en üstte. Yalnızca listeleyebildikleriniz, Secret'lar asla; informer önbelleğinden okunur ve audit'e yazılmaz (`GET /api/search`).
 - **Klavye öncelikli gezinme**: `⌘K` / `Ctrl+K` komut paleti, `?` kısayol listesi, navigasyon / tema için akor kısayolları, `c` cluster seçici, `v` kayıtlı görünümler, `e` canlı olaylar paneli, `n` namespace filtresine odak. TR klavyedeki tuşlar (`ğ` / `ü` / `.`) fiziksel konuma göre US `[` / `]` / `/` tuşlarına eşlenir; böylece kısayollar TR Q düzeninde bozulmaz.
 - **Kayıtlı görünümler** — (cluster, namespace, sekme, arama, görünüm modu) bilgisini bir adla sunucuda saklayın; hangi tarayıcıya geçerseniz geçin sizinle gelir. Bir görünümü tüm kullanıcılarla **paylaşın**.
 - **Tabloda klavyeyle gezinme** — `j` / `k` yönetim tablolarında satırlar arasında gezer, `Enter` açar, `d` siler (onay ister), `n` / `p` sayfa değiştirir.

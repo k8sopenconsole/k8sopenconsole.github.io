@@ -1,0 +1,83 @@
+---
+title: "Two-factor authentication"
+description: "Sign in with a code from an authenticator app as well as your password: set it up, use recovery codes, change phones."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Two-factor authentication
+
+**You want to:** protect your account so that your password alone isn't enough to sign in.
+
+With two-factor authentication on, sign-in asks for a 6-digit code from an authenticator app on your phone
+(Microsoft Authenticator, Google Authenticator, 1Password, …) after your password. It is for **local** and **LDAP**
+accounts. If you sign in with Microsoft, your organization's Microsoft account settings decide the second factor.
+
+Your admin decides whether it is offered at all, and whether it is required for you
+([Admin → Two-factor authentication](../administration/two-factor.mdx)).
+
+## Set it up {/* #set-it-up */}
+
+Account menu (your name, top right) → **Two-factor authentication** → **Set up**. If your admin requires it and you
+haven't set it up yet, OpenConsole shows **Set up two-factor authentication** right after you sign in, and nothing
+else until you have done it (the only other button is **Sign out**).
+
+<Screenshot id="two-factor-enroll" alt="Set up two-factor authentication: the QR code for the authenticator app, the key to enter by hand with Copy, and the code field with Turn on" />
+
+1. **Scan the QR code** with your authenticator app. Can't scan? Enter the key shown under it in the app.
+2. **Enter the 6-digit code** the app shows and press **Turn on**.
+3. **Save the recovery codes.** OpenConsole shows ten **Recovery codes** once: **Copy** or **Download** them and keep
+   them somewhere safe, such as a password manager. Then **I saved them**.
+
+Turning it on signs you out of every other browser; this one stays signed in.
+
+## Sign in with a code {/* #sign-in-with-a-code */}
+
+<Screenshot id="login-code" alt="The sign-in page's code step: Two-factor authentication, the Code field, Verify, Use a recovery code and Back to sign-in" />
+
+After your password, enter the 6-digit code from the app and press **Verify**. The step lasts 5 minutes; after that
+(*The sign-in took too long. Enter your password again.*) you start again with the password. **Back to sign-in**
+leaves it.
+
+- **No phone at hand?** **Use a recovery code**, enter one of your recovery codes and **Verify**. Each code works once.
+  After such a sign-in OpenConsole opens your two-factor page, which says how many unused codes are left.
+- A code works **once**: wait for the app's next one if a code was refused right after you used it.
+- Wrong codes count like wrong passwords: after several the account is locked for 5 minutes
+  ([Signing in](/user-guide/signing-in#which-account)). After 10 wrong codes in a row the code step is locked as well:
+  15 minutes the first time, twice as long each time after that, at most 24 hours. The right code, or a reset by your
+  admin, ends it.
+
+## Your two-factor page {/* #your-two-factor-page */}
+
+<Screenshot id="two-factor-account" alt="Two-factor authentication page: status On, 10 unused recovery codes left, New recovery codes and Turn off" />
+
+Account menu → **Two-factor authentication** shows its status (**On** / **Off**) and how many recovery codes are left.
+
+- **New recovery codes**: enter a code from the app; ten new codes replace the old ones, which stop working. Do this
+  when few are left (the page warns at two).
+- **Turn off**: enter a code from the app or a recovery code. When your admin requires two-factor authentication for
+  you, there is no **Turn off** (*Your administrator requires two-factor authentication for your account.*).
+
+## Changing phones {/* #changing-phones */}
+
+- **Most apps move their accounts to a new phone** (backup, export or sync): then nothing changes in OpenConsole.
+- **Not required for you:** on the old phone, or with a recovery code, **Turn off**; then **Set up** again with the
+  new phone.
+- **Required for you, the old phone is gone:** sign in with a recovery code and ask your admin to
+  [reset your two-factor authentication](/administration/users#edit-reset-disable-delete); you set it up again at your
+  next sign-in.
+- **No phone and no recovery codes:** ask your admin to reset it.
+
+## API keys {/* #api-keys */}
+
+[API keys](/user-guide/api-keys) don't ask for a code: they keep working whatever the policy. Setting up, changing
+and turning off two-factor authentication works only in the browser, never with an API key.
+
+:::info[Code not accepted?]
+- *The code is wrong or was used already.*: check that the phone's clock is set automatically. OpenConsole accepts the
+  current code and the one 30 seconds before or after it; a phone whose clock is further off gives codes that never
+  work.
+- No **Two-factor authentication** in your account menu: your admin hasn't turned it on (policy *Off*), or you sign in
+  with Microsoft.
+- Locked out with no recovery codes: your admin resets it under Admin → Users.
+:::

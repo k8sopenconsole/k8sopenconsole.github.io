@@ -1,0 +1,61 @@
+---
+title: "Giriş yapma"
+description: "Yerel, LDAP ya da Microsoft hesabıyla giriş yapın; parolanızı, dili ve temayı değiştirin."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# Giriş yapma
+
+**Yapmak istediğiniz:** OpenConsole'u açıp çalışmaya başlamak.
+
+<Screenshot id="login" alt="Giriş sayfası: Kullanıcı adı ve Parola alanları ve Giriş yap düğmesi" />
+
+## Hangi hesap {/* #which-account */}
+
+Nasıl giriş yapacağınızı yöneticiniz söyler. Giriş sayfası üçü için de aynıdır:
+
+| Hesabınız | Nasıl giriş yaparsınız |
+|---|---|
+| **Yerel** | kullanıcı adı ve parola; ikisi de OpenConsole'da tanımlanır |
+| **LDAP / Active Directory** | dizindeki kullanıcı adınız ve parolanız, aynı forma yazılır; OpenConsole bunları dizine karşı doğrular |
+| **Azure AD (Entra ID)** | **Microsoft ile giriş yap** düğmesi; yöneticiniz açtıysa görünür |
+
+Başarısız bir giriş, nedeni ne olursa olsun hep aynı mesajı verir. Bir hesap için aynı adresten art arda beş
+başarısız deneme, hesabı beş dakika kilitler.
+
+Hesabınızda [iki adımlı doğrulama](./two-factor.mdx) açıksa paroladan sonra bir **Kod** adımı gelir: doğrulama
+uygulamanızdaki 6 haneli kodu girin ya da **Kurtarma kodu kullan**'a basın. Yöneticiniz zorunlu kıldıysa ve henüz
+kurmadıysanız OpenConsole girişten hemen sonra kurmanızı ister.
+
+## Parolanız {/* #your-password */}
+
+- Parolanızı yöneticiniz belirlediyse ya da sıfırladıysa, onu yalnızca sizin bildiğiniz bir parolayla değiştirin
+  (hesap menüsünden, aşağıda). Sıfırlamadan sonra OpenConsole bunu çoğu zaman kendisi ister. Parola değiştirince
+  oturumunuz kapanır; yeni parolayla tekrar giriş yapın.
+- Daha sonra hesap menüsünden (sağ üstte adınız) değiştirebilirsiniz. Bu, diğer her yerdeki oturumlarınızı da kapatır.
+- Parolalar en az 8 karakterdir (yöneticiniz daha fazlasını isteyebilir).
+- LDAP ve Microsoft hesapları parolalarını burada değil, dizinde değiştirir.
+
+## Oturumunuz ne kadar sürer {/* #how-long-you-stay-signed-in */}
+
+Oturum varsayılan olarak 60 dakika sürer (yöneticiniz başka bir değer verebilir). Süre dolunca giriş sayfasına
+dönersiniz. **Çıkış** (sağ üstte) oturumu hemen kapatır.
+
+## Dil ve tema {/* #language-and-theme */}
+
+- **Dil**: üst çubuktaki ve giriş sayfasının sağ üst köşesindeki **EN / TR** düğmesi. OpenConsole kaydedilmiş
+  seçiminizi (tarayıcıda tutulur), yoksa İngilizce ya da Türkçe ise tarayıcınızın dilini, o da değilse İngilizceyi
+  kullanır.
+- **Tema**: üst çubuktaki güneş / ay / ekran düğmeleri; açık, koyu ya da sisteminizin ayarı için. Ya da `t l`,
+  `t d`, `t s` tuşları.
+
+:::info[Giriş yapamıyor musunuz?]
+- *Giriş başarısız. Lütfen bilgilerini kontrol et.* mesajı devre dışı ya da kilitli hesap için de çıkar. Birkaç
+  başarısız denemeden sonra beş dakika bekleyin, sonra yöneticinizden hesabınızın aktif olduğunu ve doğru yoldan
+  (yerel, LDAP ya da Microsoft) giriş yaptığınızı kontrol etmesini isteyin.
+- **Microsoft ile giriş yap**'tan sonra *Microsoft hesabınızda MFA yapılmadı; …*: yöneticiniz Microsoft girişlerinde
+  MFA'yı zorunlu tutuyor; MFA'nın Entra'da zorunlu kılınması gerekir ([Azure AD](../administration/azure-ad.mdx#require-mfa)).
+- Kod kabul edilmiyor: bkz. [İki adımlı doğrulama](./two-factor.mdx) (telefon saati, bir kod bir kez çalışır).
+- Giriş yapıyorsunuz ama hiç namespace görmüyorsunuz: henüz rolü olan bir grupta değilsiniz. Bkz. [Cluster ve namespace seçme](/user-guide/cluster-and-namespace).
+:::

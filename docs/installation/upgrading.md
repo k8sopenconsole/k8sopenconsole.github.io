@@ -26,17 +26,17 @@ Change the version in both places of your `kustomization.yaml` and apply it:
 
 ```yaml title="kustomization.yaml"
 resources:
-  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.25.0   # was v2.24.0
+  - https://github.com/vurulkan/kubernetes-openconsole//deploy?ref=v2.26.0   # was v2.25.0
 images:
   - name: ghcr.io/vurulkan/kubernetes-openconsole
-    newTag: "2.25.0"                                                         # was 2.24.0
+    newTag: "2.26.0"                                                         # was 2.25.0
 ```
 
 ```bash
 kubectl diff -k .      # the image tag, plus whatever the release changed in deploy/
 kubectl apply -k .
 kubectl -n kubernetes-openconsole rollout status deploy/kubernetes-openconsole --timeout=5m
-kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.25.0"
+kubectl -n kubernetes-openconsole logs deploy/kubernetes-openconsole | head -3   # "version":"2.26.0"
 ```
 
 Sessions stay valid, so signed-in users carry on after a page reload. With `Recreate` the console is unavailable
@@ -68,6 +68,16 @@ cluster OpenConsole runs in; on every other connected cluster apply the new `rba
    you took before the upgrade. Everything since the backup (audit events, users, settings) is lost.
 
 ## Version notes {#version-notes}
+
+### Upgrading to 2.26 {#upgrading-to-226}
+
+- No database change, no new environment variable, no new ClusterRole rule: only the image changes. Going back to
+  2.25 works with the same database.
+- The Secrets list (`GET /api/namespaces/{namespace}/secrets`) now reads Helm release Secrets
+  (`helm.sh/release.v1`) as metadata only: their key `release` comes **without `size`**. One Secret's read
+  (`GET …/secrets/{name}`) still has it. Update automation that reads the size from the list.
+- New: `GET /api/search` (the `⌘K` resource search; [Find a resource](/user-guide/keyboard-shortcuts#find-a-resource)).
+  It needs no new permission.
 
 ### Upgrading to 2.25 {#upgrading-to-225}
 

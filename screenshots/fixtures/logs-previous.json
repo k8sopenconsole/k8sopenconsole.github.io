@@ -1,25 +1,24 @@
 {
- "time": 1795533045366,
+ "time": 1795605288558,
  "sockets": [
   {
-   "path": "/ws/namespaces/shop/pods/catalog-79b9cb9459-pk4sf/logs",
-   "frames": [
-    {
-     "s": "{\"t\":\"line\",\"ts\":\"2026-11-24T15:09:47.665607707Z\",\"c\":\"catalog\",\"text\":\"catalog 3.4.1 starting\"}\n"
-    },
-    {
-     "s": "{\"t\":\"line\",\"ts\":\"2026-11-24T15:09:47.665916768Z\",\"c\":\"catalog\",\"text\":\"connecting to postgres:5432\"}\n"
-    },
-    {
-     "s": "{\"t\":\"line\",\"ts\":\"2026-11-24T15:09:49.669748776Z\",\"c\":\"catalog\",\"text\":\"error: dial tcp postgres:5432: connection refused\"}\n"
-    }
-   ]
+   "path": "/ws/namespaces/shop/pods/catalog-55fdc8f5b7-2nmcj/logs",
+   "frames": []
   },
   {
-   "path": "/ws/namespaces/shop/pods/catalog-79b9cb9459-pk4sf/logs",
+   "path": "/ws/namespaces/shop/pods/catalog-55fdc8f5b7-2nmcj/logs",
    "frames": [
     {
-     "s": "{\"t\":\"error\",\"reason\":\"previous_unavailable\",\"msg\":\"unable to retrieve container logs for containerd://e32269ec7b67cb0d28ab7eed7961d8a86de0db1beb29cc3358f6974150cde7cb\"}\n"
+     "s": "{\"t\":\"line\",\"ts\":\"2026-11-25T11:13:50.617811457Z\",\"c\":\"catalog\",\"text\":\"catalog 3.4.1 starting\"}\n"
+    },
+    {
+     "s": "{\"t\":\"line\",\"ts\":\"2026-11-25T11:13:50.618121424Z\",\"c\":\"catalog\",\"text\":\"connecting to postgres:5432\"}\n"
+    },
+    {
+     "s": "{\"t\":\"line\",\"ts\":\"2026-11-25T11:13:52.619623742Z\",\"c\":\"catalog\",\"text\":\"error: dial tcp postgres:5432: connection refused\"}\n"
+    },
+    {
+     "s": "{\"t\":\"end\",\"reason\":\"previous_complete\"}\n"
     }
    ]
   }

@@ -7,7 +7,7 @@ description: "Send OpenConsole's audit events and request logs to Elasticsearch,
 
 With `LOG_FORMAT=ecs` (the manifest's setting) every line OpenConsole writes is one JSON object in Elastic Common
 Schema field names ([Logging](/operations/logging)). The files in
-[`deploy/elk`](https://github.com/vurulkan/kubernetes-openconsole/tree/v2.25.0/deploy/elk) turn those lines into
+[`deploy/elk`](https://github.com/vurulkan/kubernetes-openconsole/tree/v2.26.0/deploy/elk) turn those lines into
 two data streams with typed fields:
 
 | Data stream | What |
@@ -21,14 +21,14 @@ stays where it arrived.
 
 Requires Elasticsearch 8.8 or later. Every command and query on this page was run against Elasticsearch **8.15.3**
 and **9.1.0** with lines from OpenConsole 2.22.0. For 8.7, see
-[Elasticsearch 8.7 and older](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.25.0/deploy/elk/README.md#elasticsearch-87-and-older).
+[Elasticsearch 8.7 and older](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.26.0/deploy/elk/README.md#elasticsearch-87-and-older).
 
 ## 1. Install the pipeline and templates {#1-install-the-pipeline-and-templates}
 
 From a checkout of the code repository at the release you run:
 
 ```bash
-git clone --depth 1 --branch v2.25.0 https://github.com/vurulkan/kubernetes-openconsole.git
+git clone --depth 1 --branch v2.26.0 https://github.com/vurulkan/kubernetes-openconsole.git
 cd kubernetes-openconsole
 ES_URL=https://elasticsearch.example:9200 ES_API_KEY=<base64 id:key> deploy/elk/install.sh
 # or ES_USER=elastic ES_PASSWORD=…; ES_INSECURE=1 for a self-signed certificate
@@ -44,7 +44,7 @@ ok   PUT /_ingest/pipeline/logs-kubernetes.container_logs@custom
 The API key needs the `manage_index_templates` and `manage_pipeline` cluster privileges. The script is safe to run
 again, e.g. after an upgrade that adds fields. If `logs-kubernetes.container_logs@custom` already exists, the script
 leaves it alone and prints the one processor to add to it. Without shell access, send the same four requests from
-Kibana → Dev Tools ([Without install.sh](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.25.0/deploy/elk/README.md#without-installsh)).
+Kibana → Dev Tools ([Without install.sh](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.26.0/deploy/elk/README.md#without-installsh)).
 
 ## 2. Ship the lines {#2-ship-the-lines}
 
@@ -212,7 +212,7 @@ POST logs-openconsole.app-default/_rollover
 ```
 
 The release notes say when a release adds fields (2.22 added ten). Details:
-[deploy/elk/README.md](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.25.0/deploy/elk/README.md).
+[deploy/elk/README.md](https://github.com/vurulkan/kubernetes-openconsole/blob/v2.26.0/deploy/elk/README.md).
 
 ## Remove {#remove}
 

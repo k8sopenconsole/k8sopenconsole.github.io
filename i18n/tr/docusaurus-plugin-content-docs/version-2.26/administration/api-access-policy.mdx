@@ -1,0 +1,72 @@
+---
+title: "API erişim politikası"
+description: "Kullanıcıların API anahtarları yetkilerinin ne kadarını kullanabilir: rol modları, kullanıcıya özel ayar, süre politikası, tüm kullanıcıların anahtarları."
+---
+
+import Screenshot from '@site/src/components/Screenshot';
+
+# API erişim politikası
+
+**Yapmak istediğiniz:** script'lerin ve AI agent'larının kullanıcıların [API anahtarlarıyla](/user-guide/api-keys) neler
+yapabileceğine karar vermek ve tüm anahtarları tek yerde görmek.
+
+Bir anahtar, sahibinin yapabileceğinden fazlasını asla yapamaz. Bunun üstüne yönetici, kullanıcının yetkilerinin
+**ne kadarını** anahtarlarının kullanabileceğine karar verir.
+
+## Rol bazında {/* #per-role */}
+
+Yönetim → Roller → **API erişimi** (listede bir sütun, Rol İzinleri'nin üstünde de bir satır):
+
+| Mod | Anahtar bu rolün izinlerinden ne kullanabilir |
+|---|---|
+| **Kapalı** | hiçbirini |
+| **Güvenli salt okuma** (varsayılan; 2.22 öncesinden kalan roller için de) | `list`, `get`, `logs`; ConfigMap ve Secret yok; exec, edit, scale ve restart yok |
+| **Rolün tüm yetkileri** | rolün tüm izinlerini |
+
+Birden çok rol, her birinin modu uygulandıktan sonra toplanır: A rolü (`ns1`, tüm yetkiler) + B rolü (`ns2`, güvenli
+salt okuma) ile bir anahtar `ns1`'de exec yapabilir, `ns2`'de ise yalnızca okuyabilir.
+
+## Kullanıcı bazında {/* #per-user */}
+
+Yönetim → Kullanıcılar → Düzenle → **API erişimi** rollerin önüne geçer: **Rollere göre** (varsayılan), **Kapalı**,
+**Güvenli salt okuma** ya da **Tüm yetkileri** (kullanıcının web'de sahip olduğundan asla fazlası değil). Pencere,
+kullanıcının anahtarlarının nereye erişebileceğini önizler (`prod-eu/shop: read-only · staging/shop: read-only`), aktif
+anahtarlarını sayar ve **Tüm anahtarlarını iptal et** düğmesini sunar. Kullanıcılar listesi API erişimine göre
+filtrelenebilir (*API erişimi: hepsi*, *Rollere göre*, …).
+
+Yöneticiler her şeye sahip olduğu için rolleri hesaba katılmaz: bir yöneticinin anahtarları yalnızca bu kullanıcı
+ayarına uyar. **Admin API** anahtarı (yönetici anahtar oluştururken işaretlediği kutu) `/api/admin/*`'a erişir. Kullanıcı
+ayarı *Kapalı* ya da *Güvenli salt okuma* ise bu kutu işaretlenemez ve mevcut Admin API anahtarları yönetici erişimini
+kaybeder. Sahibi yönetici olmaktan çıktığı anda Admin API anahtarı da `/api/admin/*`'a erişemez.
+
+## Politika değişikliği ne yapar {/* #what-a-policy-change-does */}
+
+Hiçbir anahtarı değiştirmez. Politikanın kaldırdığı bir izin çalışmayı bırakır (403, neden `api_access_policy`),
+politika yeniden izin verdiğinde tekrar çalışır; kullanıcının anahtar listesinde *"N yetki şu an geçersiz"* yazar.
+Politika kullanıcının anahtarlarına hiçbir şey bırakmazsa, bu anahtarlarla yapılan her çağrı 403 `api_access_off`
+döner ve `api_key.use` `denied` olarak audit'e yazılır.
+
+Bir anahtarı düzenlerken politikanın dışında kalan hücreler üstü çizili olarak kalır: kullanıcı bunları kaldırabilir,
+ekleyemez. İşaretli **Admin API** kutusu da aynı şekilde kalır; işareti kaldırılırsa yeniden işaretlenemez.
+
+## Süre politikası {/* #expiry-policy */}
+
+Yönetim → Oturum → **API anahtarı süresi**: gün cinsinden **en uzun süre** (zorunlu, 1 ile 3650; 2.25 boş sınırı 365
+yaptı) ve **Süresiz anahtarlara izin ver**. Form sınırı aşan hazır seçenekleri gizler, takvimde sınırdan sonraki günlerin
+üstünü çizer, en geç tarihi söyler ve izin verilmiyorsa *Süresiz* seçeneğini gizler; sunucu da oluşturmayı ve yeniden
+üretmeyi kontrol eder (400). Sınırı
+düşürmek mevcut anahtarlara dokunmaz, böylece agent'lar habersiz kesilmez; bu anahtarları Yönetim → API anahtarları →
+*Süre politikası dışında* altında bulursunuz.
+
+## Tüm kullanıcıların anahtarları {/* #every-users-keys */}
+
+**Yönetim → API anahtarları**:
+
+<Screenshot id="admin-api-keys" alt="Yönetim → API anahtarları: alice'in ci-smoke-test ve claude-code anahtarları; önek, izinler, son kullanım ve bitiş; sahip, durum, exec içeren, Admin API ve süre politikası dışında filtreleri; CSV olarak dışa aktar" />
+
+Sahip, ad, önek (secret asla gösterilmez), izinler, son kullanım ve adres, bitiş ve durum. Sahibe, duruma, *Exec
+içeren*, *Admin API* ve *Süre politikası dışında* seçeneklerine göre filtreleyebilirsiniz. **İptal et** isteğe bağlı
+bir gerekçe alır (`by_admin`, `owner`, `comment` ile `api_key.revoke` olarak audit'e yazılır); **CSV olarak dışa
+aktar**. Yönetici başkasının anahtarını düzenleyemez. Bu ekranlar yalnızca web oturumuyla çalışır, anahtarla asla.
+
+API anahtarlarını herkes için kapatmanın yolu `FEATURE_API_KEYS=false`: sayfa kaybolur ve her anahtar 401 alır.
